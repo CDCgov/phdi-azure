@@ -6,14 +6,14 @@ on:
         description: "Environment to deploy to"
         type: environment
         required: true
-  pull_request:
-    branches:
-      - "**"
-    paths:
-      - "terraform/**"
-  push:
-    branches:
-      - main
+  # pull_request:
+  #   branches:
+  #     - "**"
+  #   paths:
+  #     - "terraform/**"
+  # push:
+  #   branches:
+  #     - main
 
 env:
   TEST_RUNNER_TERRAFORM_VERSION: 1.2.5
@@ -84,7 +84,7 @@ jobs:
         env:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           REGION: ${{ secrets.REGION }}
-          ZONE: ${{ secrets.ZONE }}          
+          ZONE: ${{ secrets.ZONE }}
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
         run: |
