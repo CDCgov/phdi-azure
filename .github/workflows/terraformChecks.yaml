@@ -1,0 +1,115 @@
+name: Terraform checks
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        type: environment
+        required: true
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - "terraform/**"
+  push:
+    branches:
+      - main
+
+env:
+  TEST_RUNNER_TERRAFORM_VERSION: 1.2.5
+
+jobs:
+  check-terraform-formatting:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{env.TEST_RUNNER_TERRAFORM_VERSION}}
+      - name: Check format
+        run: terraform fmt -check -recursive
+  check-terraform-validity:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+    env:
+      TERRAFORM_DIRS: |
+        setup implementation
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.4
+      - name: Terraform Init
+        run: |
+          for d in $TERRAFORM_DIRS
+          do
+            echo "Initializing $d";
+            (cd $d && terraform init -backend=false)
+          done
+      - name: Terraform Validate
+        run: |
+          for d in $TERRAFORM_DIRS
+          do
+            echo "Validating $d";
+            (cd $d && terraform validate)
+          done
+  check-terraform-plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform/implementation
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.4
+
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_ID }}
+
+      - name: Load input variables
+        env:
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          REGION: ${{ secrets.REGION }}
+          ZONE: ${{ secrets.ZONE }}          
+          SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
+          SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
+        run: |
+          echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
+          echo region=\""$REGION"\" >> terraform.tfvars
+          echo zone=\""$ZONE"\" >> terraform.tfvars
+          echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
+          echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
+          echo bucket=\"phdi-tfstate-"$PROJECT_ID"\" >> backend.tfvars
+
+      - name: Set environment
+        run: |-
+          echo "ENVIRONMENT=$(
+          if "${{ github.event.inputs.environment }}"; then
+            echo ${{ github.event.inputs.environment }}
+          else
+            echo dev
+          fi
+          )" >> $GITHUB_ENV
+
+      - name: terraform init
+        run: terraform init -backend-config=backend.tfvars
+
+      - name: terraform workspace
+        run: terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
+
+      - name: terraform plan
+        run: terraform plan

@@ -1,0 +1,42 @@
+name: Terraform Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup_environment:
+    name: Setup a new GCP environment by creating a tfstate bucket
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform/setup
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_ID }}
+
+      - name: Load input variables
+        env:
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          REGION: ${{ secrets.REGION }}
+          ZONE: ${{ secrets.ZONE }}
+        run: |
+          echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
+          echo region=\""$REGION"\" >> terraform.tfvars
+          echo zone=\""$ZONE"\" >> terraform.tfvars
+
+      - name: terraform init
+        run: terraform init
+
+      - name: terraform apply
+        run: terraform apply -auto-approve -lock-timeout=30m

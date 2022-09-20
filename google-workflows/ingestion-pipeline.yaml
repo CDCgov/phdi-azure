@@ -1,0 +1,97 @@
+main:
+  params:
+    - event
+  steps:
+    - decode_pubsub_message:
+        assign:
+          - base64: $${base64.decode(event.data.message.data)}
+          - message: $${json.decode(base64)}
+          - input_data: $${message.message}
+          - input_type: $${message.message_type}
+          - root_template: $${message.root_template}
+    - convert_to_fhir:
+        try:
+          call: http.post
+          args:
+            url: ${fhir_converter_url}/convert-to-fhir
+            auth:
+              type: OIDC
+            body:
+              input_data: $${input_data}
+              input_type: $${input_type}
+              root_template: $${root_template}
+          result: fhir_converter_response
+        except:
+          as: error
+          steps:
+            - upload_failed_fhir_conversion:
+                call: http.post
+                args:
+                  url: ${failed_fhir_conversion_url}
+                  auth:
+                    type: OIDC
+                  body: $${error.body}
+                next: end
+    - standardize_name:
+        call: http.post
+        args:
+          url: ${standardize_names_url}
+          auth:
+            type: OIDC
+          body: $${fhir_converter_response.body.FhirResource}
+          headers:
+            Content-Type: "application/json"
+        result: standardize_names_response
+    - standardize_phone:
+        call: http.post
+        args:
+          url: ${standardize_phones_url}
+          auth:
+            type: OIDC
+          body: $${standardize_names_response.body}
+          headers:
+            Content-Type: "application/json"
+        result: standardize_phones_response
+    - geocode_patients:
+        call: http.post
+        args:
+          url: ${geocode_patients_url}
+          auth:
+            type: OIDC
+          body: $${standardize_phones_response.body}
+          headers:
+            Content-Type: "application/json"
+        result: geocode_patients_response
+    - add_patient_hash:
+        call: http.post
+        args:
+          url: ${add_patient_hash_url}
+          auth:
+            type: OIDC
+          body: $${geocode_patients_response.body}
+          headers:
+            Content-Type: "application/json"
+        result: add_patient_hash_response
+    - upload_fhir_bundle:
+        try:
+          call: http.post
+          args:
+            url: ${upload_fhir_bundle_url}
+            auth:
+              type: OIDC
+            body:
+              bundle: $${add_patient_hash_response.body}
+              dataset_id: "phdi-dev-dataset-phdi-357418"
+              location: "us-west1"
+              fhir_store_id: "phdi-dev-fhirstore"
+            headers:
+              Content-Type: "application/json"
+          result: upload_fhir_bundle_response
+        except:
+          as: error
+          call: http.post
+          args:
+            url: ${failed_fhir_upload_url}
+            auth:
+              type: OIDC
+            body: $${error.body}
