@@ -8,15 +8,33 @@
 #
 ###########################################################################################
 
-provider "google" {
-  project = var.project_id
-  region  = var.region
-  zone    = var.zone
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=3.23.0"
+    }
+  }
 }
 
-resource "google_storage_bucket" "tfstate" {
-  name          = "phdi-tfstate-${var.project_id}"
-  force_destroy = true
-  location      = "US"
-  storage_class = "MULTI_REGIONAL"
+provider "azurerm" {
+  features {}
+  subscription_id            = var.subscription_id
+}
+
+resource "azurerm_resource_group" "tfstate" {
+  name     = "phdi-tfstate-${var.subscription_id}"
+  location = "Central US"
+}
+
+resource "azurerm_storage_account" "tfstate" {
+  name                     = "phdi-tfstate-${var.subscription_id}"
+  resource_group_name      = azurerm_resource_group.tfstate.name
+  location                 = azurerm_resource_group.tfstate.location
+  account_tier             = "Standard"
+  account_kind             = "StorageV2"
+  account_replication_type = "GRS"
+
+  lifecycle {
+    prevent_destroy = true
 }

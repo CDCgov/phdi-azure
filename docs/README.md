@@ -1,6 +1,6 @@
-# Public Health Data Infrastructure Google Cloud
+# Public Health Data Infrastructure Azure
 
-- [Public Health Data Infrastructure Google Cloud](#public-health-data-infrastructure-google-cloud)
+- [Public Health Data Infrastructure Azure](#public-health-data-infrastructure-google-cloud)
   - [Overview](#overview)
     - [Quick Start](#quick-start)
     - [Structure and Organizations](#structure-and-organization)
@@ -23,11 +23,11 @@
 
 ## Overview
 
-The Public Health Data Infrastructure (PHDI) projects are part of the Pandemic-Ready Interoperability Modernization Effort (PRIME), a multi-year collaboration between CDC and the U.S. Digital Service (USDS) to strengthen data quality and information technology systems in state and local health departments. Under the PRIME umberalla the PHDI project seeks to develop tools, often reffered to as Building Blocks, that State, Tribal, Local, and Territorial public health agencies (STLTs) can use to better handle the public health data they recieve. The purpose of this repository is to implement the Building Blocks devloped from the [PHDI SDK](https://github.com/CDCgov/phdi-sdk) on Google Cloud Platform (GCP). This will allow users to easily begin using these Building Blocks in their own GCP environment. For more information on using this repository beyond what is contained in this document please refer to our [Getting Started](getting_started.md) doc.
+The Public Health Data Infrastructure (PHDI) projects are part of the Pandemic-Ready Interoperability Modernization Effort (PRIME), a multi-year collaboration between CDC and the U.S. Digital Service (USDS) to strengthen data quality and information technology systems in state and local health departments. Under the PRIME umberalla the PHDI project seeks to develop tools, often reffered to as Building Blocks, that State, Tribal, Local, and Territorial public health agencies (STLTs) can use to better handle the public health data they recieve. The purpose of this repository is to implement the Building Blocks devloped from the [PHDI SDK](https://github.com/CDCgov/phdi) on Azure. This will allow users to easily begin using these Building Blocks in their own Azure environment. For more information on using this repository beyond what is contained in this document please refer to our [Getting Started](getting_started.md) doc.
 
 ### Quick Start
 
-To deploy this pipeline to your own Google Cloud environment, follow these steps.
+To deploy this pipeline to your own Azure environment, follow these steps.
   
   Be sure to replace all instances of `myuser` in GitHub URLs with your user or organization name.
   1. [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install-sdk)
@@ -52,7 +52,7 @@ To deploy this pipeline to your own Google Cloud environment, follow these steps
   https://github.com/myuser/phdi-google-cloud/settings/environments/new
   1. Deploy to your newly created `dev` environment by running the GitHub Action at this URL, selecting `dev` as the environment input:  
   https://github.com/myuser/phdi-google-cloud/actions/workflows/deployment.yaml
-  1. Success! You should now see resources in your GCP project ready for data ingestion.
+  1. Success! You should now see resources in your Azure project ready for data ingestion.
 
 ### Structure and Organization
 
@@ -60,7 +60,7 @@ There are primarily four major components to this repository.
 
 #### Serverless Functions
 
-The PHDI Building Blocks are implemented as Google Cloud Functions. Google Cloud Functions are GCP's version of serverless functions, similar to Lamabda in Amazon Web Services (AWS) and Azure Functions in Mircosoft Azure. Severless function provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. Since they are serverless, GCP abstracts all aspects of the underlying infrastructure allowing us to simply write and excute our Building Blocks without worrying about the computers they run on. The `cloud-functions` directory contains Python source code for Google Cloud Functions that implement Building Blocks from the PHDI SDK.
+The PHDI Building Blocks are implemented as Azure Functions. Azure Functions are Azure's version of serverless functions, similar to Lamabda in Amazon Web Services (AWS) and Azure Functions in Mircosoft Azure. Severless function provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. Since they are serverless, Azure abstracts all aspects of the underlying infrastructure allowing us to simply write and excute our Building Blocks without worrying about the computers they run on. The `cloud-functions` directory contains Python source code for Azure Functions that implement Building Blocks from the PHDI SDK.
 
 #### Pipeline Orchestration
 
@@ -68,11 +68,11 @@ Since the Building Blocks are designed to be composable users may want to chain 
 
 #### Infrastructure as Code
 
-Every resource required to use the Building Blocks and pipelines implemented in this respostory are defined using Terraform. This makes it simple for users to deploy all of the functionality provided in this repository to their own GCP environments. The Terraform code can be found in the `terraform` directory.
+Every resource required to use the Building Blocks and pipelines implemented in this respostory are defined using Terraform. This makes it simple for users to deploy all of the functionality provided in this repository to their own Azure environments. The Terraform code can be found in the `terraform` directory.
 
 #### Continuous Integration and Continuous Deployment
 
-In order to ensure high code quality and reliability we have implemented a Continuous Integation (CI) pipeline consisting of a suite of tests all new contributions must pass before they are merged into `main`. We have also built a Continuous Deployment (CD) pipeline that automatically deploys the code in the repositiory to linked GCP environments when changes are made. The combined CI/CD pipeline is implemented with GitHub Actions in the `.github` directory. 
+In order to ensure high code quality and reliability we have implemented a Continuous Integation (CI) pipeline consisting of a suite of tests all new contributions must pass before they are merged into `main`. We have also built a Continuous Deployment (CD) pipeline that automatically deploys the code in the repositiory to linked Azure environments when changes are made. The combined CI/CD pipeline is implemented with GitHub Actions in the `.github` directory. 
 
 ### Target Users
 
@@ -84,7 +84,7 @@ Target users of this system include:
   - IT teams who have to support epidemiologists and external stakeholders integrating with the PHD
   - PHDs may include state, county, city, and tribal organizations
 - CDC
-  - Employees and contractors working on CDC projects with access to a GCP environment and interest in using PHDI Building Blocks
+  - Employees and contractors working on CDC projects with access to a Azure environment and interest in using PHDI Building Blocks
 
 
 ## Access Request, Repo Creation Request
