@@ -67,3 +67,4 @@ terraform.tfstate.d
 terraform.tfstate.backup
 *.tfvars
 .vscode/settings.json
+credentials.json
