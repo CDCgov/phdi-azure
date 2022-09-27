@@ -3,6 +3,9 @@ name: Terraform Setup
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
 jobs:
   setup_environment:
     name: Setup a new Azure environment by creating a tfstate bucket
@@ -12,9 +15,6 @@ jobs:
       run:
         shell: bash
         working-directory: ./terraform/setup
-    permissions:
-      contents: "read"
-      id-token: "write"
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
