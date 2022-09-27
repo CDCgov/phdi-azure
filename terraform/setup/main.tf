@@ -18,8 +18,8 @@ terraform {
 }
 
 provider "azurerm" {
+  use_oidc = true
   features {}
-  subscription_id = var.subscription_id
 }
 
 resource "azurerm_storage_account" "tfstate" {

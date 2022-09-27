@@ -47,8 +47,6 @@ jobs:
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
-          echo subscription_id=\""$SUBSCRIPTION_ID"\" >> backend.tfvars
-          echo tenant_id=\""$TENANT_ID"\" >> backend.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phdi-tfstate-"$SUBSCRIPTION_ID"\" >> backend.tfvars
 
@@ -62,11 +60,12 @@ jobs:
           fi
           )" >> $GITHUB_ENV
 
-      - name: terraform init
-        run: terraform init -backend-config=backend.tfvars
-
-      - name: terraform workspace
-        run: terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-
-      - name: terraform apply
-        run: terraform apply -auto-approve -lock-timeout=30m
+      - name: terraform
+        env:
+          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        run: |
+          terraform init -backend-config=backend.tfvars
+          terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
+          terraform apply -auto-approve -lock-timeout=30m
