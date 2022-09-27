@@ -26,30 +26,30 @@ jobs:
       - name: Check Out Changes
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v0"
+      - name: "Azure login"
+        uses: azure/login@v1
         with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_ID }}
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
       - name: Load input variables
         env:
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          REGION: ${{ secrets.REGION }}
-          ZONE: ${{ secrets.ZONE }}
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          LOCATION: ${{ secrets.LOCATION }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
         run: |
-          echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
-          echo region=\""$REGION"\" >> terraform.tfvars
-          echo zone=\""$ZONE"\" >> terraform.tfvars
+          echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
+          echo location=\""$LOCATION"\" >> terraform.tfvars
+          echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
-          echo bucket=\"phdi-tfstate-"$PROJECT_ID"\" >> backend.tfvars
+          echo subscription_id=\""$SUBSCRIPTION_ID"\" >> backend.tfvars
+          echo tenant_id=\""$TENANT_ID"\" >> backend.tfvars
+          echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
+          echo storage_account_name=\"phdi-tfstate-"$SUBSCRIPTION_ID"\" >> backend.tfvars
 
       - name: Set environment
         run: |-
@@ -66,21 +66,6 @@ jobs:
 
       - name: terraform workspace
         run: terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
-
-      - name: Create artifact registry
-        run: terraform apply -target="module.artifact-registries" -auto-approve -lock-timeout=30m
-
-      - name: Log in to artifact registry with docker
-        run: gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev
-
-      - name: Build and push FHIR Converter
-        uses: docker/build-push-action@v3
-        with:
-          context: ./cloud-run/fhir-converter
-          push: true
-          tags: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/fhir-converter:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: terraform apply
         run: terraform apply -auto-approve -lock-timeout=30m
