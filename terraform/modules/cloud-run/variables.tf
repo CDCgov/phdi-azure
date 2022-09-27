@@ -1,11 +1,11 @@
 variable "region" {
   type        = string
-  description = "The GCP region to deploy to"
+  description = "The Azure region to deploy to"
 }
 
 variable "project_id" {
   type        = string
-  description = "value of the GCP project ID to use"
+  description = "value of the Azure project ID to use"
 }
 
 variable "workflow_service_account_email" {

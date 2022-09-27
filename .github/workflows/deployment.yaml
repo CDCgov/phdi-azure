@@ -13,8 +13,9 @@ on:
 
 jobs:
   deployment:
-    name: Deploy to GCP
+    name: Deploy to Azure
     runs-on: ubuntu-latest
+    environment: main
     defaults:
       run:
         shell: bash
@@ -53,7 +54,7 @@ jobs:
 
       - name: Set environment
         run: |-
-          echo "ENVIRONMENT=$(
+          echo "TF_ENVIRONMENT=$(
           if "${{ github.event.inputs.environment }}"; then
             echo ${{ github.event.inputs.environment }}
           else
@@ -65,7 +66,7 @@ jobs:
         run: terraform init -backend-config=backend.tfvars
 
       - name: terraform workspace
-        run: terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
+        run: terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
 
       - name: terraform apply
         run: terraform apply -auto-approve -lock-timeout=30m

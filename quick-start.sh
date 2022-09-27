@@ -109,7 +109,7 @@ cat << EOF > credentials.json
 {
   "name": "$APP_REG_NAME",
   "issuer": "https://token.actions.githubusercontent.com/",
-  "subject": "repo:$GITHUB_REPO:ref:refs/heads/main",
+  "subject": "repo:$GITHUB_REPO:environment:main",
   "description": "GitHub Actions",
   "audiences": ["api://AzureADTokenExchange"]
 }

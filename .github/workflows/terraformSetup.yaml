@@ -5,8 +5,9 @@ on:
 
 jobs:
   setup_environment:
-    name: Setup a new GCP environment by creating a tfstate bucket
+    name: Setup a new Azure environment by creating a tfstate bucket
     runs-on: ubuntu-latest
+    environment: main
     defaults:
       run:
         shell: bash

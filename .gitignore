@@ -56,7 +56,7 @@ data/
 
 .DS_Store
 
-# GCP Application Creds
+# Azure Application Creds
 appcreds.json
 # Terraform
 .terraform
