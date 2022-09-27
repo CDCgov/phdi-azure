@@ -15,7 +15,7 @@ print_variables() {
   echo "TENANT_ID: ${TENANT_ID}"
   echo "SUBSCRIPTION_ID: ${SUBSCRIPTION_ID}"
   echo "CLIENT_ID: ${CLIENT_ID}"
-  echo "RESOURCE_GROUP_ID: ${RESOURCE_GROUP_ID}"
+  echo "RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}"
   echo "LOCATION: ${LOCATION}"
   echo "SMARTY_AUTH_ID: Your Smarty Streets App Authorization ID"
   echo "SMARTY_AUTH_TOKEN: Your Smarty Streets App Authorization Token"
@@ -51,7 +51,7 @@ set_variables() {
   gh secret -R "${GITHUB_REPO}" set TENANT_ID --body "${TENANT_ID}"
   gh secret -R "${GITHUB_REPO}" set SUBSCRIPTION_ID --body "${SUBSCRIPTION_ID}"
   gh secret -R "${GITHUB_REPO}" set CLIENT_ID --body "${CLIENT_ID}"
-  gh secret -R "${GITHUB_REPO}" set RESOURCE_GROUP_ID --body "${RESOURCE_GROUP_ID}"
+  gh secret -R "${GITHUB_REPO}" set RESOURCE_GROUP_NAME --body "${RESOURCE_GROUP_NAME}"
   gh secret -R "${GITHUB_REPO}" set LOCATION --body "${LOCATION}"
   gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
   gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
@@ -97,7 +97,7 @@ if [ -z "$RESOURCE_GROUP_ID" ]; then
     exit 1
 fi
 
-# Set the current resource group to the RESOURCE_GROUP_ID specified above
+# Set the current resource group to the RESOURCE_GROUP_NAME specified above
 az config set defaults.group="${RESOURCE_GROUP_NAME}"
 
 # Define app registration name, get client ID.

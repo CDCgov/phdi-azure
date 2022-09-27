@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "testbucket" {
-  name                     = "testbucketPHDI${substr(var.subscription_id, 0, 8)}"
+  name                     = "phditestbucket${substr(var.subscription_id, 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
