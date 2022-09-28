@@ -34,3 +34,8 @@ resource "azurerm_storage_account" "tfstate" {
     prevent_destroy = true
   }
 }
+
+resource "azurerm_storage_container" "tfstate" {
+  name                 = "tfstate"
+  storage_account_name = azurerm_storage_account.tfstate.name
+}
