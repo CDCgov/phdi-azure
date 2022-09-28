@@ -3,40 +3,44 @@ name: Terraform Setup
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
 jobs:
   setup_environment:
-    name: Setup a new GCP environment by creating a tfstate bucket
+    name: Setup a new Azure environment by creating a tfstate bucket
     runs-on: ubuntu-latest
+    environment: main
     defaults:
       run:
         shell: bash
         working-directory: ./terraform/setup
-    permissions:
-      contents: "read"
-      id-token: "write"
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
 
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v0"
+      - name: "Azure login"
+        uses: azure/login@v1
         with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_ID }}
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
       - name: Load input variables
         env:
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          REGION: ${{ secrets.REGION }}
-          ZONE: ${{ secrets.ZONE }}
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          LOCATION: ${{ secrets.LOCATION }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
         run: |
-          echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
-          echo region=\""$REGION"\" >> terraform.tfvars
-          echo zone=\""$ZONE"\" >> terraform.tfvars
+          echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
+          echo location=\""$LOCATION"\" >> terraform.tfvars
+          echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
 
-      - name: terraform init
-        run: terraform init
-
-      - name: terraform apply
-        run: terraform apply -auto-approve -lock-timeout=30m
+      - name: terraform
+        env:
+          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        run: |
+          terraform init
+          terraform apply -auto-approve -lock-timeout=30m

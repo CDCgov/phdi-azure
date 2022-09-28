@@ -1,4 +1,4 @@
 variable "region" {
-  description = "value of the GCP region to deploy to"
+  description = "value of the Azure region to deploy to"
   default     = "us-east1"
 }

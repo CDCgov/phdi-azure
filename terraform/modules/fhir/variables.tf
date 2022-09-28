@@ -12,10 +12,10 @@ variable "fhir_version" {
 
 variable "region" {
   type        = string
-  description = "The GCP region to deploy to"
+  description = "The Azure region to deploy to"
   default     = "us-east1"
 }
 
 variable "project_id" {
-  description = "value of the GCP project ID to use"
+  description = "value of the Azure project ID to use"
 }

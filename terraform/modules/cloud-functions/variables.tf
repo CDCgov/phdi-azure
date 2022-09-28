@@ -1,5 +1,5 @@
 variable "project_id" {
-  description = "value of the GCP project ID to use"
+  description = "value of the Azure project ID to use"
 }
 
 variable "functions_storage_bucket" {

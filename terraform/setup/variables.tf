@@ -7,7 +7,6 @@ variable "location" {
   default     = "Central US"
 }
 
-variable "zone" {
-  description = "value of the Azure zone to deploy to"
-  default     = "Zone 1"
+variable "resource_group_name" {
+  description = "value of the Azure resource group to deploy to"
 }

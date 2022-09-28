@@ -1,6 +1,6 @@
 # Public Health Data Infrastructure Azure
 
-- [Public Health Data Infrastructure Azure](#public-health-data-infrastructure-google-cloud)
+- [Public Health Data Infrastructure Azure](#public-health-data-infrastructure-azure)
   - [Overview](#overview)
     - [Quick Start](#quick-start)
     - [Structure and Organizations](#structure-and-organization)
@@ -30,28 +30,28 @@ The Public Health Data Infrastructure (PHDI) projects are part of the Pandemic-R
 To deploy this pipeline to your own Azure environment, follow these steps.
   
   Be sure to replace all instances of `myuser` in GitHub URLs with your user or organization name.
-  1. [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install-sdk)
+  1. [Install the az CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
   1. [Install the GitHub CLI](https://cli.github.com/manual/installation) (optional)
-  1. [Fork this repository](https://github.com/myuser/phdi-google-cloud/fork) into your personal or organization account
+  1. [Fork this repository](https://github.com/myuser/phdi-azure/fork) into your personal or organization account
   1. Clone your newly forked repository to your local machine by running:
 
-         git clone https://github.com/myuser/phdi-google-cloud.git
+         git clone https://github.com/myuser/phdi-azure.git
 
   1. Navigate to the new repository directory with:
 
-         cd phdi-google-cloud
+         cd phdi-azure
 
   1. Authenticate the gcloud CLI by running:
 
          ./quick-start.sh
 
-  1. Follow [these steps](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) to set the secrets output by the previous step in your repository.
-  1. Setup a storage bucket for Terraform state by running the GitHub Action at this URL:  
-  https://github.com/myuser/phdi-google-cloud/actions/workflows/terraformSetup.yaml
+  1. If you did not install the GitHub CLI, follow [these steps](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) to set the secrets output by the previous step in your repository.
+  1. Setup a storage account for Terraform state by running the GitHub Action at this URL:  
+  https://github.com/myuser/phdi-azure/actions/workflows/terraformSetup.yaml
   1. Create an environment named `dev` in your repository at this URL:  
-  https://github.com/myuser/phdi-google-cloud/settings/environments/new
+  https://github.com/myuser/phdi-azure/settings/environments/new
   1. Deploy to your newly created `dev` environment by running the GitHub Action at this URL, selecting `dev` as the environment input:  
-  https://github.com/myuser/phdi-google-cloud/actions/workflows/deployment.yaml
+  https://github.com/myuser/phdi-azure/actions/workflows/deployment.yaml
   1. Success! You should now see resources in your Azure project ready for data ingestion.
 
 ### Structure and Organization
@@ -60,7 +60,7 @@ There are primarily four major components to this repository.
 
 #### Serverless Functions
 
-The PHDI Building Blocks are implemented as Azure Functions. Azure Functions are Azure's version of serverless functions, similar to Lamabda in Amazon Web Services (AWS) and Azure Functions in Mircosoft Azure. Severless function provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. Since they are serverless, Azure abstracts all aspects of the underlying infrastructure allowing us to simply write and excute our Building Blocks without worrying about the computers they run on. The `cloud-functions` directory contains Python source code for Azure Functions that implement Building Blocks from the PHDI SDK.
+The PHDI Building Blocks are implemented as Azure Function Apps. Azure Function Apps are Azure's version of serverless functions, similar to Lambda in Amazon Web Services (AWS) and Azure Function Apps in Mircosoft Azure. Severless function provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. Since they are serverless, Azure abstracts all aspects of the underlying infrastructure allowing us to simply write and excute our Building Blocks without worrying about the computers they run on. The `cloud-functions` directory contains Python source code for Azure Function Apps that implement Building Blocks from the PHDI SDK.
 
 #### Pipeline Orchestration
 

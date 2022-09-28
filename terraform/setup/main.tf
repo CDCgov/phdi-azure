@@ -18,23 +18,24 @@ terraform {
 }
 
 provider "azurerm" {
+  use_oidc = true
   features {}
-  subscription_id            = var.subscription_id
-}
-
-resource "azurerm_resource_group" "tfstate" {
-  name     = "phdi-tfstate-${var.subscription_id}"
-  location = "Central US"
 }
 
 resource "azurerm_storage_account" "tfstate" {
-  name                     = "phdi-tfstate-${var.subscription_id}"
-  resource_group_name      = azurerm_resource_group.tfstate.name
-  location                 = azurerm_resource_group.tfstate.location
+  name                     = "phditfstate${substr(var.subscription_id, 0, 8)}"
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
   account_tier             = "Standard"
   account_kind             = "StorageV2"
   account_replication_type = "GRS"
 
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+resource "azurerm_storage_container" "tfstate" {
+  name                 = "tfstate"
+  storage_account_name = azurerm_storage_account.tfstate.name
 }

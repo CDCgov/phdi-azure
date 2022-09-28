@@ -1,10 +1,10 @@
 variable "project_id" {
   type        = string
-  description = "value of the GCP project ID to use"
+  description = "value of the Azure project ID to use"
 }
 
 variable "region" {
-  description = "GCP region to deploy to"
+  description = "Azure region to deploy to"
   default     = "us-east1"
 }
 
