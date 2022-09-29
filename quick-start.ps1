@@ -66,16 +66,16 @@ Write-Host "We need some info from you to get started."
 Write-Host "After entering the info, a browser window will open for you to authenticate with Azure."
 Write-Host ""
 
-while ($null -eq $PROJECT_NAME) {
+while ($null -eq $RESOURCE_GROUP_NAME) {
     $yn = Read-Host "Do you already have a Resource Group in Azure? (y/n)"
     Switch ($yn) {
         { @("y", "Y") -eq $_ } {
-            $PROJECT_NAME = Read-Host "Please enter the name of the existing Resource Group."
-            $NEW_PROJECT = $false
+            $RESOURCE_GROUP_NAME = Read-Host "Please enter the name of the existing Resource Group."
+            $NEW_RESOURCE_GROUP = $false
         }
         { @("n", "N") -eq $_ } {
-            $PROJECT_NAME = Read-Host "Please enter a name for a new Resource Group."
-            $NEW_PROJECT = $true
+            $RESOURCE_GROUP_NAME = Read-Host "Please enter a name for a new Resource Group."
+            $NEW_RESOURCE_GROUP = $true
         }
         default { "Please enter y or n." }
     }
@@ -96,10 +96,10 @@ $SUBSCRIPTION_ID = (az account show --query "id" -o tsv)
 
 # Create a project if needed and get the project ID
 if ($NEW_RESOURCE_GROUP) {
-    az group create --name "$RESOURCE_GROUP_NAME" --location "$LOCATION"
+    az group create --location "$LOCATION" --resource-group "$RESOURCE_GROUP_NAME"
 }
 
-$RESOURCE_GROUP_ID = (az group show --name "${RESOURCE_GROUP_NAME}" --query "id" -o tsv)
+$RESOURCE_GROUP_ID = (az group show --resource-group "${RESOURCE_GROUP_NAME}" --query "id" -o tsv)
 if ([string]::IsNullOrEmpty($RESOURCE_GROUP_ID)) {
     Write-Host "Error: Resource Group ID not found. To list resource groups, run 'az group list'."
     Exit 1
@@ -109,7 +109,7 @@ if ([string]::IsNullOrEmpty($RESOURCE_GROUP_ID)) {
 az config set defaults.group="${RESOURCE_GROUP_NAME}"
 
 # Define app registration name, get client ID.
-$APP_REG_NAME = github
+$APP_REG_NAME = "github"
 $CLIENT_ID = (az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
 
 # Create service principal and grant access to subscription
@@ -126,9 +126,6 @@ Write-Host @"
 }
 "@ > credentials.json
 az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
-
-echo "Workload Identity Federation setup complete!"
-echo
 
 Write-Host "Workload Identity Federation setup complete!"
 Write-Host ""
