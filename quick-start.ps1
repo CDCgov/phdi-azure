@@ -116,7 +116,7 @@ $CLIENT_ID = (az ad app create --display-name $APP_REG_NAME --query appId --outp
 az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role contributor --name $APP_REG_NAME
 
 # Create federated credential
-Write-Host @"
+$CREDENTIALS = @"
 {
   "name": "$APP_REG_NAME",
   "issuer": "https://token.actions.githubusercontent.com",
@@ -124,7 +124,8 @@ Write-Host @"
   "description": "GitHub Actions",
   "audiences": ["api://AzureADTokenExchange"]
 }
-"@ > credentials.json
+"@ 
+Write-Host "$CREDENTIALS" > credentials.json
 az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
 
 Write-Host "Workload Identity Federation setup complete!"
