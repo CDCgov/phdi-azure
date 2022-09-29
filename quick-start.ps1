@@ -124,8 +124,7 @@ $CREDENTIALS = @"
   "description": "GitHub Actions",
   "audiences": ["api://AzureADTokenExchange"]
 }
-"@ 
-Write-Host "$CREDENTIALS" > credentials.json
+"@ | Out-File -FilePath credentials.json
 az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
 
 Write-Host "Workload Identity Federation setup complete!"
