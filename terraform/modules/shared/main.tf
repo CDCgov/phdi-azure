@@ -22,8 +22,8 @@ resource "azurerm_storage_container" "phi" {
 
 resource "azurerm_servicebus_namespace" "ingestion" {
   name                = "phdi-${terraform.workspace}-ingestion"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
   sku                 = "Standard"
 }
 
@@ -37,7 +37,7 @@ resource "azurerm_servicebus_topic" "ingestion" {
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
-  name                       = "phdi_key_vault"
+  name                       = "phdi-key-vault"
   location                   = var.location
   resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id

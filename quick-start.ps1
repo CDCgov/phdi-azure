@@ -125,6 +125,12 @@ $CREDENTIALS = @"
   "audiences": ["api://AzureADTokenExchange"]
 }
 "@ | Out-File -FilePath credentials.json
+
+do {
+    $APP = (az ad app show --id $CLIENT_ID) | out-null
+    Start-Sleep -Seconds 5
+} while ($null -eq $APP)
+
 az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
 
 Write-Host "Workload Identity Federation setup complete!"
