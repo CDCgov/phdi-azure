@@ -117,6 +117,12 @@ cat << EOF > credentials.json
   "audiences": ["api://AzureADTokenExchange"]
 }
 EOF
+
+until az ad app show --id $CLIENT_ID &> /dev/null; do
+  echo "Waiting for app to be created..."
+  sleep 5
+done
+
 az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
 
 echo "Workload Identity Federation setup complete!"
