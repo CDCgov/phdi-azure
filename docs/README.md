@@ -43,10 +43,12 @@ To deploy this pipeline to your own Azure environment, follow these steps.
 
   1. Authenticate the Azure cloud CLI by running:
        
-       for Unix based systems    
+      for Unix based systems
+
          ./quick-start.sh
 
-       for Windows based systems
+      for Windows based systems
+      
          quick-start.ps1
 
   1. If you did not install the GitHub CLI, follow [these steps](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) to set the secrets output by the previous step in your repository.
