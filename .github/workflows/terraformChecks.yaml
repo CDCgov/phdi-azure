@@ -50,6 +50,7 @@ jobs:
           done
   check-terraform-plan:
     runs-on: ubuntu-latest
+    environment: main
     defaults:
       run:
         working-directory: ./terraform/implementation
