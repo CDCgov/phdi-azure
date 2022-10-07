@@ -25,7 +25,7 @@
 This document provides a detailed guide for implementing the PHDI pipelines provided in this repository.
 
 ### What is PHDI?
-The Public Health Data Infrastructure (PHDI) project is part of the Pandemic-Ready Interoperability Modernization Effort (PRIME), a multi-year collaboration between CDC and the U.S. Digital Service (USDS) to strengthen data quality and information technology systems in state and local health departments. Under the PRIME umbrella the PHDI project seeks to develop tools, often referred to as Building Blocks, that State, Tribal, Local, and Territorial public health agencies (STLTs) can use to better handle the public health data they receive. The purpose of this repository is to implement the Building Blocks provided in the [PHDI library](https://github.com/CDCgov/phdi-sdk) on Azure. This will allow users to start using these Building Blocks easily in their own Azure environment.
+The Public Health Data Infrastructure (PHDI) project is part of the Pandemic-Ready Interoperability Modernization Effort (PRIME), a multi-year collaboration between CDC and the U.S. Digital Service (USDS) to strengthen data quality and information technology systems in state and local health departments. Under the PRIME umbrella the PHDI project seeks to develop tools, often referred to as Building Blocks, that State, Tribal, Local, and Territorial public health agencies (STLTs) can use to better handle the public health data they receive. The purpose of this repository is to implement the Building Blocks provided in the [PHDI library](https://github.com/CDCgov/phdi) on Azure. This will allow users to start using these Building Blocks easily in their own Azure environment.
 
 ### What are Building Blocks?
 PHDI's goal is to provide STLTs with modern tools to solve challenges working with public health data. We refer to each of these tools as a "Building Block". Some Building Blocks offer relatively simple functionality, like standardizing patient names, while others perform more complex tasks, including geocoding and standardizing addresses. Importantly, the Building Blocks have been carefully designed with common inputs and outputs making them easily composable.  
@@ -63,7 +63,7 @@ or
 
 If you do not meet either of these criteria contact the owner of your organization's Azure environment.
 
-### Step 2: Install the Gcloud and GitHub CLI tools
+### Step 2: Install the Azure and GitHub CLI tools
 The az CLI is a command line tool provided by Microsoft for working with Azure. We will use it to authenticate your local machine with your organization's Azure environment. Follow [this guide](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) to install `az`. Confirm that the installation was successful by running `az --version`. If `az` is installed properly you should get a response similar to what is shown below.
 
 ```bash
