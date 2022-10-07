@@ -120,7 +120,7 @@ From your machine's command line:
     - [quick-start.sh](../quick-start.sh) for Mac and Linux
     - [quick-start.ps1](../quick-start.ps1) for Windows
 
-If you plan to deploy to an existing project in your Azure environment, have the project name ready and provide it to the quick start script when prompted.
+If you plan to deploy to an existing resource group in your Azure environment, have the resource group name ready and provide it to the quick start script when prompted.
 
 ### Step 6: Set Repository Secrets
 If you installed the `gh` CLI and the quick start script set these secrets automatically, you may skip to Step 7.
@@ -134,7 +134,7 @@ Set the following secret values in your forked phdi-azure repository:
 
 Information about Azure regions and zones is available [here](https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#overview).
 
-If your project will utilize the geocoding functionality you will need to set these secret values in your forked phdi-azure repository:
+If your resource group will utilize the geocoding functionality you will need to set these secret values in your forked phdi-azure repository:
 - `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID.
 - `SMARTY_AUTH_TOKEN` - Your SmartyStreet Authorization Token.
 
@@ -151,7 +151,7 @@ To create a repository secret follow these steps.
 ![repo-secret-4](./images/repo-secret-4.png)
 
 ### Step 7: Run the Terraform Setup GitHub Workflow
-In order for Terraform to deploy the PHDI pipelines, it needs a place to store the "state" of your Azure project. In this context "state" is simply a record of the current configuration of the project. In the first stage of a deployment Terraform compares the configuration specified in the `terraform/` directory of your forked phdi-azure repository to the current state of your Azure project. In the second stage Terraform makes the necessary changes to resolve any differences and align the Azure project with the repository. To create a Azure storage account for storing the state of your Azure project run the `Terraform Setup` GitHub Workflow. For additional information on state please reffer to [this documentation](https://www.terraform.io/language/state) from Terraform.
+In order for Terraform to deploy the PHDI pipelines, it needs a place to store the "state" of your Azure resource group. In this context "state" is simply a record of the current configuration of the resource group. In the first stage of a deployment Terraform compares the configuration specified in the `terraform/` directory of your forked phdi-azure repository to the current state of your Azure resource group. In the second stage Terraform makes the necessary changes to resolve any differences and align the Azure resource group with the repository. To create a Azure storage account for storing the state of your Azure resource group run the `Terraform Setup` GitHub Workflow. For additional information on state please reffer to [this documentation](https://www.terraform.io/language/state) from Terraform.
 
 To run `Terraform Setup` follow the steps below.
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure` in your browser.
@@ -165,7 +165,7 @@ To run `Terraform Setup` follow the steps below.
 ![terraform-setup-3](./images/terraform-setup-3.png)
 
 ### Step 8: Create a Development Environment
-Your forked version of the phdi-azure repository can deploy multiple instances of the PHDI pipeline infrastructure to your Azure project, each managed by its own [terraform workspace](https://www.terraform.io/language/state/workspaces). This allows you to easily create and maintain instances of the PHDI pipelines dedicated for distinct purposes like development, testing, and production. We recommend that your organization maintain at least two instances of the PHDI pipelines, one for production and at least one other for development and testing purposes. Each instance of the PHDI pipelines is associated with a GitHub Environment. To create a new Environemnt in your forked version of the phdi-azure respository follow the steps below.
+Your forked version of the phdi-azure repository can deploy multiple instances of the PHDI pipeline infrastructure to your Azure resource group, each managed by its own [terraform workspace](https://www.terraform.io/language/state/workspaces). This allows you to easily create and maintain instances of the PHDI pipelines dedicated for distinct purposes like development, testing, and production. We recommend that your organization maintain at least two instances of the PHDI pipelines, one for production and at least one other for development and testing purposes. Each instance of the PHDI pipelines is associated with a GitHub Environment. To create a new Environemnt in your forked version of the phdi-azure respository follow the steps below.
 
 To create a repository secret follow this steps.
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure` in your browser.
@@ -179,7 +179,7 @@ To create a repository secret follow this steps.
 ![create-environment-3](./images/create-environment-3.png)
 
 ### Step 9: Run the Deployment GitHub Workflow
-At this point we have completed all of the necessary setup. We are now ready to deploy the PHDI pipelines to your Azure project with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously, follow the steps below.
+At this point we have completed all of the necessary setup. We are now ready to deploy the PHDI pipelines to your Azure resource group with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously, follow the steps below.
 
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure` in your browser.
 2. Click on `Actions` near the center at the top of the page.
