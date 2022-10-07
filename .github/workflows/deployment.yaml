@@ -7,9 +7,9 @@ on:
         description: "Environment to deploy to"
         type: environment
         required: true
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 permissions:
   id-token: write
@@ -26,6 +26,9 @@ jobs:
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
 
       - name: "Azure login"
         uses: azure/login@v1
