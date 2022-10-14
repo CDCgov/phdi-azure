@@ -1,6 +1,6 @@
 # Getting Started
 
-This is a guide for getting started as a user and/or developer with the PRIME PHDI Azure project. You'll find resources on how to setup a local development environment, how these tools are deployed, and more.
+This is a guide for getting started as a user and/or developer with the PHDI Azure Quickstart Kit. You'll find resources on how to setup a local development environment, how these tools are deployed, and more.
 
 - [Getting Started](#getting-started)
   - [Architecture](#architecture)
