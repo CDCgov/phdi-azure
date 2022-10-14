@@ -144,11 +144,19 @@ All Azure Functions live in the [severless-functions](https://github.com/CDCgov/
 
 ```bash
 serverless-functions/
-├── requirements_dev.txt
-└── myfunction/
-    ├── main.py
-    ├── requirements.txt
-    └── test_myfunction.py
+└── python/
+    ├── requirements_dev.txt
+    ├── requirements.txt
+    └── myfunction/
+        ├── .funcignore
+        ├── __init__.py
+        └── function.json
+    └── tests/
+        └── myfunction/
+            ├── assets/
+            ├── __init__.py
+            └── test_myfunction.py
+    
 ```
 
 #### Creating a Virtual Environment
@@ -183,7 +191,7 @@ Before diving into the specifics of working with Python, it's worth covering how
 
 #### Azure Function Unit Testing
 
-As mentioned in [Azure Function Directory Structure](#azure-function-directory-structure) every Azure Function has unit testing in a `test_<FUNCTION-NAME>.py` file. We use [pytest](https://docs.pytest.org) to run these unit tests. Pytest is included in the [Development Dependencies](#development-dependencies), but can also be installed with `pip install pytest`. To run the unit tests for a Azure Function navigate to its root directory and simply run `pytest`. To run the unit tests for all Azure Function in this repository navigate to `phdi-azure/serverless-functions/` and run `pytest`. Please note that merging into the `main` branch of this repository is automatically blocked if all unit tests are not passing, see [Continuous Integration (CI)](#continuous-integration-ci) for details on this.  
+As mentioned in [Azure Function Directory Structure](#azure-function-directory-structure) every Azure Function has unit testing in a `test_<FUNCTION-NAME>.py` file. We use [pytest](https://docs.pytest.org) to run these unit tests. Pytest is included in the [Development Dependencies](#development-dependencies), but can also be installed with `pip install pytest`. To run the unit tests for a Azure Function navigate to its root directory and simply run `pytest`. To run the unit tests for all Azure Function in this repository navigate to `phdi-azure/src/serverless-functions/tests/` and run `pytest`. Please note that merging into the `main` branch of this repository is automatically blocked if all unit tests are not passing, see [Continuous Integration (CI)](#continuous-integration-ci) for details on this.  
 
 #### Pushing to Github
 
