@@ -99,7 +99,6 @@ Lastly, there are some dependencies that the team makes use of in order to test 
 5. Install [Azure CLI Tools](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).  These tools are essential to work with various aspects of the Azure cloud. 
 In the next section, "Developing Azure Locally", we'll go over which Extensions you need to install, including the Azurite Extension, in order to begin developing Azure functionality.
 6. Install [pip](https://pip.pypa.io/en/stable/installation/). This is the dependency manager for the Azure Functions
-7. Install [poetry](https://python-poetry.org/docs/). This is the dependency manager for the internal library. 
 
 ### Developing Azure Locally
 

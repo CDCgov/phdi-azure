@@ -70,7 +70,7 @@ The PHDI Building Blocks are implemented as Azure Function Apps. Azure Function 
 
 #### Pipeline Orchestration
 
-Since the Building Blocks are designed to be composable users may want to chain serveral together into pipelines.  **TODO**
+Since the Building Blocks are designed to be composable users may want to chain serveral together into pipelines.  We use Microsofts Azure Data Factory (ADF) to define the process that require the use of multiple Building Blocks.  These pipelines can be configured using **TBD TODO**
 
 #### Infrastructure as Code
 
