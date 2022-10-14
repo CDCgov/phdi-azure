@@ -30,7 +30,7 @@ This is a guide for getting started as a user and/or developer with the PRIME PH
 
 We store data on Google Cloud Platform (GCP) in [Cloud Storage buckets](https://cloud.google.com/storage/docs). Data is processed in pipelines, defined as [Google Workflows](https://cloud.google.com/workflows/docs), that each orchestrate a series of calls to indepent microservices (AKA Building Blocks) that we have implemented using [Cloud Functions](https://cloud.google.com/functions/docs). Each service preforms a single step in a pipeline (e.g patient name standardization) and returns the processed data back to the workflow where it is passed on to the next service via a POST request. The diagram below describes the current version of our ingestion pipeline that converts source HL7v2 and CCDA data to FHIR, preforms some basic standardizations and enrichments, and finally uploads the data to a FHIR server.
 
-![Architecture Diagram](./images/architecture-diagram.png)
+![Architecture Diagram](./images/azure-starter-kit-arch.drawio.png)
 
 ### Google Workflows
 
