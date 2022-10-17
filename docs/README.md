@@ -41,9 +41,15 @@ To deploy this pipeline to your own Azure environment, follow these steps.
 
          cd phdi-azure
 
-  1. Authenticate the gcloud CLI by running:
+  1. Authenticate the Azure cloud CLI by running:
+       
+      for Unix based systems
 
          ./quick-start.sh
+
+      for Windows based systems
+      
+         quick-start.ps1
 
   1. If you did not install the GitHub CLI, follow [these steps](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) to set the secrets output by the previous step in your repository.
   1. Setup a storage account for Terraform state by running the GitHub Action at this URL:  
@@ -64,7 +70,7 @@ The PHDI Building Blocks are implemented as Azure Function Apps. Azure Function 
 
 #### Pipeline Orchestration
 
-Since the Building Blocks are designed to be composable users may want to chain serveral together into pipelines. We use the Google Workflow resource to define processes that require the use of multiple Building Blocks. These workflows are defined using YAML configuration files found in the `worklows` directory.
+Since the Building Blocks are designed to be composable users may want to chain serveral together into pipelines.  We use Microsofts Azure Data Factory (ADF) to define the process that require the use of multiple Building Blocks.  These pipelines can be configured using **TBD TODO**
 
 #### Infrastructure as Code
 
