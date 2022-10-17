@@ -1,4 +1,0 @@
-Flask==2.2.2
-functions-framework==3.2.0
-google-cloud-storage==2.5.0
-phdi_cloud_function_utils @ git+https://github.com/CDCgov/phdi-google-cloud@main#subdirectory=cloud-functions/phdi_cloud_function_utils
