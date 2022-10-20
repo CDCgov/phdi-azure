@@ -66,6 +66,8 @@ resource "azurerm_linux_function_app" "read_source_data" {
   }
 
   site_config {
-    linux_fx_version = "python|3.9"
+    application_stack {
+      python_version = "3.9"
+    }
   }
 }
