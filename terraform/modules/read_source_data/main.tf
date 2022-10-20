@@ -54,7 +54,7 @@ resource "azurerm_function_app" "read_source_data" {
   name                       = "phdi-${terraform.workspace}-read-source-data"
   location                   = var.location
   resource_group_name        = var.resource_group_name
-  app_service_plan_id        = azurerm_app_service_plan.function_app_sp.id
+  app_service_plan_id        = azurerm_service_plan.function_app_sp.id
   storage_account_name       = azurerm_storage_account.function_app_sa.name
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
   os_type                    = "linux"
