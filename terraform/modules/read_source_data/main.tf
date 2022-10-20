@@ -42,7 +42,7 @@ data "azurerm_storage_account_blob_container_sas" "storage_account_blob_containe
   }
 }
 
-resource "azurerm_app_service_plan" "function_app_sp" {
+resource "azurerm_service_plan" "function_app_sp" {
   name                = "phdi-azure-functions-sp"
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -71,7 +71,7 @@ resource "azurerm_function_app" "read_source_data" {
   os_type                    = "linux"
   version                    = "~4"
 
-  app_settings {
+  app_settings = {
     WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.function_app_sa.name}.blob.core.windows.net/${azurerm_storage_container.read_source_data.name}/${azurerm_storage_blob.read_source_data_blob.name}${data.azurerm_storage_account_blob_container_sas.storage_account_blob_container_sas.sas}"
     FUNCTIONS_WORKER_RUNTIME = "python"
     AzureWebJobsPhiStorage   = var.phi_storage_account_connection_string
