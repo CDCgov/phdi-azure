@@ -50,15 +50,13 @@ resource "azurerm_service_plan" "function_app_sp" {
   sku_name            = "Y1"
 }
 
-resource "azurerm_function_app" "read_source_data" {
+resource "azurerm_linux_function_app" "read_source_data" {
   name                       = "phdi-${terraform.workspace}-read-source-data"
   location                   = var.location
   resource_group_name        = var.resource_group_name
-  app_service_plan_id        = azurerm_service_plan.function_app_sp.id
+  service_plan_id            = azurerm_service_plan.function_app_sp.id
   storage_account_name       = azurerm_storage_account.function_app_sa.name
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
-  os_type                    = "linux"
-  version                    = "~4"
 
   app_settings = {
     WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.function_app_sa.name}.blob.core.windows.net/${azurerm_storage_container.read_source_data.name}/${azurerm_storage_blob.read_source_data_blob.name}${data.azurerm_storage_account_blob_container_sas.storage_account_blob_container_sas.sas}"
