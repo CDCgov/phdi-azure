@@ -43,22 +43,11 @@ data "azurerm_storage_account_blob_container_sas" "storage_account_blob_containe
 }
 
 resource "azurerm_service_plan" "function_app_sp" {
-  name                = "phdi-azure-functions-sp"
+  name                = "phdi-${terraform.workspace}-azure-functions-sp"
   location            = var.location
   resource_group_name = var.resource_group_name
-  kind                = "Linux"
-  reserved            = true
-
-  sku {
-    tier = "Dynamic"
-    size = "Y1"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      kind
-    ]
-  }
+  os_type             = "Linux"
+  sku_name            = "Y1"
 }
 
 resource "azurerm_function_app" "read_source_data" {
