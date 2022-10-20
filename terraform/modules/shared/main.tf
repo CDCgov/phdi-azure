@@ -84,7 +84,7 @@ resource "azurerm_container_registry" "phdi_registry" {
 
 resource "azurerm_healthcare_service" "fhir_server" {
   name                = "phdi-${terraform.workspace}-fhir-server"
-  location            = var.location
+  location            = "eastus"
   resource_group_name = var.resource_group_name
   kind                = "fhir-R4"
   cosmosdb_throughput = 1400
