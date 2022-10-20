@@ -1,6 +1,6 @@
 data "archive_file" "read_source_data" {
   type        = "zip"
-  source_dir  = "../../../serverless-functions"
+  source_dir  = "../../serverless-functions"
   output_path = "function-app.zip"
 }
 
