@@ -1,0 +1,7 @@
+output "phi_storage_account_connection_string" {
+  value = azurerm_storage_account.phi.primary_connection_string
+}
+
+output "ingestion_queue_name" {
+  value = azurerm_servicebus_queue.ingestion.name
+}
