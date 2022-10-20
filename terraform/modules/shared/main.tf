@@ -1,6 +1,6 @@
 ##### PHI Storage Account #####
 
-resource "azurerm_storage_account" "phi" {
+resource "azurerm_storage_account" "phi_storage_account" {
   name                     = "phdi${terraform.workspace}phi"
   resource_group_name      = var.resource_group_name
   location                 = var.location
@@ -13,7 +13,7 @@ resource "azurerm_storage_account" "phi" {
   }
 }
 
-resource "azurerm_storage_container" "phi" {
+resource "azurerm_storage_container" "phi_container" {
   name                 = "phi"
   storage_account_name = azurerm_storage_account.phi.name
 }
