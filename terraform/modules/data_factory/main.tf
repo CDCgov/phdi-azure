@@ -1,5 +1,5 @@
 resource "azurerm_data_factory" "phdi_data_factory" {
-  name                            = "${var.resource_prefix}-df"
+  name                            = "phdi-${terraform.workspace}-data-factory"
   location                        = var.location
   resource_group_name             = var.resource_group_name
   public_network_enabled          = false
@@ -16,7 +16,7 @@ resource "azurerm_data_factory" "phdi_data_factory" {
   }
 
   tags = {
-    environment = var.environment
+    environment = terraform.workspace
     managed-by  = "terraform"
   }
 }

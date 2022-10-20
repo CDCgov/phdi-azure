@@ -15,7 +15,7 @@ resource "azurerm_storage_account" "phi_storage_account" {
 
 resource "azurerm_storage_container" "phi_container" {
   name                 = "phi"
-  storage_account_name = azurerm_storage_account.phi.name
+  storage_account_name = azurerm_storage_account.phi_storage_account.name
 }
 
 ##### Service Bus #####
@@ -96,7 +96,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
   }
 
   tags = {
-    environment = var.environment
+    environment = terraform.workspace
     managed-by  = "terraform"
   }
 }
