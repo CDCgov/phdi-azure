@@ -54,7 +54,7 @@ resource "azurerm_application_insights" "insights" {
   name                = "phdi-${terraform.workspace}-insights"
   location            = var.location
   resource_group_name = var.resource_group_name
-  application_type    = "Web"
+  application_type    = "web"
 }
 
 resource "azurerm_linux_function_app" "read_source_data" {
