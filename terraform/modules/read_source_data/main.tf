@@ -50,6 +50,13 @@ resource "azurerm_service_plan" "function_app_sp" {
   sku_name            = "Y1"
 }
 
+resource "azurerm_application_insights" "insights" {
+  name                = "phdi-${terraform.workspace}-insights"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  application_type    = "Web"
+}
+
 resource "azurerm_linux_function_app" "read_source_data" {
   name                       = "phdi-${terraform.workspace}-read-source-data"
   location                   = var.location
@@ -59,10 +66,11 @@ resource "azurerm_linux_function_app" "read_source_data" {
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
 
   app_settings = {
-    WEBSITE_RUN_FROM_PACKAGE = "https://${azurerm_storage_account.function_app_sa.name}.blob.core.windows.net/${azurerm_storage_container.read_source_data.name}/${azurerm_storage_blob.read_source_data_blob.name}${data.azurerm_storage_account_blob_container_sas.storage_account_blob_container_sas.sas}"
-    FUNCTIONS_WORKER_RUNTIME = "python"
-    AzureWebJobsPhiStorage   = var.phi_storage_account_connection_string
-    ServiceBusQueueName      = var.ingestion_queue_name
+    WEBSITE_RUN_FROM_PACKAGE       = "https://${azurerm_storage_account.function_app_sa.name}.blob.core.windows.net/${azurerm_storage_container.read_source_data.name}/${azurerm_storage_blob.read_source_data_blob.name}${data.azurerm_storage_account_blob_container_sas.storage_account_blob_container_sas.sas}"
+    FUNCTIONS_WORKER_RUNTIME       = "python"
+    AzureWebJobsPhiStorage         = var.phi_storage_account_connection_string
+    ServiceBusQueueName            = var.ingestion_queue_name
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.insights.instrumentation_key
   }
 
   site_config {
