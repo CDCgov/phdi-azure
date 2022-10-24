@@ -48,7 +48,7 @@ def test_publishing_initial_success(
             "message": "some-message",
             "message_type": message_type,
             "root_template": root_template,
-            "filename": f"source-data/{source_data_subdirectory}/some-filename",
+            "filename": f"source-data/{source_data_subdirectory}/some-filename.txt",
         }
         queue_message = json.dumps(queue_message).encode("utf-8")
 
