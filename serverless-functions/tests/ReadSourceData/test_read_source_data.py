@@ -10,6 +10,7 @@ def test_handle_batch_hl7(
     blob = mock.MagicMock()
     blob.folder = "elr"
     blob.name = "some-filename"
+    blob.extension = "hl7"
     blob.read.return_value = b"some-blob-contents"
     queue = mock.MagicMock()
     patched_batch_converter.return_value = ["some-message"]
