@@ -1,3 +1,9 @@
+data "archive_file" "read_source_data" {
+  type        = "zip"
+  source_dir  = "../../serverless-functions"
+  output_path = "function-app.zip"
+}
+
 resource "azurerm_storage_account" "function_app_sa" {
   name                     = "phdi${terraform.workspace}functions"
   resource_group_name      = var.resource_group_name
@@ -9,6 +15,31 @@ resource "azurerm_storage_account" "function_app_sa" {
 resource "azurerm_storage_container" "read_source_data" {
   name                 = "read-source-data"
   storage_account_name = azurerm_storage_account.function_app_sa.name
+}
+
+resource "azurerm_storage_blob" "read_source_data_blob" {
+  name                   = "${filesha256(data.archive_file.read_source_data.output_path)}.zip"
+  storage_account_name   = azurerm_storage_account.function_app_sa.name
+  storage_container_name = azurerm_storage_container.read_source_data.name
+  type                   = "Block"
+  source                 = data.archive_file.read_source_data.output_path
+}
+
+data "azurerm_storage_account_blob_container_sas" "storage_account_blob_container_sas" {
+  connection_string = azurerm_storage_account.function_app_sa.primary_connection_string
+  container_name    = azurerm_storage_container.read_source_data.name
+
+  start  = "2021-01-01T00:00:00Z"
+  expiry = "2026-01-01T00:00:00Z"
+
+  permissions {
+    read   = true
+    add    = false
+    create = false
+    write  = false
+    delete = false
+    list   = false
+  }
 }
 
 resource "azurerm_service_plan" "function_app_sp" {
