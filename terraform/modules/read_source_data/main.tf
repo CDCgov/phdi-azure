@@ -1,3 +1,16 @@
+resource "azurerm_storage_account" "function_app_sa" {
+  name                     = "phdi${terraform.workspace}functions"
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_container" "read_source_data" {
+  name                 = "read-source-data"
+  storage_account_name = azurerm_storage_account.function_app_sa.name
+}
+
 resource "azurerm_service_plan" "function_app_sp" {
   name                = "phdi-${terraform.workspace}-azure-functions-sp"
   location            = var.location
