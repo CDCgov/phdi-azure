@@ -23,17 +23,15 @@ def main(blob: func.InputStream, queue: func.Out[str]) -> None:
 
     try:
         # Determine data type and root template.
-        filename_parts = blob.name.split("/")
-
-        if filename_parts[0] == "elr":
+        if blob.folder == "elr":
             message_type = "hl7v2"
             root_template = "ORU_R01"
 
-        elif filename_parts[0] == "vxu":
+        elif blob.folder == "vxu":
             message_type = "hl7v2"
             root_template = "VXU_V04"
 
-        elif filename_parts[0] == "ecr":
+        elif blob.folder == "ecr":
             message_type = "ccda"
             root_template = "CCD"
 
@@ -54,7 +52,7 @@ def main(blob: func.InputStream, queue: func.Out[str]) -> None:
                 "message": message,
                 "message_type": message_type,
                 "root_template": root_template,
-                "filename": f"source-data/{blob.name}",
+                "filename": f"source-data/{blob.folder}/{blob.name}.{blob.extension}",
             }
 
             queue_message = json.dumps(queue_message).encode("utf-8")
