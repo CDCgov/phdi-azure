@@ -82,7 +82,7 @@ jobs:
         working-directory: ./serverless-functions
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
 
       - name: "Run Azure Functions Action"
         uses: Azure/functions-action@v1
