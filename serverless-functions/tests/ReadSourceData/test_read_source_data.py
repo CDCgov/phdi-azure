@@ -8,7 +8,8 @@ def test_handle_batch_hl7(
     patched_batch_converter,
 ):
     blob = mock.MagicMock()
-    blob.name = "elr/some-filename"
+    blob.folder = "elr"
+    blob.name = "some-filename"
     blob.read.return_value = b"some-blob-contents"
     queue = mock.MagicMock()
     patched_batch_converter.return_value = ["some-message"]
@@ -35,7 +36,9 @@ def test_publishing_initial_success(
             root_template = "CCD"
 
         blob = mock.MagicMock()
-        blob.name = f"{source_data_subdirectory}/some-filename"
+        blob.folder = source_data_subdirectory
+        blob.name = "some-filename"
+        blob.extension = "txt"
         blob.read.return_value = b"some-message"
         queue = mock.MagicMock()
         patched_batch_converter.return_value = ["some-message"]
