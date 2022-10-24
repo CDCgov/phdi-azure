@@ -105,5 +105,5 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform force-unlock a4e735c9-22ad-9f31-d5d7-1c75d70b28ef
+          terraform force-unlock -force a4e735c9-22ad-9f31-d5d7-1c75d70b28ef
           terraform plan
