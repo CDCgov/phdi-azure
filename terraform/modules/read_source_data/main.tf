@@ -66,12 +66,13 @@ resource "azurerm_linux_function_app" "read_source_data" {
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
 
   app_settings = {
-    WEBSITE_RUN_FROM_PACKAGE       = 1
-    FUNCTIONS_WORKER_RUNTIME       = "python"
-    SCM_DO_BUILD_DURING_DEPLOYMENT = 1
-    AzureWebJobsPhiStorage         = var.phi_storage_account_connection_string
-    ServiceBusQueueName            = var.ingestion_queue_name
-    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.insights.instrumentation_key
+    WEBSITE_RUN_FROM_PACKAGE        = 1
+    FUNCTIONS_WORKER_RUNTIME        = "python"
+    SCM_DO_BUILD_DURING_DEPLOYMENT  = 1
+    AzureWebJobsPhiStorage          = var.phi_storage_account_connection_string
+    AzureServiceBusConnectionString = var.service_bus_connection_string
+    ServiceBusQueueName             = var.ingestion_queue_name
+    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.insights.instrumentation_key
   }
 
   site_config {
