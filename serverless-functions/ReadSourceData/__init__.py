@@ -58,7 +58,7 @@ def main(blob: func.InputStream, queue: func.Out[str]) -> None:
                 "filename": blob.name,
             }
 
-            queue_message = json.dumps(queue_message).encode("utf-8")
+            queue_message = json.dumps(queue_message)
             queue.set(queue_message)
 
     except Exception:

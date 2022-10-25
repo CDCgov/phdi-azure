@@ -46,7 +46,7 @@ def test_publishing_initial_success(
             "root_template": root_template,
             "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
         }
-        queue_message = json.dumps(queue_message).encode("utf-8")
+        queue_message = json.dumps(queue_message)
 
         read_source_data(blob, queue)
         queue.set.assert_called_with(queue_message)
