@@ -5,7 +5,7 @@
       "name": "blob",
       "type": "blobTrigger",
       "direction": "in",
-      "path": "source-data/{folder}/{name}.{extension}",
+      "path": "source-data/{name}",
       "connection": "PhiStorage"
     },
     {
