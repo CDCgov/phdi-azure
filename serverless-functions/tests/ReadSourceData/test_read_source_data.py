@@ -8,9 +8,7 @@ def test_handle_batch_hl7(
     patched_batch_converter,
 ):
     blob = mock.MagicMock()
-    blob.folder = "elr"
-    blob.name = "some-filename"
-    blob.extension = "hl7"
+    blob.name = "source-data/elr/some-filename.hl7"
     blob.read.return_value = b"some-blob-contents"
     queue = mock.MagicMock()
     patched_batch_converter.return_value = ["some-message"]
@@ -37,9 +35,7 @@ def test_publishing_initial_success(
             root_template = "CCD"
 
         blob = mock.MagicMock()
-        blob.folder = source_data_subdirectory
-        blob.name = "some-filename"
-        blob.extension = "txt"
+        blob.name = f"source-data/{source_data_subdirectory}/some-filename.hl7"
         blob.read.return_value = b"some-message"
         queue = mock.MagicMock()
         patched_batch_converter.return_value = ["some-message"]
@@ -48,7 +44,7 @@ def test_publishing_initial_success(
             "message": "some-message",
             "message_type": message_type,
             "root_template": root_template,
-            "filename": f"source-data/{source_data_subdirectory}/some-filename.txt",
+            "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
         }
         queue_message = json.dumps(queue_message).encode("utf-8")
 
