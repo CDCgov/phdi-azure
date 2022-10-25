@@ -20,7 +20,7 @@ def main(blob: func.InputStream, queue: func.Out[str]) -> None:
         outcome and associated HTTP status code.
     """
     logging.debug("File uploaded, reading source data...")
-    logging.info('Python Blob trigger function processed %s', blob.name)
+    logging.info("Python Blob trigger function processed %s", blob.name)
 
     try:
         # Determine data type and root template.
