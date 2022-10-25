@@ -7,5 +7,5 @@ output "ingestion_queue_name" {
 }
 
 output "service_bus_connection_string" {
-  value = azurerm_servicebus_namespace.service_bus.primary_connection_string
+  value = azurerm_servicebus_namespace.ingestion.primary_connection_string
 }
