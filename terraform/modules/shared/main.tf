@@ -13,8 +13,8 @@ resource "azurerm_storage_account" "phi" {
   }
 }
 
-resource "azurerm_storage_container" "phi" {
-  name                 = "phi"
+resource "azurerm_storage_container" "source_data" {
+  name                 = "source-data"
   storage_account_name = azurerm_storage_account.phi.name
 }
 
@@ -27,7 +27,7 @@ resource "azurerm_servicebus_namespace" "ingestion" {
   sku                 = "Standard"
 }
 
-resource "azurerm_servicebus_topic" "ingestion" {
+resource "azurerm_servicebus_queue" "ingestion" {
   name         = "phdi-${terraform.workspace}-ingestion"
   namespace_id = azurerm_servicebus_namespace.ingestion.id
 

@@ -72,3 +72,20 @@ jobs:
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
           terraform apply -auto-approve -lock-timeout=30m
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
+
+      - name: Install python dependencies
+        working-directory: ./serverless-functions
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+
+      - name: "Run Azure Functions Action"
+        uses: Azure/functions-action@v1
+        with:
+          app-name: "phdi-${{ inputs.environment }}-read-source-data"
+          package: serverless-functions
