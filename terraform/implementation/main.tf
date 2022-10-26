@@ -14,3 +14,9 @@ module "read_source_data" {
   ingestion_queue_name                  = module.shared.ingestion_queue_name
   service_bus_connection_string         = module.shared.service_bus_connection_string
 }
+
+module "fhir_converter" {
+  source              = "../modules/fhir_converter"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
