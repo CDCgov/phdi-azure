@@ -1,6 +1,7 @@
 from ReadSourceData import main as read_source_data
 from unittest import mock
 import json
+import pytest
 
 
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
@@ -50,3 +51,19 @@ def test_publishing_initial_success(
 
         read_source_data(blob, queue)
         queue.set.assert_called_with(queue_message)
+
+
+@mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
+def test_publishing_failure(
+    patched_batch_converter,
+):
+
+    blob = mock.MagicMock()
+    blob.name = f"some-other-container/elr/some-filename.hl7"
+    blob.read.return_value = b"some-message"
+    queue = mock.MagicMock()
+    patched_batch_converter.return_value = ["some-message"]
+
+    with pytest.raises(Exception) as e:
+        read_source_data(blob, queue)
+        assert str(e) == "Invalid file type."

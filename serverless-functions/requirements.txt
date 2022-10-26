@@ -1,9 +1,4 @@
 azure-functions
 azure-identity
 azure-storage-blob
-hl7
 phdi
-requests
-smartystreets_python_sdk
-urllib3
-typer
