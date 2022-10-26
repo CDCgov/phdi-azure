@@ -19,7 +19,8 @@ resource "azurerm_linux_web_app" "fhir_converter" {
 
   site_config {
     application_stack {
-      docker_image = "ghcr.io/cdcgov/phdi/fhir-converter"
+      docker_image     = "ghcr.io/cdcgov/phdi/fhir-converter"
+      docker_image_tag = "latest"
     }
   }
 }
