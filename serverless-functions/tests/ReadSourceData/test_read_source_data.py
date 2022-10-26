@@ -59,7 +59,7 @@ def test_publishing_failure(
 ):
 
     blob = mock.MagicMock()
-    blob.name = f"some-other-container/elr/some-filename.hl7"
+    blob.name = "some-other-container/elr/some-filename.hl7"
     blob.read.return_value = b"some-message"
     queue = mock.MagicMock()
     patched_batch_converter.return_value = ["some-message"]
