@@ -37,3 +37,8 @@ variable "container_registry_reader_id" {
   type        = string
   description = "The ID of the reader role for the container registry to use for the Function App."
 }
+
+variable "application_insights_instrumentation_key" {
+  type        = string
+  description = "The instrumentation key for the Application Insights instance to use for the Function App."
+}

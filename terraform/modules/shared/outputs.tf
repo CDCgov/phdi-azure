@@ -33,3 +33,7 @@ output "container_registry_url" {
 output "container_registry_reader_id" {
   value = azurerm_container_registry.phdi_registry.identity.0.principal_id
 }
+
+output "application_insights_instrumentation_key" {
+  value = azurerm_application_insights.insights.instrumentation_key
+}

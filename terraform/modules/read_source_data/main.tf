@@ -49,7 +49,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
     AzureWebJobsPhiStorage          = var.phi_storage_account_connection_string
     AzureServiceBusConnectionString = var.service_bus_connection_string
     ServiceBusQueueName             = var.ingestion_queue_name
-    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.insights.instrumentation_key
+    APPINSIGHTS_INSTRUMENTATIONKEY  = var.application_insights_instrumentation_key
   }
 
   site_config {

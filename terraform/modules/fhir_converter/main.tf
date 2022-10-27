@@ -7,7 +7,7 @@ resource "azurerm_linux_function_app" "fhir_converter" {
   storage_account_access_key = var.function_app_storage_account_access_key
 
   app_settings = {
-
+    APPINSIGHTS_INSTRUMENTATIONKEY = var.application_insights_instrumentation_key
   }
 
   site_config {

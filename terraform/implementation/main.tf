@@ -25,6 +25,7 @@ module "read_source_data" {
   function_app_storage_account_access_key        = module.shared.function_app_storage_account_access_key
   function_app_storage_account_connection_string = module.shared.function_app_storage_account_connection_string
   function_app_service_plan_id                   = module.shared.function_app_service_plan_id
+  application_insights_instrumentation_key       = module.shared.application_insights_instrumentation_key
 }
 
 module "fhir_converter" {
@@ -37,4 +38,5 @@ module "fhir_converter" {
   function_app_service_plan_id                   = module.shared.function_app_service_plan_id
   container_registry_url                         = module.shared.container_registry_url
   container_registry_reader_id                   = module.shared.container_registry_reader_id
+  application_insights_instrumentation_key       = module.shared.application_insights_instrumentation_key
 }
