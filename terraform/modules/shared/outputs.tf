@@ -23,7 +23,7 @@ output "function_app_storage_account_connection_string" {
 }
 
 output "function_app_service_plan_id" {
-  value = azurerm_app_service_plan.function_app_sp.id
+  value = azurerm_service_plan.function_app_sp.id
 }
 
 output "container_registry_url" {
