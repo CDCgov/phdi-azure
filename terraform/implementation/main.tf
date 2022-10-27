@@ -6,6 +6,14 @@ module "shared" {
   location            = var.location
 }
 
+
+module "data_factory" {
+  source              = "../modules/data_factory"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
+
+
 module "read_source_data" {
   source                                = "../modules/read_source_data"
   resource_group_name                   = var.resource_group_name
