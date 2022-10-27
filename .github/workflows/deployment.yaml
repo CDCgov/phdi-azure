@@ -14,6 +14,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  packages: write
 jobs:
   deployment:
     name: Deploy to Azure
@@ -89,3 +90,17 @@ jobs:
         with:
           app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data"
           package: serverless-functions
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push container images to Azure Container Registry
+        run: |
+          docker pull ghcr.io/cdcgov/phdi/fhir-converter:latest
+          docker tag ghcr.io/cdcgov/phdi/fhir-converter:latest phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
+          az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
+          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
