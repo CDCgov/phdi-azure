@@ -79,3 +79,24 @@ resource "azurerm_container_registry" "phdi_registry" {
   location            = var.location
   sku                 = "Premium"
 }
+
+##### FHIR Server #####
+
+resource "azurerm_healthcare_service" "fhir_server" {
+  name                = "phdi-${terraform.workspace}-fhir-server"
+  location            = "eastus"
+  resource_group_name = var.resource_group_name
+  kind                = "fhir-R4"
+  cosmosdb_throughput = 1400
+
+  access_policy_object_ids = []
+
+  lifecycle {
+    ignore_changes = [name, tags]
+  }
+
+  tags = {
+    environment = terraform.workspace
+    managed-by  = "terraform"
+  }
+}
