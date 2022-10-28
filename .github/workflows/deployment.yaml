@@ -100,7 +100,7 @@ jobs:
 
       - name: Push container images to Azure Container Registry
         run: |
-          docker pull ghcr.io/cdcgov/phdi/fhir-converter:latest
-          docker tag ghcr.io/cdcgov/phdi/fhir-converter:latest phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
+          docker pull ghcr.io/cdcgov/phdi/fhir-converter:main
+          docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
           az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
