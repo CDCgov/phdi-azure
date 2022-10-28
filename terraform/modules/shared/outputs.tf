@@ -31,7 +31,7 @@ output "container_registry_url" {
 }
 
 output "container_registry_reader_id" {
-  value = azurerm_user_assigned_identity.registry_reader.id
+  value = azurerm_user_assigned_identity.registry_reader.client_id
 }
 
 output "application_insights_instrumentation_key" {
