@@ -78,20 +78,6 @@ resource "azurerm_container_registry" "phdi_registry" {
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "Premium"
-
-  identity {
-    type = "UserAssigned"
-    identity_ids = [
-      azurerm_user_assigned_identity.registry_reader.id
-    ]
-  }
-}
-
-resource "azurerm_user_assigned_identity" "registry_reader" {
-  resource_group_name = var.resource_group_name
-  location            = var.location
-
-  name = "registry-reader"
 }
 
 ##### FHIR Server #####
@@ -113,28 +99,4 @@ resource "azurerm_healthcare_service" "fhir_server" {
     environment = terraform.workspace
     managed-by  = "terraform"
   }
-}
-
-##### Function App Shared Resources #####
-resource "azurerm_storage_account" "function_app_sa" {
-  name                     = "phdi${terraform.workspace}functions"
-  resource_group_name      = var.resource_group_name
-  location                 = var.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-resource "azurerm_application_insights" "insights" {
-  name                = "phdi-${terraform.workspace}-insights"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  application_type    = "web"
-}
-
-resource "azurerm_service_plan" "function_app_sp" {
-  name                = "phdi-${terraform.workspace}-azure-functions-sp"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  os_type             = "Linux"
-  sku_name            = "Y1"
 }

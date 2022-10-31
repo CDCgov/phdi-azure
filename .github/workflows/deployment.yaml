@@ -104,3 +104,23 @@ jobs:
           docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
           az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
+
+      - name: Deploy container apps
+        run: |
+          az extension add --name containerapp --upgrade
+          az provider register --namespace Microsoft.App
+          az provider register --namespace Microsoft.OperationalInsights
+          if [[ ! az containerapp env show -n ${{ env.TF_ENVIRONMENT }} ]]; then
+            az containerapp env create \
+              --name ${{ env.TF_ENVIRONMENT }} \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --location $LOCATION
+          fi
+          if [[ ! az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter ]]; then
+            az containerapp create \
+              --name phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --environment ${{ env.TF_ENVIRONMENT }} \
+              --image phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest \
+              --target-port 8080
+          fi
