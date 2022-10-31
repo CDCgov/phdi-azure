@@ -125,5 +125,7 @@ jobs:
               --resource-group $RESOURCE_GROUP_NAME \
               --environment ${{ env.TF_ENVIRONMENT }} \
               --image phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest \
-              --target-port 8080
+              --target-port 8080 \
+              --ingress 'internal' \
+              --query properties.configuration.ingress.fqdn
           fi
