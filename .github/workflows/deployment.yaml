@@ -106,6 +106,9 @@ jobs:
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
 
       - name: Deploy container apps
+        env:
+          LOCATION: ${{ secrets.LOCATION }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
         run: |
           az extension add --name containerapp --upgrade
           az provider register --namespace Microsoft.App
