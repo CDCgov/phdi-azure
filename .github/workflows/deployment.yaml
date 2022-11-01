@@ -101,9 +101,12 @@ jobs:
       - name: Push container images to Azure Container Registry
         run: |
           docker pull ghcr.io/cdcgov/phdi/fhir-converter:main
+          docker pull ghcr.io/cdcgov/phdi/phdi-ingestion:main
           docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
+          docker tag ghcr.io/cdcgov/phdi/phdi-ingestion:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
           az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
+          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
           az acr update -n phdi${{ env.TF_ENVIRONMENT }}registry --admin-enabled true
 
       - name: Deploy container apps
@@ -129,6 +132,19 @@ jobs:
               --resource-group $RESOURCE_GROUP_NAME \
               --environment ${{ env.TF_ENVIRONMENT }} \
               --image $REGISTRY_URL/phdi/fhir-converter:latest \
+              --target-port 8080 \
+              --ingress 'internal' \
+              --registry-server $REGISTRY_URL \
+              --registry-username $REGISTRY_NAME \
+              --registry-password $REGISTRY_PASSWORD \
+              --query properties.configuration.ingress.fqdn
+          fi
+          if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-ingestion) ]]; then
+            az containerapp create \
+              --name phdi-${{ env.TF_ENVIRONMENT }}-ingestion \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --environment ${{ env.TF_ENVIRONMENT }} \
+              --image $REGISTRY_URL/phdi/phdi-ingestion:latest \
               --target-port 8080 \
               --ingress 'internal' \
               --registry-server $REGISTRY_URL \
