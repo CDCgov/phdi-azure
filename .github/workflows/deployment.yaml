@@ -14,6 +14,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  packages: write
 jobs:
   deployment:
     name: Deploy to Azure
@@ -89,3 +90,49 @@ jobs:
         with:
           app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data"
           package: serverless-functions
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push container images to Azure Container Registry
+        run: |
+          docker pull ghcr.io/cdcgov/phdi/fhir-converter:main
+          docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
+          az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
+          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
+          az acr update -n phdi${{ env.TF_ENVIRONMENT }}registry --admin-enabled true
+
+      - name: Deploy container apps
+        env:
+          LOCATION: ${{ secrets.LOCATION }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+        run: |
+          az extension add --name containerapp --upgrade
+          az provider register --namespace Microsoft.App
+          az provider register --namespace Microsoft.OperationalInsights
+          REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry
+          REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
+          REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
+          if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
+            az containerapp env create \
+              --name ${{ env.TF_ENVIRONMENT }} \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --location $LOCATION
+          fi
+          if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter) ]]; then
+            az containerapp create \
+              --name phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --environment ${{ env.TF_ENVIRONMENT }} \
+              --image $REGISTRY_URL/phdi/fhir-converter:latest \
+              --target-port 8080 \
+              --ingress 'internal' \
+              --registry-server $REGISTRY_URL \
+              --registry-username $REGISTRY_NAME \
+              --registry-password $REGISTRY_PASSWORD \
+              --query properties.configuration.ingress.fqdn
+          fi
