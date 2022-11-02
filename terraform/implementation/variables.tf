@@ -10,3 +10,11 @@ variable "location" {
 variable "resource_group_name" {
   description = "value of the Azure resource group to deploy to"
 }
+
+variable "fhir_converter_url" {
+  description = "URL of the FHIR converter"
+}
+
+variable "ingestion_container_url" {
+  description = "URL of the ingestion container"
+}
