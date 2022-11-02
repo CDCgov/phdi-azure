@@ -64,18 +64,15 @@ jobs:
           fi
           )" >> $GITHUB_ENV
 
-      - name: terraform init
+      - name: create container registry
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
-        run: terraform init -backend-config=backend.tfvars
-
-      - name: terraform workspace
-        run: terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-
-      - name: Create container registry
-        run: terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -auto-approve -lock-timeout=30m
+        run: |
+          terraform init -backend-config=backend.tfvars
+          terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
+          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -auto-approve -lock-timeout=30m
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
