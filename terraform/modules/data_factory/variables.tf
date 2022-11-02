@@ -17,3 +17,8 @@ variable "ingestion_container_url" {
   type        = string
   description = "URL of the ingestion container"
 }
+
+variable "fhir_server_url" {
+  type        = string
+  description = "URL of the FHIR server"
+}
