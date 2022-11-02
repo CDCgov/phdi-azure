@@ -142,8 +142,8 @@ jobs:
           fi
       - name: load container urls
         run: |
-          FHIR_CONVERTER_URL=$(az containerapp show --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" --query "properties.configuration.ingress.fqdn")
-          INGESTION_CONTAINER_URL=$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "properties.configuration.ingress.fqdn")
+          FHIR_CONVERTER_URL=$(az containerapp show --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)
+          INGESTION_CONTAINER_URL=$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)
           echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
           echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
       - name: terraform
