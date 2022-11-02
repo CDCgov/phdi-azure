@@ -20,3 +20,20 @@ resource "azurerm_data_factory" "phdi_data_factory" {
     managed-by  = "terraform"
   }
 }
+locals {
+  ingestion-pipeline-config = jsondecode(file("../modules/data_factory/ingestion-pipeline.json"))
+}
+
+resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
+  name            = "phdi-ingestion"
+  data_factory_id = azurerm_data_factory.phdi_data_factory.id
+  concurrency     = 10 // Max concurrent instances of the pipeline, between 1 and 50. May need to tune this in the future. 
+  parameters = {
+    "filename" : "",
+    "message" : "",
+    "message_type" : "",
+    "root_template" : "",
+  }
+
+  activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
+}
