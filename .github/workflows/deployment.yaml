@@ -53,6 +53,8 @@ jobs:
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${SUBSCRIPTION_ID:0:8}"\" >> backend.tfvars
+          echo fhir_converter_url = \"""\" >> terraform.tfvars
+          echo ingestion_container_url = \"""\" >> terraform.tfvars
 
       - name: Set environment
         run: |-
@@ -73,6 +75,9 @@ jobs:
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
           terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -auto-approve -lock-timeout=30m
+          head -n -2 terraform.tfvars >> temp.txt
+          rm terraform.tfvars
+          mv temp.text terraform.tfvars
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
