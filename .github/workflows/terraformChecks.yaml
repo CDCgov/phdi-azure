@@ -48,61 +48,61 @@ jobs:
             echo "Validating $d";
             (cd $d && terraform validate)
           done
-  check-terraform-plan:
-    runs-on: ubuntu-latest
-    environment: main
-    defaults:
-      run:
-        working-directory: ./terraform/implementation
-    permissions:
-      contents: "read"
-      id-token: "write"
-    steps:
-      - name: Check Out Changes
-        uses: actions/checkout@v3
+  # check-terraform-plan:
+  #   runs-on: ubuntu-latest
+  #   environment: main
+  #   defaults:
+  #     run:
+  #       working-directory: ./terraform/implementation
+  #   permissions:
+  #     contents: "read"
+  #     id-token: "write"
+  #   steps:
+  #     - name: Check Out Changes
+  #       uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v2
 
-      - name: "Azure login"
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.CLIENT_ID }}
-          tenant-id: ${{ secrets.TENANT_ID }}
-          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+  #     - name: "Azure login"
+  #       uses: azure/login@v1
+  #       with:
+  #         client-id: ${{ secrets.CLIENT_ID }}
+  #         tenant-id: ${{ secrets.TENANT_ID }}
+  #         subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
-      - name: Load input variables
-        env:
-          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
-          LOCATION: ${{ secrets.LOCATION }}
-          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
-          SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
-        run: |
-          echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
-          echo location=\""$LOCATION"\" >> terraform.tfvars
-          echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
-          echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
-          echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
-          echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
-          echo storage_account_name=\"phditfstate"${SUBSCRIPTION_ID:0:8}"\" >> backend.tfvars
+  #     - name: Load input variables
+  #       env:
+  #         SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+  #         LOCATION: ${{ secrets.LOCATION }}
+  #         RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+  #         SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
+  #         SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
+  #       run: |
+  #         echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
+  #         echo location=\""$LOCATION"\" >> terraform.tfvars
+  #         echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
+  #         echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
+  #         echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
+  #         echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
+  #         echo storage_account_name=\"phditfstate"${SUBSCRIPTION_ID:0:8}"\" >> backend.tfvars
 
-      - name: Set environment
-        run: |-
-          echo "TF_ENVIRONMENT=$(
-          if "${{ github.event.inputs.environment }}"; then
-            echo ${{ github.event.inputs.environment }}
-          else
-            echo dev
-          fi
-          )" >> $GITHUB_ENV
+  #     - name: Set environment
+  #       run: |-
+  #         echo "TF_ENVIRONMENT=$(
+  #         if "${{ github.event.inputs.environment }}"; then
+  #           echo ${{ github.event.inputs.environment }}
+  #         else
+  #           echo dev
+  #         fi
+  #         )" >> $GITHUB_ENV
 
-      - name: terraform
-        env:
-          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
-        run: |
-          terraform init -backend-config=backend.tfvars
-          terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform plan
+  #     - name: terraform
+  #       env:
+  #         ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+  #         ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+  #         ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+  #       run: |
+  #         terraform init -backend-config=backend.tfvars
+  #         terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
+  #         terraform plan
