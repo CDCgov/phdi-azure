@@ -29,6 +29,6 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
   name            = "phdi-ingestion"
   data_factory_id = azurerm_data_factory.phdi_data_factory.id
   concurrency     = 10 // Max concurrent instances of the pipeline, between 1 and 50. May need to tune this in the future. 
-  parameters = jsonencode(local.ingestion-pipeline-config.properties.parameters)
+  parameters = local.ingestion-pipeline-config.properties.parameters
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
 }
