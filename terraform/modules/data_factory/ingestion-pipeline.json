@@ -23,7 +23,7 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://phdi-dev-ingestion--q5apubh.bluerock-9ed363f2.centralus.azurecontainerapps.io/fhir/harmonization/standardization/standardize_names",
+                    "url": "${ingestion_container_url}fhir/harmonization/standardization/standardize_names",
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"data\":@{activity('convert_to_fhir').output.FhirResource}\n}",
@@ -52,7 +52,7 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://phdi-dev-ingestion--q5apubh.bluerock-9ed363f2.centralus.azurecontainerapps.io/fhir/harmonization/standardization/standardize_phones",
+                    "url": "${ingestion_container_url}fhir/harmonization/standardization/standardize_phones",
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"data\":@{activity('standardize_name').output}\n}",
@@ -81,7 +81,7 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://phdi-dev-ingestion--q5apubh.bluerock-9ed363f2.centralus.azurecontainerapps.io/fhir/geospatial/geocode/geocode_bundle",
+                    "url": "${ingestion_container_url}fhir/geospatial/geocode/geocode_bundle",
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"bundle\":@{activity('standardize_phone').output},\n    \"geocode_method\": \"census\"\n}",
@@ -110,7 +110,7 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://phdi-dev-ingestion--q5apubh.bluerock-9ed363f2.centralus.azurecontainerapps.io/fhir/linkage/link/add_patient_identifier_in_bundle",
+                    "url": "${ingestion_container_url}fhir/linkage/link/add_patient_identifier_in_bundle",
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"bundle\":@{activity('geocode').output},\n    \"salt_str\" : \"some-dummy-salt\"\n}    ",
@@ -132,7 +132,7 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://phdi-dev-fhir-converter.bluerock-9ed363f2.centralus.azurecontainerapps.io/convert-to-fhir",
+                    "url": "${fhir_converter_url}/convert-to-fhir",
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"input_data\": \"@{pipeline().parameters.message}\",\n    \"input_type\": \"@{pipeline().parameters.message_type}\",\n    \"root_template\": \"@{pipeline().parameters.root_template}\"\n}",
@@ -161,7 +161,7 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://phdi-dev-ingestion--q5apubh.bluerock-9ed363f2.centralus.azurecontainerapps.io/cloud/storage/write_blob_to_storage",
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"bundle\": @{activity('convert_to_fhir').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"fhir_conversion_failures\",\n    \"file_name\": @{pipeline().parameters.filename}\n}",
@@ -190,10 +190,10 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://phdi-dev-ingestion--q5apubh.bluerock-9ed363f2.centralus.azurecontainerapps.io/fhir/transport/http/upload_bundle_to_fhir_server",
+                    "url": "${ingestion_container_url}/fhir/transport/http/upload_bundle_to_fhir_server",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"fhir_url\": \"https://phdi-dev-fhir-server.azurehealthcareapis.com\",\n    \"bundle\": @{activity('add_patient_hash').output},\n    \"cred_manager\": \"azure\"\n}",
+                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('add_patient_hash').output},\n    \"cred_manager\": \"azure\"\n}",
                         "type": "Expression"
                     }
                 }
@@ -219,7 +219,7 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://phdi-dev-ingestion--q5apubh.bluerock-9ed363f2.centralus.azurecontainerapps.io/cloud/storage/write_blob_to_storage",
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"bundle\": @{activity('upload_fhir_bundle').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"fhir_upload_failures\",\n    \"file_name\": @{pipeline().parameters.filename}\n}",

@@ -21,7 +21,11 @@ resource "azurerm_data_factory" "phdi_data_factory" {
   }
 }
 locals {
-  ingestion-pipeline-config = jsondecode(file("../modules/data_factory/ingestion-pipeline.json"))
+  ingestion-pipeline-config = jsondecode(templatefile("../modules/data_factory/ingestion-pipeline.json", {
+    fhir_converter_url      = var.fhir_converter_url,
+    ingestion_container_url = var.ingestion_container_url,
+    fhir_server_url         = var.fhir_server_url
+  }))
 }
 
 resource "azurerm_data_factory_pipeline" "phdi_ingestion" {

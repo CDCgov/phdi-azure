@@ -53,6 +53,8 @@ jobs:
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${SUBSCRIPTION_ID:0:8}"\" >> backend.tfvars
+          echo fhir_converter_url = \"""\" >> terraform.tfvars
+          echo ingestion_container_url = \"""\" >> terraform.tfvars
 
       - name: Set environment
         run: |-
@@ -64,7 +66,7 @@ jobs:
           fi
           )" >> $GITHUB_ENV
 
-      - name: terraform
+      - name: create container registry
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
@@ -72,24 +74,10 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform apply -auto-approve -lock-timeout=30m
-
-      - name: Setup Python Environment
-        uses: actions/setup-python@v1
-        with:
-          python-version: "3.9"
-
-      - name: Install python dependencies
-        working-directory: ./serverless-functions
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
-
-      - name: "Run Azure Functions Action"
-        uses: Azure/functions-action@v1
-        with:
-          app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data"
-          package: serverless-functions
+          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -auto-approve -lock-timeout=30m
+          head -n -2 terraform.tfvars >> temp.txt
+          rm terraform.tfvars
+          mv temp.txt terraform.tfvars
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -107,13 +95,13 @@ jobs:
           az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
-          az acr update -n phdi${{ env.TF_ENVIRONMENT }}registry --admin-enabled true
 
       - name: Deploy container apps
         env:
           LOCATION: ${{ secrets.LOCATION }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
         run: |
+          az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
           az extension add --name containerapp --upgrade
           az provider register --namespace Microsoft.App
           az provider register --namespace Microsoft.OperationalInsights
@@ -152,3 +140,33 @@ jobs:
               --registry-password $REGISTRY_PASSWORD \
               --query properties.configuration.ingress.fqdn
           fi
+      - name: load container urls
+        run: |
+          FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
+          INGESTION_CONTAINER_URL="https://$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)"
+          echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
+          echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
+      - name: terraform
+        env:
+          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        run: |
+          terraform apply -auto-approve -lock-timeout=30m
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
+
+      - name: Install python dependencies
+        working-directory: ./serverless-functions
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+
+      - name: "Run Azure Functions Action"
+        uses: Azure/functions-action@v1
+        with:
+          app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data"
+          package: serverless-functions
