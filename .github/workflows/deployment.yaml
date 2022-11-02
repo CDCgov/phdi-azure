@@ -139,10 +139,15 @@ jobs:
               --query properties.configuration.ingress.fqdn
           fi
       - name: load container urls
-        env:
-          FHIR_CONVERTER_URL: ${{az containerapp show -n "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" -g "${{ secrets.RESOURCE_GROUP_NAME }}" --query 'properties.configuration.ingress.fqdn'}}
-          INGESTION_CONTAINER_URL: ${{az containerapp show -n "phdi-${{env.TF_ENVIRONMENT}}-ingestion" -g "${{ secrets.RESOURCE_GROUP_NAME }}" --query 'properties.configuration.ingress.fqdn'}}
         run: |
+          FHIR_CONVERTER_URL = ${{az containerapp show \
+            --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" \ 
+            --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" \
+            --query 'properties.configuration.ingress.fqdn'}}
+          INGESTION_CONTAINER_URL = ${{az containerapp show \
+            --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" \
+            --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" \
+            --query 'properties.configuration.ingress.fqdn'}}
           echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
           echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
       - name: terraform
