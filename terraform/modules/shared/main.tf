@@ -81,6 +81,18 @@ resource "azurerm_key_vault_secret" "salt" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
+resource "azurerm_key_vault_secret" "smarty_auth_id" {
+  name         = "smarty-auth-id"
+  value        = var.smarty_auth_id
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "smarty_auth_token" {
+  name         = "smarty-auth-token"
+  value        = var.smarty_auth_token
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
@@ -100,7 +112,9 @@ resource "azurerm_healthcare_service" "fhir_server" {
   kind                = "fhir-R4"
   cosmosdb_throughput = 1400
 
-  access_policy_object_ids = []
+  access_policy_object_ids = [
+    var.adf_identity_id
+  ]
 
   lifecycle {
     ignore_changes = [name, tags]

@@ -11,6 +11,14 @@ variable "resource_group_name" {
   description = "value of the Azure resource group to deploy to"
 }
 
+variable "smarty_auth_id" {
+  description = "value of the SmartyStreets Auth ID"
+}
+
+variable "smarty_auth_token" {
+  description = "value of the SmartyStreets Auth Token"
+}
+
 variable "fhir_converter_url" {
   description = "URL of the FHIR converter"
 }

@@ -7,3 +7,18 @@ variable "location" {
   type        = string
   description = "The Azure location where the resources should be created."
 }
+
+variable "smarty_auth_id" {
+  type        = string
+  description = "The SmartyStreets Auth ID."
+}
+
+variable "smarty_auth_token" {
+  type        = string
+  description = "The SmartyStreets Auth Token."
+}
+
+variable "adf_identity_id" {
+  type        = string
+  description = "The object ID of the identity used by the Data Factory."
+}
