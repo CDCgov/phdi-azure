@@ -18,6 +18,16 @@ resource "azurerm_storage_container" "source_data" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
+resource "azurerm_storage_container" "fhir_conversion_failures" {
+  name                 = "fhir-conversion-failures"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
+resource "azurerm_storage_container" "fhir_upload_failures" {
+  name                 = "fhir-upload-failures"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
 ##### Service Bus #####
 
 resource "azurerm_servicebus_namespace" "ingestion" {
