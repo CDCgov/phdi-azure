@@ -64,32 +64,18 @@ jobs:
           fi
           )" >> $GITHUB_ENV
 
-      - name: terraform
+      - name: terraform init
+        run: terraform init -backend-config=backend.tfvars
+
+      - name: terraform workspace
+        run: terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
+
+      - name: Create container registry
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
-        run: |
-          terraform init -backend-config=backend.tfvars
-          terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform apply -auto-approve -lock-timeout=30m
-
-      - name: Setup Python Environment
-        uses: actions/setup-python@v1
-        with:
-          python-version: "3.9"
-
-      - name: Install python dependencies
-        working-directory: ./serverless-functions
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
-
-      - name: "Run Azure Functions Action"
-        uses: Azure/functions-action@v1
-        with:
-          app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data"
-          package: serverless-functions
+        run: terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -auto-approve -lock-timeout=30m
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -152,3 +138,34 @@ jobs:
               --registry-password $REGISTRY_PASSWORD \
               --query properties.configuration.ingress.fqdn
           fi
+      - name: load container urls
+        env:
+          FHIR_CONVERTER_URL: ${{az containerapp show -n "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" -g "${{ secrets.RESOURCE_GROUP_NAME }}" --query 'properties.configuration.ingress.fqdn'}}
+          INGESTION_CONTAINER_URL: ${{az containerapp show -n "phdi-${{env.TF_ENVIRONMENT}}-ingestion" -g "${{ secrets.RESOURCE_GROUP_NAME }}" --query 'properties.configuration.ingress.fqdn'}}
+        run: |
+          echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
+          echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
+      - name: terraform
+        env:
+          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        run: |
+          terraform apply -auto-approve -lock-timeout=30m
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
+
+      - name: Install python dependencies
+        working-directory: ./serverless-functions
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+
+      - name: "Run Azure Functions Action"
+        uses: Azure/functions-action@v1
+        with:
+          app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data"
+          package: serverless-functions

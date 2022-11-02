@@ -7,3 +7,13 @@ variable "resource_group_name" {
   type        = string
   description = "Resource Group Name"
 }
+
+variable "fhir_converter_url" {
+  type        = string
+  description = "URL of the FHIR conversion service"
+}
+
+variable "ingestion_container_url" {
+  type        = string
+  description = "URL of the ingestion container"
+}

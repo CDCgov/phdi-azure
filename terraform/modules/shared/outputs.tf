@@ -9,3 +9,7 @@ output "ingestion_queue_name" {
 output "service_bus_connection_string" {
   value = azurerm_servicebus_namespace.ingestion.default_primary_connection_string
 }
+
+output "fhir_server_name" {
+  value = azurerm_healthcare_service.fhir_server.name
+}
