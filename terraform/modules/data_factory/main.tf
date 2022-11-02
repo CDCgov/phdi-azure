@@ -23,7 +23,6 @@ resource "azurerm_data_factory" "phdi_data_factory" {
 
 resource "azurerm_data_factory_pipeline" "ingestion" {
   name                = "ingestion"
-  resource_group_name = var.resource_group_name
   data_factory_id     = azurerm_data_factory.phdi_data_factory.id
   concurrency         = 10 // Max concurrent instances of the pipeline, between 1 and 50. May need to tune this in the future. 
   parameters = {
