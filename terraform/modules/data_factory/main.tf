@@ -33,5 +33,5 @@ resource "azurerm_data_factory_pipeline" "ingestion" {
                           "root_template": "",
                         }
 
-  activities_json = file("./google-workflows/ingestion-pipeline.json")
+  activities_json = file("./ingestion-pipeline.json")
 }
