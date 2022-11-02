@@ -32,5 +32,5 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
     "root_template" : "",
   }
 
-  activities_json = file("../modules/data_factory/ingestion-pipeline.json")
+  activities_json = jsonencode(file("../modules/data_factory/ingestion-pipeline.json"))
 }
