@@ -72,7 +72,7 @@ jobs:
         run: terraform init -backend-config=backend.tfvars
 
       - name: terraform workspace
-        run: terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
+        run: terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
 
       - name: Create container registry
         run: terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -auto-approve -lock-timeout=30m
