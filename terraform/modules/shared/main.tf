@@ -113,7 +113,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
   cosmosdb_throughput = 1400
 
   access_policy_object_ids = [
-    var.adf_identity_id
+    var.ingestion_container_identity_id
   ]
 
   lifecycle {

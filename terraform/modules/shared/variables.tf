@@ -18,7 +18,7 @@ variable "smarty_auth_token" {
   description = "The SmartyStreets Auth Token."
 }
 
-variable "adf_identity_id" {
+variable "ingestion_container_identity_id" {
   type        = string
-  description = "The object ID of the identity used by the Data Factory."
+  description = "The object ID of the identity used by the ingestion container."
 }

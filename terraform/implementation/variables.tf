@@ -26,3 +26,7 @@ variable "fhir_converter_url" {
 variable "ingestion_container_url" {
   description = "URL of the ingestion container"
 }
+
+variable "ingestion_container_identity_id" {
+  description = "object ID of the identity used by the ingestion container"
+}
