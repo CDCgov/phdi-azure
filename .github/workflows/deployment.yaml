@@ -139,6 +139,7 @@ jobs:
               --registry-username $REGISTRY_NAME \
               --registry-password $REGISTRY_PASSWORD \
               --system-assigned
+              --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}""
           fi
       - name: load container urls
         run: |
