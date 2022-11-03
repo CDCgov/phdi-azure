@@ -24,5 +24,5 @@ module "read_source_data" {
   phi_storage_account_connection_string = module.shared.phi_storage_account_connection_string
   ingestion_queue_name                  = module.shared.ingestion_queue_name
   service_bus_connection_string         = module.shared.service_bus_connection_string
-  subscription_id                       = module.shared.subscription_id
+  subscription_id                       = var.subscription_id
 }
