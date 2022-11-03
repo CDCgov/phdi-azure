@@ -5,7 +5,7 @@ data "archive_file" "read_source_data" {
 }
 
 resource "azurerm_storage_account" "function_app_sa" {
-  name                     = "phdi${terraform.workspace}functions"
+  name                     = "phdi${terraform.workspace}functions${substr(var.subscription_id, 0, 6)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
