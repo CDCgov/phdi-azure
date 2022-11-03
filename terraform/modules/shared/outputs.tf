@@ -14,6 +14,6 @@ output "fhir_server_name" {
   value = azurerm_healthcare_service.fhir_server.name
 }
 
-variable "subscription_id" {
+output "subscription_id" {
   value = var.subscription_id
 }
