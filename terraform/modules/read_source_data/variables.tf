@@ -22,3 +22,7 @@ variable "service_bus_connection_string" {
   type        = string
   description = "The connection string for the Service Bus namespace."
 }
+
+variable "subscription_id" {
+  description = "value of the Azure Subscription ID to use"
+}
