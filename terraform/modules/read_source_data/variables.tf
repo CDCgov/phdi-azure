@@ -22,3 +22,8 @@ variable "service_bus_connection_string" {
   type        = string
   description = "The connection string for the Service Bus namespace."
 }
+
+variable "time_stamp" {
+  type        = string
+  description = "The unix timestamp at the time of deployment."
+}
