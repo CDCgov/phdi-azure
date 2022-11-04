@@ -1,6 +1,5 @@
 from ReadSourceData import main as read_source_data
 from unittest import mock
-import json
 import pytest
 
 
@@ -69,8 +68,8 @@ def test_pipeline_trigger_success(
         adf_url = (
             "https://management.azure.com/subscriptions/"
             f"{patched_os.environ['SUBSCRIPTION_ID']}/resourceGroups/"
-            f"{patched_os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft.DataFactory/"
-            f"factories/{patched_os.environ['FACTORY_NAME']}/pipelines/"
+            f"{patched_os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft"
+            f".DataFactory/factories/{patched_os.environ['FACTORY_NAME']}/pipelines/"
             f"{patched_os.environ['PIPELINE_NAME']}/createRun?api-version=2018-06-01"
         )
 
@@ -109,7 +108,7 @@ def test_publishing_failure(patched_batch_converter, patched_os, patched_request
 
     with pytest.raises(Exception) as e:
         read_source_data(blob)
-        assert (
-            str(e)
-            == f"The ingestion pipeline was not triggered for some messages in {blob.name}."
+        assert str(e) == (
+            "The ingestion pipeline was not triggered for some messages in "
+            f"{blob.name}."
         )
