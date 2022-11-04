@@ -1,7 +1,5 @@
-import json
 import os
 import azure.functions as func
-import logging
 import requests
 
 from phdi.harmonization.hl7 import (

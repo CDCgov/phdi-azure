@@ -62,7 +62,6 @@ def test_pipeline_trigger_success(
         blob = mock.MagicMock()
         blob.name = f"source-data/{source_data_subdirectory}/some-filename.hl7"
         blob.read.return_value = b"some-message"
-        queue = mock.MagicMock()
         patched_batch_converter.return_value = ["some-message"]
 
         adf_url = (
