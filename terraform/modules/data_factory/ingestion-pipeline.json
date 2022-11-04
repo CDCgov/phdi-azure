@@ -55,7 +55,7 @@
                     "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_phones",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"data\":@{activity('standardize_name').output}\n}",
+                        "value": "{\n    \"data\":@{activity('standardize_name').output.bundle}\n}",
                         "type": "Expression"
                     }
                 }
@@ -84,7 +84,7 @@
                     "url": "${ingestion_container_url}/fhir/geospatial/geocode/geocode_bundle",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\":@{activity('standardize_phone').output},\n    \"geocode_method\": \"smarty\"\n}",
+                        "value": "{\n    \"bundle\":@{activity('standardize_phone').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
                         "type": "Expression"
                     }
                 }
@@ -113,7 +113,7 @@
                     "url": "${ingestion_container_url}/fhir/linkage/link/add_patient_identifier_in_bundle",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\":@{activity('geocode').output},\n    \"salt_str\" : \"some-dummy-salt\"\n}    ",
+                        "value": "{\n    \"bundle\":@{activity('geocode').output.bundle},\n    \"salt_str\" : \"some-dummy-salt\"\n}    ",
                         "type": "Expression"
                     }
                 }
@@ -193,7 +193,7 @@
                     "url": "${ingestion_container_url}/fhir/transport/http/upload_bundle_to_fhir_server",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('add_patient_hash').output},\n    \"cred_manager\": \"azure\"\n}",
+                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('add_patient_hash').output.bundle},\n    \"cred_manager\": \"azure\"\n}",
                         "type": "Expression"
                     }
                 }
