@@ -1,4 +1,4 @@
-output "phi_adf_name" {
+output "phdi_data_factory_name" {
   value = azurerm_data_factory.phdi_data_factory.name
 }
 
