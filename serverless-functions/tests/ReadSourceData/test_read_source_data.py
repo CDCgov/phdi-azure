@@ -3,6 +3,7 @@ from unittest import mock
 import json
 import pytest
 
+
 @mock.patch("ReadSourceData.requests")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
@@ -66,11 +67,11 @@ def test_pipeline_trigger_success(
         patched_batch_converter.return_value = ["some-message"]
 
         adf_url = (
-        "https://management.azure.com/subscriptions/"
-        f"{patched_os.environ['SUBSCRIPTION_ID']}/resourceGroups/"
-        f"{patched_os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft.DataFactory/"
-        f"factories/{patched_os.environ['FACTORY_NAME']}/pipelines/"
-        f"{patched_os.environ['PIPELINE_NAME']}/createRun?api-version=2018-06-01"
+            "https://management.azure.com/subscriptions/"
+            f"{patched_os.environ['SUBSCRIPTION_ID']}/resourceGroups/"
+            f"{patched_os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft.DataFactory/"
+            f"factories/{patched_os.environ['FACTORY_NAME']}/pipelines/"
+            f"{patched_os.environ['PIPELINE_NAME']}/createRun?api-version=2018-06-01"
         )
 
         parameters = {
@@ -87,9 +88,7 @@ def test_pipeline_trigger_success(
 @mock.patch("ReadSourceData.requests")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
-def test_publishing_failure(
-    patched_batch_converter, patched_os, patched_requests
-):
+def test_publishing_failure(patched_batch_converter, patched_os, patched_requests):
 
     patched_os.environ = {
         "SUBSCRIPTION_ID": "some-subscription-id",
@@ -110,4 +109,7 @@ def test_publishing_failure(
 
     with pytest.raises(Exception) as e:
         read_source_data(blob)
-        assert str(e) == f"The ingestion pipeline was not triggered for some messages in {blob.name}."
+        assert (
+            str(e)
+            == f"The ingestion pipeline was not triggered for some messages in {blob.name}."
+        )
