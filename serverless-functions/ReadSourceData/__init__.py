@@ -1,6 +1,8 @@
 import json
+import os
 import azure.functions as func
 import logging
+import requests
 
 from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
@@ -46,16 +48,21 @@ def main(blob: func.InputStream, queue: func.Out[str]) -> None:
         else:
             messages = [blob_contents]
 
+        adf_url = ("https://management.azure.com/subscriptions/"
+                f"{os.environ['SUBSCRIPTION_ID']}/resourceGroups/"
+                f"{os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft.DataFactory/"
+                f"factories/{os.environ['FACTORY_NAME']}/pipelines/"
+                f"{os.environ['PIPELINE_NAME']}/createRun?api-version=2018-06-01")
+
         for message in messages:
-            queue_message = {
+            pipeline_parameters = {
                 "message": message,
                 "message_type": message_type,
                 "root_template": root_template,
                 "filename": blob.name,
             }
-
-            queue_message = json.dumps(queue_message)
-            queue.set(queue_message)
+            
+            requests.post(url=adf_url, json=pipeline_parameters)
 
     except Exception:
         logging.exception("Exception occurred during read_source_data processing.")
