@@ -19,50 +19,57 @@ def main(blob: func.InputStream, queue: func.Out[str]) -> None:
     :param queue: A service bus queue to which each individual message will be posted
     :return: None
     """
-    try:
-        # Determine data type and root template.
-        filename_parts = blob.name.split("/")
-        if filename_parts[0] == "source-data":
 
-            if filename_parts[1] == "elr":
-                message_type = "hl7v2"
-                root_template = "ORU_R01"
+    # Determine data type and root template.
+    filename_parts = blob.name.split("/")
+    if filename_parts[0] == "source-data":
 
-            elif filename_parts[1] == "vxu":
-                message_type = "hl7v2"
-                root_template = "VXU_V04"
+        if filename_parts[1] == "elr":
+            message_type = "hl7v2"
+            root_template = "ORU_R01"
 
-            elif filename_parts[1] == "ecr":
-                message_type = "ccda"
-                root_template = "CCD"
+        elif filename_parts[1] == "vxu":
+            message_type = "hl7v2"
+            root_template = "VXU_V04"
 
-        else:
-            raise Exception("Invalid file type.")
+        elif filename_parts[1] == "ecr":
+            message_type = "ccda"
+            root_template = "CCD"
 
-        blob_contents = blob.read().decode("utf-8", errors="ignore")
+    else:
+        raise Exception("Invalid file type.")
 
-        # Handle batch Hl7v2 messages.
-        if message_type == "hl7v2":
-            messages = convert_hl7_batch_messages_to_list(blob_contents)
+    blob_contents = blob.read().decode("utf-8", errors="ignore")
 
-        else:
-            messages = [blob_contents]
+    # Handle batch Hl7v2 messages.
+    if message_type == "hl7v2":
+        messages = convert_hl7_batch_messages_to_list(blob_contents)
 
-        adf_url = ("https://management.azure.com/subscriptions/"
-                f"{os.environ['SUBSCRIPTION_ID']}/resourceGroups/"
-                f"{os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft.DataFactory/"
-                f"factories/{os.environ['FACTORY_NAME']}/pipelines/"
-                f"{os.environ['PIPELINE_NAME']}/createRun?api-version=2018-06-01")
+    else:
+        messages = [blob_contents]
 
-        for message in messages:
-            pipeline_parameters = {
-                "message": message,
-                "message_type": message_type,
-                "root_template": root_template,
-                "filename": blob.name,
-            }
-            
-            requests.post(url=adf_url, json=pipeline_parameters)
+    adf_url = (
+        "https://management.azure.com/subscriptions/"
+        f"{os.environ['SUBSCRIPTION_ID']}/resourceGroups/"
+        f"{os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft.DataFactory/"
+        f"factories/{os.environ['FACTORY_NAME']}/pipelines/"
+        f"{os.environ['PIPELINE_NAME']}/createRun?api-version=2018-06-01"
+    )
 
-    except Exception:
-        logging.exception("Exception occurred during read_source_data processing.")
+    failed_pipeline_executions = []
+    for message in messages:
+        pipeline_parameters = {
+            "message": message,
+            "message_type": message_type,
+            "root_template": root_template,
+            "filename": blob.name,
+        }
+
+        adf_response = requests.post(url=adf_url, json=pipeline_parameters)
+        if adf_response.status_code != 200:
+            failed_pipeline_executions.append(pipeline_parameters)
+
+    if failed_pipeline_executions != []:
+        raise Exception(
+            f"The ingestion pipeline was not triggered for some messages in {blob.name}."
+        )
