@@ -55,6 +55,7 @@ jobs:
           echo storage_account_name=\"phditfstate"${SUBSCRIPTION_ID:0:8}"\" >> backend.tfvars
           echo fhir_converter_url = \"""\" >> terraform.tfvars
           echo ingestion_container_url = \"""\" >> terraform.tfvars
+          echo ingestion_container_identity_id = \"""\" >> terraform.tfvars
 
       - name: Set environment
         run: |-
@@ -75,7 +76,7 @@ jobs:
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
           terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -auto-approve -lock-timeout=30m
-          head -n -2 terraform.tfvars >> temp.txt
+          head -n -3 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
 
@@ -121,11 +122,10 @@ jobs:
               --environment ${{ env.TF_ENVIRONMENT }} \
               --image $REGISTRY_URL/phdi/fhir-converter:latest \
               --target-port 8080 \
-              --ingress 'internal' \
+              --ingress 'external' \
               --registry-server $REGISTRY_URL \
               --registry-username $REGISTRY_NAME \
-              --registry-password $REGISTRY_PASSWORD \
-              --query properties.configuration.ingress.fqdn
+              --registry-password $REGISTRY_PASSWORD
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-ingestion) ]]; then
             az containerapp create \
@@ -134,18 +134,21 @@ jobs:
               --environment ${{ env.TF_ENVIRONMENT }} \
               --image $REGISTRY_URL/phdi/phdi-ingestion:latest \
               --target-port 8080 \
-              --ingress 'internal' \
+              --ingress 'external' \
               --registry-server $REGISTRY_URL \
               --registry-username $REGISTRY_NAME \
               --registry-password $REGISTRY_PASSWORD \
-              --query properties.configuration.ingress.fqdn
+              --system-assigned \
+              --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}"
           fi
       - name: load container urls
         run: |
           FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
           INGESTION_CONTAINER_URL="https://$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)"
+          INGESTION_CONTAINER_IDENTITY_ID=$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "identity.principalId" -o tsv)
           echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
           echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
+          echo ingestion_container_identity_id=\""$INGESTION_CONTAINER_IDENTITY_ID"\" >> terraform.tfvars
       - name: terraform
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
