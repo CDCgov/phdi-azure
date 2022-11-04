@@ -26,7 +26,7 @@
                     "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_names",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"data\":@{activity('convert_to_fhir').output.FhirResource}\n}",
+                        "value": "{\n    \"data\":@{activity('convert_to_fhir').output.response.FhirResource}\n}",
                         "type": "Expression"
                     }
                 }
@@ -222,7 +222,7 @@
                     "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\": @{activity('upload_fhir_bundle').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"fhir_upload_failures\",\n    \"file_name\": @{pipeline().parameters.filename}\n}",
+                        "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"fhir_upload_failures\",\n    \"file_name\": @{pipeline().parameters.filename}\n   \"storage_account_url\": \"${storage_account_url}\"\n}",
                         "type": "Expression"
                     }
                 }
