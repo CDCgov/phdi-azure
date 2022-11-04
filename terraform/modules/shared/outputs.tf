@@ -14,6 +14,6 @@ output "fhir_server_name" {
   value = azurerm_healthcare_service.fhir_server.name
 }
 
-output "timestamp" {
+output "time_stamp" {
   value = time_static.timestamp
 }
