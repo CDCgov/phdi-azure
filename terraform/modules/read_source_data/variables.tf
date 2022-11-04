@@ -24,6 +24,6 @@ variable "service_bus_connection_string" {
 }
 
 variable "time_stamp" {
-  type = string
+  type        = string
   description = "The unix timestamp at the time of deployment."
 }
