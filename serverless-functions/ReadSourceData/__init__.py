@@ -9,14 +9,14 @@ from phdi.harmonization.hl7 import (
 )
 
 
-def main(blob: func.InputStream, queue: func.Out[str]) -> None:
+def main(blob: func.InputStream) -> None:
     """
     When this function is triggered with a blob payload, read the new file if its
     name begins with 'source-data/', identify each individual messsage
-    (ELR, VXU, or eCR) contained in the file, and publish each one to a service bus
-    queue.
+    (ELR, VXU, or eCR) contained in the file, and trigger in an Azure Data Factory 
+    ingestion pipeline for each of them. An exception is raised if pipeline triggering 
+    fails for any message.
     :param blob: An input stream of the blob that was uploaded to the blob storage
-    :param queue: A service bus queue to which each individual message will be posted
     :return: None
     """
 
