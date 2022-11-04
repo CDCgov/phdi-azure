@@ -28,5 +28,5 @@ module "read_source_data" {
   ingestion_queue_name                  = module.shared.ingestion_queue_name
   service_bus_connection_string         = module.shared.service_bus_connection_string
   phdi_data_factory_name                = module.data_factory.phi_adf_name
-  iingestion_pipeline_name              = module.data_factory.ingestion_pipeline_name  
+  iingestion_pipeline_name              = module.data_factory.ingestion_pipeline_name
 }
