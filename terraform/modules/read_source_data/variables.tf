@@ -32,3 +32,8 @@ variable "ingestion_pipeline_name" {
   type        = string
   description = "The name of the ingestion pipeline in ADF."
 }
+
+variable "subscription_id" {
+  type        = string
+  description = "The Azure subscription ID."
+}
