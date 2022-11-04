@@ -22,3 +22,13 @@ variable "service_bus_connection_string" {
   type        = string
   description = "The connection string for the Service Bus namespace."
 }
+
+variable "phdi_data_factory_name" {
+  type        = string
+  description = "The name of the PHDI ADF resource."
+}
+
+variable "ingestion_pipeline_name" {
+  type        = string
+  description = "The name of the ingestion pipeline in ADF."
+}

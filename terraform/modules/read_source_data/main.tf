@@ -41,6 +41,10 @@ resource "azurerm_linux_function_app" "read_source_data" {
     AzureWebJobsPhiStorage          = var.phi_storage_account_connection_string
     AzureServiceBusConnectionString = var.service_bus_connection_string
     ServiceBusQueueName             = var.ingestion_queue_name
+    SUBSCRIPTION_ID                 = terraform.subscription_id
+    RESOURCE_GROUP_NAME             = var.resource_group_name
+    FACTORY_NAME                    = var.phdi_adf_name
+    PIPELINE_NAME                   = var.ingestion_pipeline_name
   }
 
   lifecycle {
