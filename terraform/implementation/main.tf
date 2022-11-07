@@ -1,11 +1,11 @@
 // Load modules here
 
 module "shared" {
-  source                          = "../modules/shared"
-  resource_group_name             = var.resource_group_name
-  location                        = var.location
-  smarty_auth_id                  = var.smarty_auth_id
-  smarty_auth_token               = var.smarty_auth_token
+  source              = "../modules/shared"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  smarty_auth_id      = var.smarty_auth_id
+  smarty_auth_token   = var.smarty_auth_token
 }
 
 
