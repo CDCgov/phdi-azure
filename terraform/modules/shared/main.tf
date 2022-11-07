@@ -1,7 +1,9 @@
 ##### PHI Storage Account #####
 
+resource "time_static" "timestamp" {}
+
 resource "azurerm_storage_account" "phi" {
-  name                     = "phdi${terraform.workspace}phi"
+  name                     = "phdi${terraform.workspace}phi${substr(tostring(time_static.timestamp.unix), 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
@@ -9,7 +11,7 @@ resource "azurerm_storage_account" "phi" {
   account_replication_type = "GRS"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 

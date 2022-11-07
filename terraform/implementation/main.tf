@@ -11,12 +11,13 @@ module "shared" {
 
 
 module "data_factory" {
-  source                  = "../modules/data_factory"
-  resource_group_name     = var.resource_group_name
-  location                = var.location
-  fhir_converter_url      = var.fhir_converter_url
-  ingestion_container_url = var.ingestion_container_url
-  fhir_server_url         = "https://${module.shared.fhir_server_name}.azurehealthcareapis.com/"
+  source                           = "../modules/data_factory"
+  resource_group_name              = var.resource_group_name
+  location                         = var.location
+  fhir_converter_url               = var.fhir_converter_url
+  ingestion_container_url          = var.ingestion_container_url
+  fhir_server_url                  = "https://${module.shared.fhir_server_name}.azurehealthcareapis.com/"
+  phi_storage_account_endpoint_url = module.shared.phi_storage_account_endpoint_url
 }
 
 
@@ -30,4 +31,5 @@ module "read_source_data" {
   phdi_data_factory_name                = module.data_factory.phdi_data_factory_name
   ingestion_pipeline_name               = module.data_factory.ingestion_pipeline_name
   subscription_id                       = var.subscription_id
+  time_stamp                            = module.shared.time_stamp
 }
