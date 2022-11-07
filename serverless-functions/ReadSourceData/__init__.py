@@ -71,6 +71,6 @@ def main(blob: func.InputStream) -> None:
         raise Exception(
             (
                 "The ingestion pipeline was not triggered for some messages in "
-                f"{blob.name}."
+                f"{blob.name}. The status code was {adf_response.status_code}."
             )
         )
