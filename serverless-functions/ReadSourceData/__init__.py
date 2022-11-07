@@ -73,6 +73,6 @@ def main(blob: func.InputStream) -> None:
             (
                 "The ingestion pipeline was not triggered for some messages in "
                 f"{blob.name}. The status code was {adf_response.status_code}. The"
-                f"response was {json.dumps(adf_response.status_code.json())}"
+                f"response was {json.dumps(adf_response.json())}"
             )
         )
