@@ -75,7 +75,7 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -auto-approve -lock-timeout=30m
+          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -auto-approve -lock-timeout=30m
           head -n -3 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
@@ -109,6 +109,7 @@ jobs:
           REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry
           REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
+          RUNNER_ID=$(terraform output module.shared.pipeline_runner_id)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
@@ -125,7 +126,8 @@ jobs:
               --ingress 'external' \
               --registry-server $REGISTRY_URL \
               --registry-username $REGISTRY_NAME \
-              --registry-password $REGISTRY_PASSWORD
+              --registry-password $REGISTRY_PASSWORD\
+              --user-assigned $RUNNER_ID 
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-ingestion) ]]; then
             az containerapp create \
@@ -138,7 +140,7 @@ jobs:
               --registry-server $REGISTRY_URL \
               --registry-username $REGISTRY_NAME \
               --registry-password $REGISTRY_PASSWORD \
-              --system-assigned \
+              --user-assigned $RUNNER_ID \
               --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}"
           fi
       - name: load container urls

@@ -21,3 +21,7 @@ output "fhir_server_name" {
 output "time_stamp" {
   value = tostring(time_static.timestamp.unix)
 }
+
+output "pipeline_runner_id" {
+  value = azurerm_user_assigned_identity.pipeline_runner.id
+}

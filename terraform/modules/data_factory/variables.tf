@@ -27,3 +27,8 @@ variable "phi_storage_account_endpoint_url" {
   type        = string
   description = "URL of the PHI storage account"
 }
+
+variable "pipeline_runner_id" {
+  type        = string
+  description = "ID of the pipeline runner identity"
+}

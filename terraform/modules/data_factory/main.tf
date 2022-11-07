@@ -6,7 +6,8 @@ resource "azurerm_data_factory" "phdi_data_factory" {
   managed_virtual_network_enabled = true
 
   identity {
-    type = "SystemAssigned"
+    type = "UserAssigned"
+    identity_ids = [var.pipeline_runner_id]
   }
 
   lifecycle {

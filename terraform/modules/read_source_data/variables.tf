@@ -37,7 +37,13 @@ variable "subscription_id" {
   type        = string
   description = "The Azure subscription ID."
 }
+
 variable "time_stamp" {
   type        = string
   description = "The unix timestamp at the time of deployment."
+}
+
+variable "pipeline_runner_id" {
+  type        = string
+  description = "ID of the pipeline runner identity"
 }

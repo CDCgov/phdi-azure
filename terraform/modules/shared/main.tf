@@ -115,7 +115,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
   cosmosdb_throughput = 1400
 
   access_policy_object_ids = [
-    var.ingestion_container_identity_id
+    azurerm_user_assigned_identity.pipeline_runner.principal_id
   ]
 
   lifecycle {
@@ -126,4 +126,12 @@ resource "azurerm_healthcare_service" "fhir_server" {
     environment = terraform.workspace
     managed-by  = "terraform"
   }
+}
+
+#### User Assigned Identity ####
+
+resource "azurerm_user_assigned_identity" "pipeline_runner" {
+  location            = var.location
+  name                = "phdi-${terraform.workspace}-pipeline-runner"
+  resource_group_name = var.resource_group_name
 }
