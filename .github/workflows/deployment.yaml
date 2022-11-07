@@ -111,7 +111,7 @@ jobs:
           REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry
           REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
-          RUNNER_ID=$(terraform output module.shared.pipeline_runner_id)
+          MANAGED_IDENTITY_ID=$(terraform output module.shared.pipeline_runner_id)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
@@ -129,7 +129,7 @@ jobs:
               --registry-server $REGISTRY_URL \
               --registry-username $REGISTRY_NAME \
               --registry-password $REGISTRY_PASSWORD \
-              --user-assigned $RUNNER_ID 
+              --user-assigned $MANAGED_IDENTITY_ID 
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-ingestion) ]]; then
             az containerapp create \
@@ -142,7 +142,7 @@ jobs:
               --registry-server $REGISTRY_URL \
               --registry-username $REGISTRY_NAME \
               --registry-password $REGISTRY_PASSWORD \
-              --user-assigned $RUNNER_ID \
+              --user-assigned $MANAGED_IDENTITY_ID \
               --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}"
           fi
       - name: load container urls
