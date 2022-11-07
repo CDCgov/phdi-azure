@@ -55,7 +55,6 @@ jobs:
           echo storage_account_name=\"phditfstate"${SUBSCRIPTION_ID:0:8}"\" >> backend.tfvars
           echo fhir_converter_url = \"""\" >> terraform.tfvars
           echo ingestion_container_url = \"""\" >> terraform.tfvars
-          echo ingestion_container_identity_id = \"""\" >> terraform.tfvars
 
       - name: Set environment
         run: |-
@@ -147,10 +146,8 @@ jobs:
         run: |
           FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
           INGESTION_CONTAINER_URL="https://$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)"
-          INGESTION_CONTAINER_IDENTITY_ID=$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "identity.principalId" -o tsv)
           echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
           echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
-          echo ingestion_container_identity_id=\""$INGESTION_CONTAINER_IDENTITY_ID"\" >> terraform.tfvars
       - name: terraform
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}

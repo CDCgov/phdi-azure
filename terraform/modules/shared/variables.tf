@@ -17,8 +17,3 @@ variable "smarty_auth_token" {
   type        = string
   description = "The SmartyStreets Auth Token."
 }
-
-variable "ingestion_container_identity_id" {
-  type        = string
-  description = "The object ID of the identity used by the ingestion container."
-}
