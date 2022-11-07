@@ -111,6 +111,8 @@ jobs:
           REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry
           REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
+          terraform output
+          terraform output module.shared.pipeline_runner_id
           MANAGED_IDENTITY_ID=$(terraform output module.shared.pipeline_runner_id)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
