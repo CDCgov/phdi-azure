@@ -75,7 +75,7 @@ jobs:
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
           terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -auto-approve -lock-timeout=30m
-          head -n -3 terraform.tfvars >> temp.txt
+          head -n -2 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
 
@@ -125,7 +125,7 @@ jobs:
               --ingress 'external' \
               --registry-server $REGISTRY_URL \
               --registry-username $REGISTRY_NAME \
-              --registry-password $REGISTRY_PASSWORD\
+              --registry-password $REGISTRY_PASSWORD \
               --user-assigned $RUNNER_ID 
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-ingestion) ]]; then
