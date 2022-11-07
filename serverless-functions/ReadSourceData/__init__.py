@@ -1,6 +1,7 @@
 import os
 import azure.functions as func
 import requests
+import json
 
 from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
@@ -71,6 +72,7 @@ def main(blob: func.InputStream) -> None:
         raise Exception(
             (
                 "The ingestion pipeline was not triggered for some messages in "
-                f"{blob.name}. The status code was {adf_response.status_code}."
+                f"{blob.name}. The status code was {adf_response.status_code}. The"
+                f"response was {json.dumps(adf_response.status_code.json())}"
             )
         )
