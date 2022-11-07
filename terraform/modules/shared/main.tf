@@ -10,6 +10,11 @@ resource "azurerm_storage_account" "phi" {
   account_kind             = "StorageV2"
   account_replication_type = "GRS"
 
+  identity {
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+  }
+
   lifecycle {
     prevent_destroy = false
   }
@@ -40,6 +45,7 @@ resource "azurerm_key_vault" "phdi_key_vault" {
   sku_name                   = "premium"
   soft_delete_retention_days = 7
 
+
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = data.azurerm_client_config.current.object_id
@@ -55,6 +61,19 @@ resource "azurerm_key_vault" "phdi_key_vault" {
       "Delete",
       "Purge",
       "Recover"
+    ]
+  }
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = azurerm_user_assigned_identity.pipeline_runner.principal_id
+
+    key_permissions = [
+      "Get",
+    ]
+
+    secret_permissions = [
+      "Get",
     ]
   }
 }
