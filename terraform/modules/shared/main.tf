@@ -10,10 +10,6 @@ resource "azurerm_storage_account" "phi" {
   account_kind             = "StorageV2"
   account_replication_type = "GRS"
 
-  identity {
-    type = "UserAssigned"
-  }
-
   lifecycle {
     prevent_destroy = false
   }
