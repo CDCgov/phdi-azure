@@ -30,22 +30,6 @@ resource "azurerm_storage_container" "fhir_upload_failures" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
-##### Service Bus #####
-
-resource "azurerm_servicebus_namespace" "ingestion" {
-  name                = "phdi-${terraform.workspace}-ingestion"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard"
-}
-
-resource "azurerm_servicebus_queue" "ingestion" {
-  name         = "phdi-${terraform.workspace}-ingestion"
-  namespace_id = azurerm_servicebus_namespace.ingestion.id
-
-  enable_partitioning = true
-}
-
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {

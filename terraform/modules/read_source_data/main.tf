@@ -43,8 +43,6 @@ resource "azurerm_linux_function_app" "read_source_data" {
     FUNCTIONS_WORKER_RUNTIME        = "python"
     SCM_DO_BUILD_DURING_DEPLOYMENT  = 1
     AzureWebJobsPhiStorage          = var.phi_storage_account_connection_string
-    AzureServiceBusConnectionString = var.service_bus_connection_string
-    ServiceBusQueueName             = var.ingestion_queue_name
     SUBSCRIPTION_ID                 = var.subscription_id
     RESOURCE_GROUP_NAME             = var.resource_group_name
     FACTORY_NAME                    = var.phdi_data_factory_name

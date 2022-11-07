@@ -13,16 +13,6 @@ variable "phi_storage_account_connection_string" {
   description = "The connection string for the storage account where the PHI data is stored."
 }
 
-variable "ingestion_queue_name" {
-  type        = string
-  description = "The name of the Service Bus queue to which source messages should be posted."
-}
-
-variable "service_bus_connection_string" {
-  type        = string
-  description = "The connection string for the Service Bus namespace."
-}
-
 variable "phdi_data_factory_name" {
   type        = string
   description = "The name of the PHDI ADF resource."

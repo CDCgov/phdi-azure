@@ -27,8 +27,6 @@ module "read_source_data" {
   resource_group_name                   = var.resource_group_name
   location                              = var.location
   phi_storage_account_connection_string = module.shared.phi_storage_account_connection_string
-  ingestion_queue_name                  = module.shared.ingestion_queue_name
-  service_bus_connection_string         = module.shared.service_bus_connection_string
   phdi_data_factory_name                = module.data_factory.phdi_data_factory_name
   ingestion_pipeline_name               = module.data_factory.ingestion_pipeline_name
   subscription_id                       = var.subscription_id
