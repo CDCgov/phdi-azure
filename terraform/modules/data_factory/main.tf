@@ -6,7 +6,7 @@ resource "azurerm_data_factory" "phdi_data_factory" {
   managed_virtual_network_enabled = true
 
   identity {
-    type = "UserAssigned"
+    type         = "UserAssigned"
     identity_ids = [var.pipeline_runner_id]
   }
 

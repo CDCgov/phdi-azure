@@ -11,7 +11,7 @@ resource "azurerm_storage_account" "phi" {
   account_replication_type = "GRS"
 
   identity {
-    type = "UserAssigned"
+    type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
   }
 
