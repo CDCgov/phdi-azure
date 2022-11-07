@@ -100,9 +100,7 @@ jobs:
         env:
           LOCATION: ${{ secrets.LOCATION }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
         run: |
           az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
           az extension add --name containerapp --upgrade
@@ -111,9 +109,7 @@ jobs:
           REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry
           REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
-          terraform output
-          terraform output module.shared.pipeline_runner_id
-          MANAGED_IDENTITY_ID=$(terraform output module.shared.pipeline_runner_id)
+          MANAGED_IDENTITY_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.ManagedIdentity/userAssignedIdentities/phdi-${{ env.TF_ENVIRONMENT }}-pipeline-runner"
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
