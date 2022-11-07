@@ -19,5 +19,5 @@ output "fhir_server_name" {
 }
 
 output "time_stamp" {
-  value = time_static.timestamp
+  value = tostring(time_static.timestamp.unix)
 }
