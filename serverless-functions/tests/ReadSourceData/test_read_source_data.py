@@ -14,7 +14,7 @@ def test_handle_batch_hl7(
     patched_adf_management_client,
 ):
     patched_os.environ = {
-        "SUBSCRIPTION_ID": "some-subscription-id",
+        "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
         "RESOURCE_GROUP_NAME": "some-resource-group",
         "FACTORY_NAME": "some-adf",
         "PIPELINE_NAME": "some-pipeline",
@@ -52,7 +52,7 @@ def test_pipeline_trigger_success(
     patched_adf_management_client,
 ):
     patched_os.environ = {
-        "SUBSCRIPTION_ID": "some-subscription-id",
+        "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
         "RESOURCE_GROUP_NAME": "some-resource-group",
         "FACTORY_NAME": "some-adf",
         "PIPELINE_NAME": "some-pipeline",
@@ -114,7 +114,7 @@ def test_publishing_failure(
 ):
 
     patched_os.environ = {
-        "SUBSCRIPTION_ID": "some-subscription-id",
+        "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
         "RESOURCE_GROUP_NAME": "some-resource-group",
         "FACTORY_NAME": "some-adf",
         "PIPELINE_NAME": "some-pipeline",
