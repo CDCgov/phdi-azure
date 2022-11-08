@@ -65,7 +65,7 @@ def main(blob: func.InputStream) -> None:
     adf_client = DataFactoryManagementClient(credentials, subscription_id)
 
     failed_pipeline_executions = []
-    for message in messages:
+    for idx, message in enumerate(messages):
         pipeline_parameters = {
             "message": message,
             "message_type": message_type,
@@ -73,21 +73,20 @@ def main(blob: func.InputStream) -> None:
             "filename": blob.name,
         }
 
-        adf_response = adf_client.pipelines.create_run(
-            resource_group_name,
-            factory_name,
-            pipeline_name,
-            parameters=pipeline_parameters,
-        )
-
-        if adf_response.status_code != 200:
-            failed_pipeline_executions.append(pipeline_parameters)
+        try:
+            adf_client.pipelines.create_run(
+                resource_group_name,
+                factory_name,
+                pipeline_name,
+                parameters=pipeline_parameters,
+            )
+        except:
+            failed_pipeline_executions.append(idx)
 
     if failed_pipeline_executions != []:
         raise Exception(
             (
                 "The ingestion pipeline was not triggered for some messages in "
-                f"{blob.name}. The status code was {adf_response.status_code}. The"
-                f"response was {json.dumps(adf_response.json())}"
+                f"{blob.name}. Failed message indices: {failed_pipeline_executions}"
             )
         )
