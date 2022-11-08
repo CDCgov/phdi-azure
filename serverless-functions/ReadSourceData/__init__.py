@@ -61,7 +61,7 @@ def main(blob: func.InputStream) -> None:
     )
 
     cred_manager = AzureCredentialManager(resource_location=adf_url)
-    credentials = cred_manager.get_credentials()
+    credentials = cred_manager.get_credential_object()
     adf_client = DataFactoryManagementClient(credentials, subscription_id)
 
     failed_pipeline_executions = []
