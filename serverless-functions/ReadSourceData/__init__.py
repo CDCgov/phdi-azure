@@ -3,6 +3,8 @@ import azure.functions as func
 import requests
 import json
 
+from azure.mgmt.datafactory import DataFactoryManagementClient
+from phdi.cloud.azure import AzureCredentialManager
 from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
@@ -47,13 +49,21 @@ def main(blob: func.InputStream) -> None:
     else:
         messages = [blob_contents]
 
+    subscription_id = os.environ["SUBSCRIPTION_ID"]
+    resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
+    factory_name = os.environ["FACTORY_NAME"]
+    pipeline_name = os.environ["PIPELINE_NAME"]
+
     adf_url = (
         "https://management.azure.com/subscriptions/"
-        f"{os.environ['SUBSCRIPTION_ID']}/resourceGroups/"
-        f"{os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft.DataFactory/"
-        f"factories/{os.environ['FACTORY_NAME']}/pipelines/"
-        f"{os.environ['PIPELINE_NAME']}/createRun?api-version=2018-06-01"
+        f"{subscription_id}/resourceGroups/"
+        f"{resource_group_name}/providers/Microsoft.DataFactory/"
+        f"factories/{factory_name}/pipelines/{pipeline_name}"
     )
+
+    cred_manager = AzureCredentialManager(resource_location=adf_url)
+    credentials = cred_manager.get_credentials()
+    adf_client = DataFactoryManagementClient(credentials, subscription_id)
 
     failed_pipeline_executions = []
     for message in messages:
@@ -64,7 +74,13 @@ def main(blob: func.InputStream) -> None:
             "filename": blob.name,
         }
 
-        adf_response = requests.post(url=adf_url, json=pipeline_parameters)
+        adf_response = adf_client.pipelines.create_run(
+            resource_group_name,
+            factory_name,
+            pipeline_name,
+            parameters=pipeline_parameters,
+        )
+
         if adf_response.status_code != 200:
             failed_pipeline_executions.append(pipeline_parameters)
 
