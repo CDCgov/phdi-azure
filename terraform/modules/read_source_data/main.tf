@@ -48,6 +48,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
     FACTORY_NAME                    = var.phdi_data_factory_name
     PIPELINE_NAME                   = var.ingestion_pipeline_name
     AZURE_CLIENT_ID                 = var.pipeline_runner_id
+    AZURE_TENANT_ID                 = var.tenant_id
   }
 
   lifecycle {

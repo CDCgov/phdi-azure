@@ -37,3 +37,8 @@ variable "pipeline_runner_id" {
   type        = string
   description = "ID of the pipeline runner identity"
 }
+
+variable "tenant_id" {
+  type        = string
+  description = "The Azure Tenant ID"
+}
