@@ -35,7 +35,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
   identity {
     type         = "UserAssigned"
-    identity_ids = [var.pipeline_runner_id]
+    identity_ids = [var.pipeline_runner_id, data.azurerm_client_config.current.object_id]
   }
 
   app_settings = {
@@ -53,7 +53,10 @@ resource "azurerm_linux_function_app" "read_source_data" {
 
   lifecycle {
     ignore_changes = [
-      app_settings["WEBSITE_RUN_FROM_PACKAGE"]
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      tags["hidden-link: /app-insights-conn-string"],
+      tags["hidden-link: /app-insights-instrumentation-key"],
+      tags["hidden-link: /app-insights-resource-id"],
     ]
   }
 
