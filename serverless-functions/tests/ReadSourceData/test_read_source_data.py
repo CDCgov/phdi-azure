@@ -3,10 +3,16 @@ from unittest import mock
 import pytest
 
 
-@mock.patch("ReadSourceData.requests")
+@mock.patch("ReadSourceData.DataFactoryManagementClient")
+@mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
-def test_handle_batch_hl7(patched_batch_converter, patched_os, patched_requests):
+def test_handle_batch_hl7(
+    patched_batch_converter,
+    patched_os,
+    patched_azure_cred_manager,
+    patched_adf_management_client,
+):
     patched_os.environ = {
         "SUBSCRIPTION_ID": "some-subscription-id",
         "RESOURCE_GROUP_NAME": "some-resource-group",
@@ -16,7 +22,14 @@ def test_handle_batch_hl7(patched_batch_converter, patched_os, patched_requests)
 
     good_response = mock.Mock()
     good_response.status_code = 200
-    patched_requests.post.return_value = good_response
+
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    adf_client = mock.MagicMock()
+    adf_client.pipelines.create_run.return_value = good_response
+    patched_adf_management_client.return_value = adf_client
 
     blob = mock.MagicMock()
     blob.name = "source-data/elr/some-filename.hl7"
@@ -28,11 +41,15 @@ def test_handle_batch_hl7(patched_batch_converter, patched_os, patched_requests)
     patched_batch_converter.assert_called()
 
 
-@mock.patch("ReadSourceData.requests")
+@mock.patch("ReadSourceData.DataFactoryManagementClient")
+@mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
 def test_pipeline_trigger_success(
-    patched_batch_converter, patched_os, patched_requests
+    patched_batch_converter,
+    patched_os,
+    patched_azure_cred_manager,
+    patched_adf_management_client,
 ):
     patched_os.environ = {
         "SUBSCRIPTION_ID": "some-subscription-id",
@@ -43,8 +60,13 @@ def test_pipeline_trigger_success(
 
     good_response = mock.Mock()
     good_response.status_code = 200
-    patched_requests.post.return_value = good_response
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
 
+    adf_client = mock.MagicMock()
+    adf_client.pipelines.create_run.return_value = good_response
+    patched_adf_management_client.return_value = adf_client
     for source_data_subdirectory in ["elr", "vxu", "ecr"]:
 
         if source_data_subdirectory == "elr":
@@ -80,13 +102,24 @@ def test_pipeline_trigger_success(
         }
 
         read_source_data(blob)
-        patched_requests.post.assert_called_with(url=adf_url, json=parameters)
+        adf_client.pipelines.create_run.assert_called_with(
+            patched_os.environ["RESOURCE_GROUP_NAME"],
+            patched_os.environ["FACTORY_NAME"],
+            patched_os.environ["PIPELINE_NAME"],
+            parameters=parameters,
+        )
 
 
-@mock.patch("ReadSourceData.requests")
+@mock.patch("ReadSourceData.DataFactoryManagementClient")
+@mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
-def test_publishing_failure(patched_batch_converter, patched_os, patched_requests):
+def test_publishing_failure(
+    patched_batch_converter,
+    patched_os,
+    patched_azure_cred_manager,
+    patched_adf_management_client,
+):
 
     patched_os.environ = {
         "SUBSCRIPTION_ID": "some-subscription-id",
@@ -97,7 +130,13 @@ def test_publishing_failure(patched_batch_converter, patched_os, patched_request
 
     bad_response = mock.Mock()
     bad_response.status_code = 400
-    patched_requests.post.return_value = bad_response
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    adf_client = mock.MagicMock()
+    adf_client.pipelines.create_run.return_value = bad_response
+    patched_adf_management_client.return_value = adf_client
 
     blob = mock.MagicMock()
     blob.name = "source-data/elr/some-filename.hl7"
