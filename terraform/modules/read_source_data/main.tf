@@ -35,7 +35,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
   identity {
     type         = "UserAssigned"
-    identity_ids = [var.pipeline_runner_id, data.azurerm_client_config.current.object_id]
+    identity_ids = [var.pipeline_runner_id]
   }
 
   app_settings = {

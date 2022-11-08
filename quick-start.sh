@@ -105,7 +105,7 @@ APP_REG_NAME=github
 CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
 
 # Create service principal and grant access to subscription
-az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role contributor --name $APP_REG_NAME
+az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME --role owner --name $APP_REG_NAME
 
 # Create federated credential
 cat << EOF > credentials.json
