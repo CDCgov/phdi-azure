@@ -48,7 +48,7 @@ def main(blob: func.InputStream) -> None:
     else:
         messages = [blob_contents]
 
-    subscription_id = os.environ["SUBSCRIPTION_ID"]
+    subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
     factory_name = os.environ["FACTORY_NAME"]
     pipeline_name = os.environ["PIPELINE_NAME"]

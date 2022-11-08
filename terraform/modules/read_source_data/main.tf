@@ -43,12 +43,12 @@ resource "azurerm_linux_function_app" "read_source_data" {
     FUNCTIONS_WORKER_RUNTIME        = "python"
     SCM_DO_BUILD_DURING_DEPLOYMENT  = 1
     AzureWebJobsPhiStorage          = var.phi_storage_account_connection_string
-    SUBSCRIPTION_ID                 = var.subscription_id
     RESOURCE_GROUP_NAME             = var.resource_group_name
     FACTORY_NAME                    = var.phdi_data_factory_name
     PIPELINE_NAME                   = var.ingestion_pipeline_name
     AZURE_CLIENT_ID                 = var.pipeline_runner_id
     AZURE_TENANT_ID                 = data.azurerm_client_config.current.tenant_id
+    AZURE_SUBSCRIPTION_ID           = var.subscription_id
   }
 
   lifecycle {
