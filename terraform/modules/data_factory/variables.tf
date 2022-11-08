@@ -32,3 +32,8 @@ variable "pipeline_runner_id" {
   type        = string
   description = "ID of the pipeline runner identity"
 }
+
+variable "pipeline_runner_principal_id" {
+  type        = string
+  description = "Principal ID of the pipeline runner identity"
+}

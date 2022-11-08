@@ -43,3 +43,9 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
 }
+
+resource "azurerm_role_assignment" "data_factory_contributor" {
+  scope                = azurerm_data_factory.phdi_data_factory.id
+  role_definition_name = "Contributor"
+  principal_id         = var.pipeline_runner_principal_id
+}

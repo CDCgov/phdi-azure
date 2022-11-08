@@ -21,3 +21,7 @@ output "pipeline_runner_id" {
 output "pipeline_runner_client_id" {
   value = azurerm_user_assigned_identity.pipeline_runner.client_id
 }
+
+output "pipeline_runner_principal_id" {
+  value = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
