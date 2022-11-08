@@ -86,14 +86,6 @@ def test_pipeline_trigger_success(
         blob.read.return_value = b"some-message"
         patched_batch_converter.return_value = ["some-message"]
 
-        adf_url = (
-            "https://management.azure.com/subscriptions/"
-            f"{patched_os.environ['SUBSCRIPTION_ID']}/resourceGroups/"
-            f"{patched_os.environ['RESOURCE_GROUP_NAME']}/providers/Microsoft"
-            f".DataFactory/factories/{patched_os.environ['FACTORY_NAME']}/pipelines/"
-            f"{patched_os.environ['PIPELINE_NAME']}/createRun?api-version=2018-06-01"
-        )
-
         parameters = {
             "message": "some-message",
             "message_type": message_type,
