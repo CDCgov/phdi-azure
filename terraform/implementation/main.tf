@@ -31,4 +31,5 @@ module "read_source_data" {
   subscription_id                       = var.subscription_id
   time_stamp                            = module.shared.time_stamp
   pipeline_runner_id                    = module.shared.pipeline_runner_id
+  pipeline_runner_client_id             = module.shared.pipeline_runner_client_id
 }
