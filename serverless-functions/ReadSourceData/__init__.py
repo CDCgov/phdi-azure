@@ -1,6 +1,5 @@
 import os
 import azure.functions as func
-import requests
 import json
 
 from azure.mgmt.datafactory import DataFactoryManagementClient
