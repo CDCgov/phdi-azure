@@ -66,6 +66,7 @@ def main(blob: func.InputStream) -> None:
     failed_pipeline_executions = {}
     for idx, message in enumerate(messages):
         message = message.replace("\\", "\\\\")
+        message = message.replace("\\r", "\\\\r")
         pipeline_parameters = {
             "message": message,
             "message_type": message_type,
