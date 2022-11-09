@@ -1,4 +1,5 @@
 import os
+import json
 import azure.functions as func
 
 from azure.mgmt.datafactory import DataFactoryManagementClient
@@ -67,9 +68,9 @@ def main(blob: func.InputStream) -> None:
 
     failed_pipeline_executions = {}
     for idx, message in enumerate(messages):
-        message = message.replace("\\","\\\\")
+        
         pipeline_parameters = {
-            "message": message,
+            "message": json.dumps(message),
             "message_type": message_type,
             "root_template": root_template,
             "filename": blob.name,
