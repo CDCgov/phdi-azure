@@ -82,7 +82,7 @@ def main(blob: func.InputStream) -> None:
         except Exception as e:
             failed_pipeline_executions[idx] = e
 
-    if failed_pipeline_executions != []:
+    if failed_pipeline_executions != {}:
         raise Exception(
             (
                 "The ingestion pipeline was not triggered for some messages in "
