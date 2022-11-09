@@ -6,7 +6,8 @@ resource "azurerm_data_factory" "phdi_data_factory" {
   managed_virtual_network_enabled = true
 
   identity {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [var.pipeline_runner_id]
   }
 
   lifecycle {
@@ -41,4 +42,10 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
   }
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
+}
+
+resource "azurerm_role_assignment" "data_factory_contributor" {
+  scope                = azurerm_data_factory.phdi_data_factory.id
+  role_definition_name = "Contributor"
+  principal_id         = var.pipeline_runner_principal_id
 }

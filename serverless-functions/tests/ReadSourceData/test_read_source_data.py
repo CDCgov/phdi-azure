@@ -1,26 +1,72 @@
 from ReadSourceData import main as read_source_data
 from unittest import mock
-import json
 import pytest
 
 
+@mock.patch("ReadSourceData.DataFactoryManagementClient")
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
 def test_handle_batch_hl7(
     patched_batch_converter,
+    patched_os,
+    patched_azure_cred_manager,
+    patched_adf_management_client,
 ):
+    patched_os.environ = {
+        "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
+        "RESOURCE_GROUP_NAME": "some-resource-group",
+        "FACTORY_NAME": "some-adf",
+        "PIPELINE_NAME": "some-pipeline",
+    }
+
+    good_response = mock.Mock()
+    good_response.status_code = 200
+
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    adf_client = mock.MagicMock()
+    adf_client.pipelines.create_run.return_value = good_response
+    patched_adf_management_client.return_value = adf_client
+
     blob = mock.MagicMock()
     blob.name = "source-data/elr/some-filename.hl7"
     blob.read.return_value = b"some-blob-contents"
-    queue = mock.MagicMock()
+
     patched_batch_converter.return_value = ["some-message"]
-    read_source_data(blob, queue)
+
+    read_source_data(blob)
     patched_batch_converter.assert_called()
 
 
+@mock.patch("ReadSourceData.DataFactoryManagementClient")
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
-def test_publishing_initial_success(
+def test_pipeline_trigger_success(
     patched_batch_converter,
+    patched_os,
+    patched_azure_cred_manager,
+    patched_adf_management_client,
 ):
+    patched_os.environ = {
+        "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
+        "RESOURCE_GROUP_NAME": "some-resource-group",
+        "FACTORY_NAME": "some-adf",
+        "PIPELINE_NAME": "some-pipeline",
+    }
+
+    good_response = mock.Mock()
+    good_response.status_code = 200
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    adf_client = mock.MagicMock()
+    adf_client.pipelines.create_run.return_value = good_response
+    patched_adf_management_client.return_value = adf_client
     for source_data_subdirectory in ["elr", "vxu", "ecr"]:
 
         if source_data_subdirectory == "elr":
@@ -38,32 +84,61 @@ def test_publishing_initial_success(
         blob = mock.MagicMock()
         blob.name = f"source-data/{source_data_subdirectory}/some-filename.hl7"
         blob.read.return_value = b"some-message"
-        queue = mock.MagicMock()
         patched_batch_converter.return_value = ["some-message"]
 
-        queue_message = {
-            "message": "some-message",
+        parameters = {
+            "message": '"some-message"',
             "message_type": message_type,
             "root_template": root_template,
             "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
         }
-        queue_message = json.dumps(queue_message)
 
-        read_source_data(blob, queue)
-        queue.set.assert_called_with(queue_message)
+        read_source_data(blob)
+        adf_client.pipelines.create_run.assert_called_with(
+            patched_os.environ["RESOURCE_GROUP_NAME"],
+            patched_os.environ["FACTORY_NAME"],
+            patched_os.environ["PIPELINE_NAME"],
+            parameters=parameters,
+        )
 
 
+@mock.patch("ReadSourceData.DataFactoryManagementClient")
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
 def test_publishing_failure(
     patched_batch_converter,
+    patched_os,
+    patched_azure_cred_manager,
+    patched_adf_management_client,
 ):
 
+    patched_os.environ = {
+        "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
+        "RESOURCE_GROUP_NAME": "some-resource-group",
+        "FACTORY_NAME": "some-adf",
+        "PIPELINE_NAME": "some-pipeline",
+    }
+
+    bad_response = mock.Mock()
+    bad_response.status_code = 400
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    adf_client = mock.MagicMock()
+    adf_client.pipelines.create_run.return_value = bad_response
+    patched_adf_management_client.return_value = adf_client
+
     blob = mock.MagicMock()
-    blob.name = "some-other-container/elr/some-filename.hl7"
-    blob.read.return_value = b"some-message"
-    queue = mock.MagicMock()
+    blob.name = "source-data/elr/some-filename.hl7"
+    blob.read.return_value = b"some-blob-contents"
+
     patched_batch_converter.return_value = ["some-message"]
 
     with pytest.raises(Exception) as e:
-        read_source_data(blob, queue)
-        assert str(e) == "Invalid file type."
+        read_source_data(blob)
+        assert str(e) == (
+            "The ingestion pipeline was not triggered for some messages in "
+            f"{blob.name}."
+        )

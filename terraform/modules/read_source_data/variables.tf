@@ -13,17 +13,32 @@ variable "phi_storage_account_connection_string" {
   description = "The connection string for the storage account where the PHI data is stored."
 }
 
-variable "ingestion_queue_name" {
+variable "phdi_data_factory_name" {
   type        = string
-  description = "The name of the Service Bus queue to which source messages should be posted."
+  description = "The name of the PHDI ADF resource."
 }
 
-variable "service_bus_connection_string" {
+variable "ingestion_pipeline_name" {
   type        = string
-  description = "The connection string for the Service Bus namespace."
+  description = "The name of the ingestion pipeline in ADF."
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "The Azure subscription ID."
 }
 
 variable "time_stamp" {
   type        = string
   description = "The unix timestamp at the time of deployment."
+}
+
+variable "pipeline_runner_id" {
+  type        = string
+  description = "ID of the pipeline runner identity"
+}
+
+variable "pipeline_runner_client_id" {
+  type        = string
+  description = "Client ID of the pipeline runner identity"
 }

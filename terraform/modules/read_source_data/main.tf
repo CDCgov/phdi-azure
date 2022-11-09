@@ -33,19 +33,30 @@ resource "azurerm_linux_function_app" "read_source_data" {
   service_plan_id            = azurerm_service_plan.function_app_sp.id
   storage_account_name       = azurerm_storage_account.function_app_sa.name
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [var.pipeline_runner_id]
+  }
 
   app_settings = {
     WEBSITE_ENABLE_SYNC_UPDATE_SITE = true
     FUNCTIONS_WORKER_RUNTIME        = "python"
     SCM_DO_BUILD_DURING_DEPLOYMENT  = 1
     AzureWebJobsPhiStorage          = var.phi_storage_account_connection_string
-    AzureServiceBusConnectionString = var.service_bus_connection_string
-    ServiceBusQueueName             = var.ingestion_queue_name
+    RESOURCE_GROUP_NAME             = var.resource_group_name
+    FACTORY_NAME                    = var.phdi_data_factory_name
+    PIPELINE_NAME                   = var.ingestion_pipeline_name
+    AZURE_CLIENT_ID                 = var.pipeline_runner_client_id
+    AZURE_TENANT_ID                 = data.azurerm_client_config.current.tenant_id
+    AZURE_SUBSCRIPTION_ID           = var.subscription_id
   }
 
   lifecycle {
     ignore_changes = [
-      app_settings["WEBSITE_RUN_FROM_PACKAGE"]
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      tags["hidden-link: /app-insights-conn-string"],
+      tags["hidden-link: /app-insights-instrumentation-key"],
+      tags["hidden-link: /app-insights-resource-id"],
     ]
   }
 

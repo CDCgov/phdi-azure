@@ -7,13 +7,6 @@
       "direction": "in",
       "path": "source-data/{name}",
       "connection": "PhiStorage"
-    },
-    {
-      "type": "serviceBus",
-      "direction": "out",
-      "connection": "AzureServiceBusConnectionString",
-      "name": "queue",
-      "queueName": "%ServiceBusQueueName%"
     }
   ]
 }

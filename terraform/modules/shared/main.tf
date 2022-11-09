@@ -10,6 +10,11 @@ resource "azurerm_storage_account" "phi" {
   account_kind             = "StorageV2"
   account_replication_type = "GRS"
 
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+  }
+
   lifecycle {
     prevent_destroy = false
   }
@@ -30,22 +35,6 @@ resource "azurerm_storage_container" "fhir_upload_failures" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
-##### Service Bus #####
-
-resource "azurerm_servicebus_namespace" "ingestion" {
-  name                = "phdi-${terraform.workspace}-ingestion"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard"
-}
-
-resource "azurerm_servicebus_queue" "ingestion" {
-  name         = "phdi-${terraform.workspace}-ingestion"
-  namespace_id = azurerm_servicebus_namespace.ingestion.id
-
-  enable_partitioning = true
-}
-
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
@@ -55,6 +44,7 @@ resource "azurerm_key_vault" "phdi_key_vault" {
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   sku_name                   = "premium"
   soft_delete_retention_days = 7
+
 
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
@@ -71,6 +61,19 @@ resource "azurerm_key_vault" "phdi_key_vault" {
       "Delete",
       "Purge",
       "Recover"
+    ]
+  }
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = azurerm_user_assigned_identity.pipeline_runner.principal_id
+
+    key_permissions = [
+      "Get",
+    ]
+
+    secret_permissions = [
+      "Get",
     ]
   }
 }
@@ -115,7 +118,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
   cosmosdb_throughput = 1400
 
   access_policy_object_ids = [
-    var.ingestion_container_identity_id
+    azurerm_user_assigned_identity.pipeline_runner.principal_id
   ]
 
   lifecycle {
@@ -126,4 +129,12 @@ resource "azurerm_healthcare_service" "fhir_server" {
     environment = terraform.workspace
     managed-by  = "terraform"
   }
+}
+
+#### User Assigned Identity ####
+
+resource "azurerm_user_assigned_identity" "pipeline_runner" {
+  location            = var.location
+  name                = "phdi-${terraform.workspace}-pipeline-runner"
+  resource_group_name = var.resource_group_name
 }
