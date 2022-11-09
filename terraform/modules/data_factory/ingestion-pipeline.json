@@ -135,7 +135,7 @@
                     "url": "${fhir_converter_url}/convert-to-fhir",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"input_data\": \"@{pipeline().parameters.message}\",\n    \"input_type\": \"@{pipeline().parameters.message_type}\",\n    \"root_template\": \"@{pipeline().parameters.root_template}\"\n}",
+                        "value": "{\n    \"input_data\": @{pipeline().parameters.message},\n    \"input_type\": \"@{pipeline().parameters.message_type}\",\n    \"root_template\": \"@{pipeline().parameters.root_template}\"\n}",
                         "type": "Expression"
                     }
                 }
