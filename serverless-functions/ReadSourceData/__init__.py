@@ -1,6 +1,5 @@
 import os
 import azure.functions as func
-import json
 
 from azure.mgmt.datafactory import DataFactoryManagementClient
 from phdi.cloud.azure import AzureCredentialManager
@@ -64,7 +63,7 @@ def main(blob: func.InputStream) -> None:
     credentials = cred_manager.get_credential_object()
     adf_client = DataFactoryManagementClient(credentials, subscription_id)
 
-    failed_pipeline_executions = []
+    failed_pipeline_executions = {}
     for idx, message in enumerate(messages):
         pipeline_parameters = {
             "message": message,
@@ -80,13 +79,13 @@ def main(blob: func.InputStream) -> None:
                 pipeline_name,
                 parameters=pipeline_parameters,
             )
-        except:
-            failed_pipeline_executions.append(idx)
+        except Exception as e:
+            failed_pipeline_executions[idx] = e
 
     if failed_pipeline_executions != []:
         raise Exception(
             (
                 "The ingestion pipeline was not triggered for some messages in "
-                f"{blob.name}. Failed message indices: {failed_pipeline_executions}"
+                f"{blob.name}. Failed messages: {failed_pipeline_executions}"
             )
         )
