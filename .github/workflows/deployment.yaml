@@ -170,7 +170,9 @@ jobs:
 
       - name: Get publish profile
         run: |
-          echo "PUBLISH_PROFILE=$(az functionapp deployment list-publishing-profiles --name phdi-${{ env.TF_ENVIRONMENT }}-read-source-data --query "[?publishMethod=='ZipDeploy'] | [0]")" >> $GITHUB_ENV
+          echo 'PUBLISH_PROFILE<<EOF' >> $GITHUB_ENV
+          az functionapp deployment list-publishing-profiles --name phdi-${{ env.TF_ENVIRONMENT }}-read-source-data --query "[?publishMethod=='ZipDeploy'] | [0]" >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       - name: "Run Azure Functions Action"
         uses: Azure/functions-action@v1
