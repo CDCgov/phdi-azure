@@ -87,7 +87,7 @@ def test_pipeline_trigger_success(
         patched_batch_converter.return_value = ["some-message"]
 
         parameters = {
-            "message": "some-message",
+            "message": '"some-message"',
             "message_type": message_type,
             "root_template": root_template,
             "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",

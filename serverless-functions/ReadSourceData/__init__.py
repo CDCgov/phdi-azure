@@ -39,9 +39,7 @@ def main(blob: func.InputStream) -> None:
     else:
         raise Exception("Invalid file type.")
 
-    blob_contents = (
-        blob.read().decode("utf-8", errors="ignore")
-    )
+    blob_contents = blob.read().decode("utf-8", errors="ignore")
 
     # Handle batch Hl7v2 messages.
     if message_type == "hl7v2":
@@ -68,7 +66,7 @@ def main(blob: func.InputStream) -> None:
 
     failed_pipeline_executions = {}
     for idx, message in enumerate(messages):
-        
+
         pipeline_parameters = {
             "message": json.dumps(message),
             "message_type": message_type,
