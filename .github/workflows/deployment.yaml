@@ -66,7 +66,7 @@ jobs:
           fi
           )" >> $GITHUB_ENV
 
-      - name: create container registry
+      - name: Create container registry, managed identity, and PHI storage account
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
@@ -74,7 +74,7 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -auto-approve -lock-timeout=30m
+          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -auto-approve -lock-timeout=30m
           head -n -2 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
@@ -112,6 +112,7 @@ jobs:
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
           MANAGED_IDENTITY_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.ManagedIdentity/userAssignedIdentities/phdi-${{ env.TF_ENVIRONMENT }}-pipeline-runner"
           MANAGED_IDENTITY_CLIENT_ID=$(az identity show --ids $MANAGED_IDENTITY_ID --query "properties.clientId" -o tsv)
+          STORAGE_ACCOUNT_URL=$(az storage account list --query "[?contains(name,'phdi${{ env.TF_ENVIRONMENT }}phi')] | [0] | primaryEndpoints.blob" -o tsv)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
@@ -143,7 +144,7 @@ jobs:
               --registry-username $REGISTRY_NAME \
               --registry-password $REGISTRY_PASSWORD \
               --user-assigned $MANAGED_IDENTITY_ID \
-              --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}" AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID"
+              --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}" AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL"
           fi
       - name: load container urls
         run: |

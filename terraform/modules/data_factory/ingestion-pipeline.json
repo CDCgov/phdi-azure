@@ -164,7 +164,7 @@
                     "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\": @{activity('convert_to_fhir').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"fhir_conversion_failures\",\n    \"file_name\": @{pipeline().parameters.filename}\n}",
+                        "value": "{\n    \"blob\": @{activity('convert_to_fhir').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"fhir_conversion_failures\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
                         "type": "Expression"
                     }
                 }
