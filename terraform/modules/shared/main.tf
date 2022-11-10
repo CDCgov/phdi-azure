@@ -35,6 +35,12 @@ resource "azurerm_storage_container" "fhir_upload_failures" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
+resource "azurerm_role_assignment" "phi_storage_contributor" {
+  scope                = azurerm_storage_account.phi.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
