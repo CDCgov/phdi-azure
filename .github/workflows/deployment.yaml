@@ -111,7 +111,7 @@ jobs:
           REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
           MANAGED_IDENTITY_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.ManagedIdentity/userAssignedIdentities/phdi-${{ env.TF_ENVIRONMENT }}-pipeline-runner"
-          MANAGED_IDENTITY_CLIENT_ID=$(az identity show --ids $MANAGED_IDENTITY_ID --query "properties.clientId" -o tsv)
+          MANAGED_IDENTITY_CLIENT_ID=$(az identity show --ids $MANAGED_IDENTITY_ID --query "clientId" -o tsv)
           STORAGE_ACCOUNT_URL=$(az storage account list --query "[?contains(name,'phdi${{ env.TF_ENVIRONMENT }}phi')] | [0] | primaryEndpoints.blob" -o tsv)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
