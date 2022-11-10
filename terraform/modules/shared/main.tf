@@ -37,7 +37,7 @@ resource "azurerm_storage_container" "fhir_upload_failures" {
 
 resource "azurerm_role_assignment" "phi_storage_contributor" {
   scope                = azurerm_storage_account.phi.id
-  role_definition_name = "Contributor"
+  role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
