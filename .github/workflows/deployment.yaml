@@ -90,11 +90,14 @@ jobs:
         run: |
           docker pull ghcr.io/cdcgov/phdi/fhir-converter:main
           docker pull ghcr.io/cdcgov/phdi/phdi-ingestion:main
+          docker pull ghcr.io/cdcgov/phdi/phdi-tabulate:main
           docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
           docker tag ghcr.io/cdcgov/phdi/phdi-ingestion:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
+          docker tag ghcr.io/cdcgov/phdi/phdi-tabulate:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulate:latest
           az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
+          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulate:latest
 
       - name: Deploy container apps
         env:
@@ -146,10 +149,25 @@ jobs:
               --user-assigned $MANAGED_IDENTITY_ID \
               --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}" AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL"
           fi
+          if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-tabulate) ]]; then
+            az containerapp create \
+              --name phdi-${{ env.TF_ENVIRONMENT }}-tabulate \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --environment ${{ env.TF_ENVIRONMENT }} \
+              --image $REGISTRY_URL/phdi/phdi-tabulation:latest \
+              --target-port 8080 \
+              --ingress 'external' \
+              --registry-server $REGISTRY_URL \
+              --registry-username $REGISTRY_NAME \
+              --registry-password $REGISTRY_PASSWORD \
+              --user-assigned $MANAGED_IDENTITY_ID \
+              --env-vars AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL"
+          fi
       - name: load container urls
         run: |
           FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
           INGESTION_CONTAINER_URL="https://$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)"
+          TABULATE_CONTAINER_URL="https://$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-tabulate" --query "properties.configuration.ingress.fqdn" -o tsv)"
           echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
           echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
       - name: terraform
