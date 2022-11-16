@@ -106,6 +106,7 @@ jobs:
           SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           TENANT_ID: ${{ secrets.TENANT_ID }}
         run: |
+          brew install yq
           az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
           az extension add --name containerapp --upgrade
           az provider register --namespace Microsoft.App
@@ -177,22 +178,14 @@ jobs:
             az containerapp show \
               --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
               --resource-group $RESOURCE_GROUP_NAME \
-              --output yaml > tabulation.yaml       
+              --output yaml > tabulation.yaml
+            yq -i '.properties.template += {"volumes": [{"name":"tables-file-volume","storageName":"phdi${{ env.TF_ENVIRONMENT }}tables","storageType":"AzureFile"}]}' tabulation.yaml
+            yq -i '.properties.template.containers[0] += {"volumeMounts": [{"volumeName":"phdi${{ env.TF_ENVIRONMENT }}tables", "mountPath":"/tables"}]}' tabulation.yaml
+            az containerapp update \
+              --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --yaml tabulation.yaml
           fi
-      - name: Add storage share volume to tabulation.yaml
-        uses: mikefarah/yq@master
-        with:
-          cmd: 'yq -i ''.properties.template += {"volumes": [{"name":"tables-file-volume","storageName":"phdi${{ env.TF_ENVIRONMENT }}tables","storageType":"AzureFile"}]}'' tabulation.yaml'
-      - name: Add storage share volume mount to tabulation.yaml
-        uses: mikefarah/yq@master
-        with:
-          cmd: 'yq -i ''.properties.template.containers[0] += {"volumeMounts": [{"volumeName":"phdi${{ env.TF_ENVIRONMENT }}tables", "mountPath":"/tables"}]}'' tabulation.yaml'
-      - name: Update tabulation container app
-        run: |
-          az containerapp update \
-            --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
-            --resource-group $RESOURCE_GROUP_NAME \
-            --yaml tabulation.yaml
       - name: load container urls
         run: |
           FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
