@@ -74,7 +74,7 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -auto-approve -lock-timeout=30m
+          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -auto-approve -lock-timeout=30m
           head -n -2 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
@@ -115,12 +115,24 @@ jobs:
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
           MANAGED_IDENTITY_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.ManagedIdentity/userAssignedIdentities/phdi-${{ env.TF_ENVIRONMENT }}-pipeline-runner"
           MANAGED_IDENTITY_CLIENT_ID=$(az identity show --ids $MANAGED_IDENTITY_ID --query "clientId" -o tsv)
+          STORAGE_ACCOUNT_NAME=phdi${{ env.TF_ENVIRONMENT }}phi${SUBSCRIPTION_ID:0:8}
           STORAGE_ACCOUNT_URL=$(az storage account list --query "[?contains(name,'phdi${{ env.TF_ENVIRONMENT }}phi')] | [0] | primaryEndpoints.blob" -o tsv)
+          STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
+          STORAGE_SHARE_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
+          STORAGE_MOUNT_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
               --resource-group $RESOURCE_GROUP_NAME \
               --location $LOCATION
+            az containerapp env storage set \
+              --access-mode ReadWrite \
+              --azure-file-account-name $STORAGE_ACCOUNT_NAME \
+              --azure-file-account-key $STORAGE_ACCOUNT_KEY \
+              --azure-file-share-name $STORAGE_SHARE_NAME \
+              --storage-name $STORAGE_MOUNT_NAME \
+              --name ${{ env.TF_ENVIRONMENT }} \
+              --resource-group $RESOURCE_GROUP_NAME
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter) ]]; then
             az containerapp create \
@@ -149,9 +161,9 @@ jobs:
               --user-assigned $MANAGED_IDENTITY_ID \
               --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}" AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL"
           fi
-          if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-tabulate) ]]; then
+          if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-tabulation) ]]; then
             az containerapp create \
-              --name phdi-${{ env.TF_ENVIRONMENT }}-tabulate \
+              --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
               --resource-group $RESOURCE_GROUP_NAME \
               --environment ${{ env.TF_ENVIRONMENT }} \
               --image $REGISTRY_URL/phdi/phdi-tabulation:latest \
@@ -162,12 +174,30 @@ jobs:
               --registry-password $REGISTRY_PASSWORD \
               --user-assigned $MANAGED_IDENTITY_ID \
               --env-vars AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL"
+            az containerapp show \
+              --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --output yaml > tabulation.yaml       
           fi
+      - name: Add storage share volume to tabulation.yaml
+        uses: mikefarah/yq@master
+        with:
+          cmd: 'yq -i ''.properties.template += {"volumes": [{"name":"tables-file-volume","storageName":"phdi${{ env.TF_ENVIRONMENT }}tables","storageType":"AzureFile"}]}'' tabulation.yaml'
+      - name: Add storage share volume mount to tabulation.yaml
+        uses: mikefarah/yq@master
+        with:
+          cmd: 'yq -i ''.properties.template.containers[0] += {"volumeMounts": [{"volumeName":"phdi${{ env.TF_ENVIRONMENT }}tables", "mountPath":"/tables"}]}'' tabulation.yaml'
+      - name: Update tabulation container app
+        run: |
+          az containerapp update \
+            --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
+            --resource-group $RESOURCE_GROUP_NAME \
+            --yaml tabulation.yaml
       - name: load container urls
         run: |
           FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
           INGESTION_CONTAINER_URL="https://$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)"
-          TABULATE_CONTAINER_URL="https://$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-tabulate" --query "properties.configuration.ingress.fqdn" -o tsv)"
+          TABULATE_CONTAINER_URL="https://$(az containerapp show --name "phdi-${{env.TF_ENVIRONMENT}}-tabulation" --query "properties.configuration.ingress.fqdn" -o tsv)"
           echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
           echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
       - name: terraform

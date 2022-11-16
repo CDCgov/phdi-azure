@@ -9,6 +9,7 @@ resource "azurerm_storage_account" "phi" {
   account_tier             = "Standard"
   account_kind             = "StorageV2"
   account_replication_type = "GRS"
+  large_file_share_enabled = true
 
   identity {
     type         = "UserAssigned"
@@ -39,6 +40,13 @@ resource "azurerm_role_assignment" "phi_storage_contributor" {
   scope                = azurerm_storage_account.phi.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+resource "azurerm_storage_share" "tables" {
+  name                 = "phdi${terraform.workspace}tables"
+  storage_account_name = azurerm_storage_account.phi.name
+  quota                = 50
+  enabled_protocol     = "SMB"
 }
 
 ##### Key Vault #####
