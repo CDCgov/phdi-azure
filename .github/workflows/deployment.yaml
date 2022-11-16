@@ -183,7 +183,7 @@ jobs:
               --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
               --resource-group $RESOURCE_GROUP_NAME \
               --output yaml > tabulation.yaml
-            yq -i '.properties.template += {"volumes": [{"name":"tables-file-volume","storageName":"phdi${{ env.TF_ENVIRONMENT }}tables","storageType":"AzureFile"}]}' tabulation.yaml
+            yq -i '.properties.template += {"volumes": [{"name":"phdi${{ env.TF_ENVIRONMENT }}tables","storageName":"phdi${{ env.TF_ENVIRONMENT }}tables","storageType":"AzureFile"}]}' tabulation.yaml
             yq -i '.properties.template.containers[0] += {"volumeMounts": [{"volumeName":"phdi${{ env.TF_ENVIRONMENT }}tables", "mountPath":"/tables"}]}' tabulation.yaml
             az containerapp update \
               --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
