@@ -130,14 +130,6 @@ jobs:
               --name ${{ env.TF_ENVIRONMENT }} \
               --resource-group $RESOURCE_GROUP_NAME \
               --location $LOCATION
-            az containerapp env storage set \
-              --access-mode ReadWrite \
-              --azure-file-account-name $STORAGE_ACCOUNT_NAME \
-              --azure-file-account-key $STORAGE_ACCOUNT_KEY \
-              --azure-file-share-name $STORAGE_SHARE_NAME \
-              --storage-name $STORAGE_MOUNT_NAME \
-              --name ${{ env.TF_ENVIRONMENT }} \
-              --resource-group $RESOURCE_GROUP_NAME
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter) ]]; then
             az containerapp create \
@@ -185,6 +177,14 @@ jobs:
               --output yaml > tabulation.yaml
             yq -i '.properties.template += {"volumes": [{"name":"phdi${{ env.TF_ENVIRONMENT }}tables","storageName":"phdi${{ env.TF_ENVIRONMENT }}tables","storageType":"AzureFile"}]}' tabulation.yaml
             yq -i '.properties.template.containers[0] += {"volumeMounts": [{"volumeName":"phdi${{ env.TF_ENVIRONMENT }}tables", "mountPath":"/tables"}]}' tabulation.yaml
+            az containerapp env storage set \
+              --access-mode ReadWrite \
+              --azure-file-account-name $STORAGE_ACCOUNT_NAME \
+              --azure-file-account-key $STORAGE_ACCOUNT_KEY \
+              --azure-file-share-name $STORAGE_SHARE_NAME \
+              --storage-name $STORAGE_MOUNT_NAME \
+              --name ${{ env.TF_ENVIRONMENT }} \
+              --resource-group $RESOURCE_GROUP_NAME
             az containerapp update \
               --name phdi-${{ env.TF_ENVIRONMENT }}-tabulation \
               --resource-group $RESOURCE_GROUP_NAME \
