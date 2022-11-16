@@ -98,7 +98,12 @@ jobs:
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulation:latest
-
+      - name: "Setup yq"
+        uses: dcarbone/install-yq-action@v1.0.0
+        with:
+          version: 4.30.4
+          download-compressed: true
+          force: false
       - name: Deploy container apps
         env:
           LOCATION: ${{ secrets.LOCATION }}
@@ -106,7 +111,6 @@ jobs:
           SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           TENANT_ID: ${{ secrets.TENANT_ID }}
         run: |
-          brew install yq
           az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
           az extension add --name containerapp --upgrade
           az provider register --namespace Microsoft.App
