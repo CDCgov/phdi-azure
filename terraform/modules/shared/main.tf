@@ -9,7 +9,6 @@ resource "azurerm_storage_account" "phi" {
   account_tier             = "Standard"
   account_kind             = "StorageV2"
   account_replication_type = "GRS"
-  large_file_share_enabled = true
 
   identity {
     type         = "UserAssigned"
