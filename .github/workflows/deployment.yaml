@@ -90,14 +90,14 @@ jobs:
         run: |
           docker pull ghcr.io/cdcgov/phdi/fhir-converter:main
           docker pull ghcr.io/cdcgov/phdi/phdi-ingestion:main
-          docker pull ghcr.io/cdcgov/phdi/phdi-tabulate:main
+          docker pull ghcr.io/cdcgov/phdi/phdi-tabulation:main
           docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
           docker tag ghcr.io/cdcgov/phdi/phdi-ingestion:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
-          docker tag ghcr.io/cdcgov/phdi/phdi-tabulate:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulate:latest
+          docker tag ghcr.io/cdcgov/phdi/phdi-tabulation:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulation:latest
           az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
           docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulate:latest
+          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulation:latest
 
       - name: Deploy container apps
         env:
