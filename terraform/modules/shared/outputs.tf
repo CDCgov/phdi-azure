@@ -6,6 +6,10 @@ output "phi_storage_account_endpoint_url" {
   value = azurerm_storage_account.phi.primary_blob_endpoint
 }
 
+output "phi_storage_account_key" {
+  value = azurerm_storage_account.phi.primary_access_key
+}
+
 output "fhir_server_name" {
   value = azurerm_healthcare_service.fhir_server.name
 }

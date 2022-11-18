@@ -41,6 +41,13 @@ resource "azurerm_role_assignment" "phi_storage_contributor" {
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
+resource "azurerm_storage_share" "tables" {
+  name                 = "phdi${terraform.workspace}tables"
+  storage_account_name = azurerm_storage_account.phi.name
+  quota                = 50
+  enabled_protocol     = "SMB"
+}
+
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
