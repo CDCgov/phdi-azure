@@ -38,11 +38,6 @@ variable "pipeline_runner_principal_id" {
   description = "Principal ID of the pipeline runner identity"
 }
 
-variable "hash_salt" {
-  type        = string
-  description = "Salt for patient hash"
-}
-
 variable "fhir_upload_failures_container_name" {
   type        = string
   description = "Container name for failed FHIR uploads"

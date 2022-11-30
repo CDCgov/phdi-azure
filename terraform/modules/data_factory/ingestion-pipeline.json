@@ -164,7 +164,7 @@
                     "url": "${ingestion_container_url}/fhir/linkage/link/add_patient_identifier_in_bundle",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\":@{activity('geocode').output.bundle},\n    \"salt_str\" : \"${hash_salt}\"\n}    ",
+                        "value": "{\n    \"bundle\":@{activity('geocode').output.bundle},\n}",
                         "type": "Expression"
                     }
                 }

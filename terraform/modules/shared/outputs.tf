@@ -30,10 +30,6 @@ output "pipeline_runner_principal_id" {
   value = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
-output "hash_salt" {
-  value = azurerm_key_vault_secret.salt.value
-}
-
 output "fhir_upload_failures_container_name" {
   value = azurerm_storage_container.fhir_upload_failures_container_name.name
 }
