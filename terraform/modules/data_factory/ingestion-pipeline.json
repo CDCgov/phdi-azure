@@ -3,6 +3,57 @@
     "properties": {
         "activities": [
             {
+                "name": "convert_to_fhir",
+                "description": "Convert message from Hl7 or CCD to FHIR.\n",
+                "type": "WebActivity",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${fhir_converter_url}/convert-to-fhir",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"input_data\": @{pipeline().parameters.message},\n    \"input_type\": \"@{pipeline().parameters.message_type}\",\n    \"root_template\": \"@{pipeline().parameters.root_template}\"\n}",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "log_fhir_conversion_failure",
+                "description": "Write FHIR conversion failures to storage.\n",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "convert_to_fhir",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"blob\": @{activity('convert_to_fhir').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_conversion_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
                 "name": "standardize_name",
                 "description": "Standardize patient name.",
                 "type": "WebActivity",
@@ -113,58 +164,7 @@
                     "url": "${ingestion_container_url}/fhir/linkage/link/add_patient_identifier_in_bundle",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\":@{activity('geocode').output.bundle},\n    \"salt_str\" : \"some-dummy-salt\"\n}    ",
-                        "type": "Expression"
-                    }
-                }
-            },
-            {
-                "name": "convert_to_fhir",
-                "description": "Convert message from Hl7 or CCD to FHIR.\n",
-                "type": "WebActivity",
-                "dependsOn": [],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${fhir_converter_url}/convert-to-fhir",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"input_data\": @{pipeline().parameters.message},\n    \"input_type\": \"@{pipeline().parameters.message_type}\",\n    \"root_template\": \"@{pipeline().parameters.root_template}\"\n}",
-                        "type": "Expression"
-                    }
-                }
-            },
-            {
-                "name": "log_fhir_conversion_failure",
-                "description": "Write FHIR conversion failures to storage.\n",
-                "type": "WebActivity",
-                "dependsOn": [
-                    {
-                        "activity": "convert_to_fhir",
-                        "dependencyConditions": [
-                            "Failed"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"blob\": @{activity('convert_to_fhir').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"fhir-conversion-failures\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
+                        "value": "{\n    \"bundle\":@{activity('geocode').output.bundle},\n}",
                         "type": "Expression"
                     }
                 }
@@ -222,7 +222,7 @@
                     "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.fhir_server_response_body},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"fhir-upload-failures\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
+                        "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.fhir_server_response_body},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_upload_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
                         "type": "Expression"
                     }
                 }

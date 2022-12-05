@@ -74,7 +74,7 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -auto-approve -lock-timeout=30m
+          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault_secret.salt" -auto-approve -lock-timeout=30m
           head -n -2 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
@@ -125,6 +125,7 @@ jobs:
           STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
           STORAGE_SHARE_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
           STORAGE_MOUNT_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
+          HASH_SALT=$(az keyvault secret show --vault-name phdi-key-vault -n patient-hash-salt --query "value" -o tsv)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
@@ -156,7 +157,7 @@ jobs:
               --registry-username $REGISTRY_NAME \
               --registry-password $REGISTRY_PASSWORD \
               --user-assigned $MANAGED_IDENTITY_ID \
-              --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}" AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL"
+              --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}" AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL" SALT_STR="$HASH_SALT"
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-tabulation) ]]; then
             az containerapp create \

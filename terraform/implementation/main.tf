@@ -10,15 +10,17 @@ module "shared" {
 
 
 module "data_factory" {
-  source                           = "../modules/data_factory"
-  resource_group_name              = var.resource_group_name
-  location                         = var.location
-  fhir_converter_url               = var.fhir_converter_url
-  ingestion_container_url          = var.ingestion_container_url
-  fhir_server_url                  = "https://${module.shared.fhir_server_name}.azurehealthcareapis.com/"
-  phi_storage_account_endpoint_url = module.shared.phi_storage_account_endpoint_url
-  pipeline_runner_id               = module.shared.pipeline_runner_id
-  pipeline_runner_principal_id     = module.shared.pipeline_runner_principal_id
+  source                                  = "../modules/data_factory"
+  resource_group_name                     = var.resource_group_name
+  location                                = var.location
+  fhir_converter_url                      = var.fhir_converter_url
+  ingestion_container_url                 = var.ingestion_container_url
+  fhir_server_url                         = "https://${module.shared.fhir_server_name}.azurehealthcareapis.com/"
+  phi_storage_account_endpoint_url        = module.shared.phi_storage_account_endpoint_url
+  pipeline_runner_id                      = module.shared.pipeline_runner_id
+  pipeline_runner_principal_id            = module.shared.pipeline_runner_principal_id
+  fhir_upload_failures_container_name     = module.shared.fhir_upload_failures_container_name
+  fhir_conversion_failures_container_name = module.shared.fhir_conversion_failures_container_name
 }
 
 

@@ -25,12 +25,12 @@ resource "azurerm_storage_container" "source_data" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
-resource "azurerm_storage_container" "fhir_conversion_failures" {
+resource "azurerm_storage_container" "fhir_conversion_failures_container_name" {
   name                 = "fhir-conversion-failures"
   storage_account_name = azurerm_storage_account.phi.name
 }
 
-resource "azurerm_storage_container" "fhir_upload_failures" {
+resource "azurerm_storage_container" "fhir_upload_failures_container_name" {
   name                 = "fhir-upload-failures"
   storage_account_name = azurerm_storage_account.phi.name
 }
