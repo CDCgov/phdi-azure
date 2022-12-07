@@ -159,11 +159,11 @@ echo
 ### GitHub Actions ###
 
 # Set up GitHub Secrets
-spin "Setting PROJECT_ID..." gh -R "${GITHUB_REPO}" secret set PROJECT_ID --body "${PROJECT_ID}"
-spin "Setting SERVICE_ACCOUNT_ID..." gh -R "${GITHUB_REPO}" secret set SERVICE_ACCOUNT_ID --body "${SERVICE_ACCOUNT_ID}"
-spin "Setting WORKLOAD_IDENTITY_PROVIDER..." gh -R "${GITHUB_REPO}" secret set WORKLOAD_IDENTITY_PROVIDER --body "${WORKLOAD_IDENTITY_PROVIDER}"
-spin "Setting REGION..." gh -R "${GITHUB_REPO}" secret set REGION --body "${REGION}"
-spin "Setting ZONE..." gh -R "${GITHUB_REPO}" secret set ZONE --body "${ZONE}"
+spin "Setting RESOURCE_GROUP_NAME..." gh -R "${GITHUB_REPO}" secret set RESOURCE_GROUP_NAME --body "${RESOURCE_GROUP_NAME}"
+spin "Setting SUBSCRIPTION_ID..." gh -R "${GITHUB_REPO}" secret set SUBSCRIPTION_ID --body "${SUBSCRIPTION_ID}"
+spin "Setting CLIENT_ID..." gh -R "${GITHUB_REPO}" secret set CLIENT_ID --body "${CLIENT_ID}"
+spin "Setting LOCATION..." gh -R "${GITHUB_REPO}" secret set LOCATION --body "${LOCATION}"
+spin "Setting TENANT_ID..." gh -R "${GITHUB_REPO}" secret set TENANT_ID --body "${TENANT_ID}"
 spin "Setting SMARTY_AUTH_ID..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
 spin "Setting SMARTY_AUTH_TOKEN..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
 
