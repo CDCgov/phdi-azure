@@ -49,7 +49,7 @@ clear
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Welcome to the $(pink 'PHDI Azure') setup script!"
 echo "This script will help you setup $(pink 'Azure') authentication for GitHub Actions."
 echo "We need some info from you to get started."
-echo
+enter_to_continue
 
 echo "Please select the $(pink 'location') you would like to deploy to."
 echo "More info: https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#overview"
@@ -128,7 +128,7 @@ echo "GitHub repository $(pink 'set')!"
 echo
 
 # Define app registration name, get client ID.
-APP_REG_NAME=github
+APP_REG_NAME=grithub
 CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
 
 # Create service principal and grant access to subscription
