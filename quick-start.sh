@@ -50,12 +50,11 @@ echo
 if gum confirm "Do you already have a $(pink 'Resource Group') in Azure?"; then
   NEW_PROJECT=false
   echo "We will now get the ID of your existing Azure $(pink 'Resource Group')."
-  echo "A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
   echo
 
   echo "Please select the $(pink 'Resource Group') you want to use:"
   PROJECT_NAME=$(az group list --query "[].name" -o tsv | gum choose)
-  PROJECT_ID=$(gcloud projects list --filter="name:${PROJECT_NAME}" --format="value(projectId)")
+  PROJECT_ID=$(az group show -n $PROJECT_NAME --query "[].id" -o tsv)
   echo "You selected $(pink "${PROJECT_NAME}") with ID $(pink "${PROJECT_ID}")."
   echo
 
