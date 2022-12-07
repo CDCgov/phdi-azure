@@ -10,7 +10,8 @@
 ### Functions ###
 # Enter to continue
 enter_to_continue() {
-  echo "Press $(pink 'Enter') when you're done."
+  echo
+  echo "Press $(pink 'Enter') when you're ready to continue."
   echo
   read
 }
