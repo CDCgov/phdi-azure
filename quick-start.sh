@@ -53,9 +53,9 @@ if gum confirm "Do you already have a $(pink 'Resource Group') in Azure?"; then
   echo
 
   echo "Please select the $(pink 'Resource Group') you want to use:"
-  PROJECT_NAME=$(az group list --query "[].name" -o tsv | gum choose)
-  PROJECT_ID=$(az group show -n $PROJECT_NAME --query "[].id" -o tsv)
-  echo "You selected $(pink "${PROJECT_NAME}") with ID $(pink "${PROJECT_ID}")."
+  RESOURCE_GROUP_NAME=$(az group list --query "[].name" -o tsv | gum choose)
+  RESOURCE_GROUP_ID=$(az group show -n $RESOURCE_GROUP_NAME --query "id" -o tsv)
+  echo "You selected $(pink "${RESOURCE_GROUP_NAME}") with ID $(pink "${RESOURCE_GROUP_ID}")."
   echo
 
 else
@@ -64,9 +64,9 @@ else
   echo "A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
   echo
 
-  PROJECT_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Project'). " --placeholder="Project name")
-  PROJECT_ID=$(echo $PROJECT_NAME | awk '{print tolower($0)}')-$(date +"%s")
-  spin "Creating $(pink 'project')..." gcloud projects create $PROJECT_ID --name="${PROJECT_NAME}"
+  RESOURCE_GROUP_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Project'). " --placeholder="Project name")
+  RESOURCE_GROUP_ID=$(echo $RESOURCE_GROUP_NAME | awk '{print tolower($0)}')-$(date +"%s")
+  spin "Creating $(pink 'project')..." gcloud projects create $RESOURCE_GROUP_ID --name="${RESOURCE_GROUP_NAME}"
 
   # Link billing account to project
   link_billing_account
