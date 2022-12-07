@@ -7,63 +7,74 @@
 #
 ################################################################################
 
-# Function to output the variables needed to load into GitHub Actions secrets
-print_variables() {
-  echo "Please load the following variables into your repository secrets at this URL:"
-  echo "https://github.com/$GITHUB_REPO/settings/secrets/actions"
-  echo
-  echo "TENANT_ID: ${TENANT_ID}"
-  echo "SUBSCRIPTION_ID: ${SUBSCRIPTION_ID}"
-  echo "CLIENT_ID: ${CLIENT_ID}"
-  echo "RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}"
-  echo "LOCATION: ${LOCATION}"
-  echo "SMARTY_AUTH_ID: Your Smarty Streets App Authorization ID"
-  echo "SMARTY_AUTH_TOKEN: Your Smarty Streets App Authorization Token"
-  echo
-  echo "More info on locations can be found at:"
-  echo "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#overview"
-  echo
-  echo "You can now continue with the Quick Start instructions in the README.md file."
+### Functions ###
+
+# Colorize text
+colorize() {
+  gum style --foreground "$1" "$2"
 }
 
-# Function to use GitHub CLI to set repository secrets
-set_variables() {
-  if ! command -v gh &> /dev/null; then
-    echo "Error: The GitHub CLI is not installed. To install, visit this page:"
-    echo "https://cli.github.com/manual/installation"
-    echo
-    print_variables
-    exit
-  fi
-
-  echo "Please enter the authorization id of your Smarty Street Account."
-  echo "More info:   https://www.smarty.com/docs/cloud/authentication"
-  read SMARTY_AUTH_ID
-
-  echo "Please enter the authorization token of your Smarty Street Account."
-  echo "More info:   https://www.smarty.com/docs/cloud/authentication"
-  read SMARTY_AUTH_TOKEN
-
-  echo "Logging in to GitHub..."
-  gh auth login
-
-  echo "Setting repository secrets..."
-  gh secret -R "${GITHUB_REPO}" set TENANT_ID --body "${TENANT_ID}"
-  gh secret -R "${GITHUB_REPO}" set SUBSCRIPTION_ID --body "${SUBSCRIPTION_ID}"
-  gh secret -R "${GITHUB_REPO}" set CLIENT_ID --body "${CLIENT_ID}"
-  gh secret -R "${GITHUB_REPO}" set RESOURCE_GROUP_NAME --body "${RESOURCE_GROUP_NAME}"
-  gh secret -R "${GITHUB_REPO}" set LOCATION --body "${LOCATION}"
-  gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
-  gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
-
-  echo "Repository secrets set!"
-  echo "You can now continue with the Quick Start instructions in the README.md file."
+# Print pink text
+pink() {
+  colorize 212 "$1"
 }
+
+# Run a command with a spinner
+spin() {
+  local -r title="${1}"
+  shift 1
+  gum spin -s line --title "${title}" -- $@
+}
+
+### Main ###
+
+# Install gum
+if ! command -v gum &> /dev/null; then
+    echo "Installing gum..."
+    go install github.com/charmbracelet/gum@v0.8
+fi
+
+export PATH=$HOME/go/bin:$PATH
+
+clear
+
+
+# Intro text
+gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Welcome to the $(pink 'PHDI Azure') setup script!"
+echo "This script will help you setup $(pink 'Azure') authentication for GitHub Actions."
+echo "We need some info from you to get started."
+echo
+
+
+# Check if new project, create a project if needed and get the project ID
+if gum confirm "Do you already have a $(pink 'Resource Group') in Azure?"; then
+  NEW_PROJECT=false
+  echo "We will now get the ID of your existing Google Cloud $(pink 'project')."
+  echo "A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
+  echo
+
+  echo "Please select the $(pink 'Resource Group') you want to use:"
+  PROJECT_NAME=$(az group list --format="value(name)" | gum choose)
+  PROJECT_ID=$(gcloud projects list --filter="name:${PROJECT_NAME}" --format="value(projectId)")
+  echo "You selected $(pink "${PROJECT_NAME}") with ID $(pink "${PROJECT_ID}")."
+  echo
+
+else
+  NEW_PROJECT=true
+  echo "Thank you! We will now attempt to create a new Azure $(pink 'Resource Group') for you."
+  echo "A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
+  echo
+
+  PROJECT_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Project'). " --placeholder="Project name")
+  PROJECT_ID=$(echo $PROJECT_NAME | awk '{print tolower($0)}')-$(date +"%s")
+  spin "Creating $(pink 'project')..." gcloud projects create $PROJECT_ID --name="${PROJECT_NAME}"
+
+  # Link billing account to project
+  link_billing_account
+fi
+
 
 # Prompt user for resource group name and repository name
-echo "Welcome to the PHDI Azure setup script!"
-echo "This script will help you setup az CLI authentication for GitHub Actions."
-echo "We need some info from you to get started."
 echo "After entering the info, a browser window will open for you to authenticate with Azure."
 echo
 while true; do
