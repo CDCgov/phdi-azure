@@ -44,6 +44,9 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
         run: |
           terraform init
           terraform apply -auto-approve -lock-timeout=30m
+          gh secret -R "${GITHUB_REPO}" set TFSTATE_STORAGE_ACCOUNT_NAME --body "$(terraform output tfstate_storage_account_name)"

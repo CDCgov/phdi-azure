@@ -41,3 +41,7 @@ resource "azurerm_storage_container" "tfstate" {
   name                 = "tfstate"
   storage_account_name = azurerm_storage_account.tfstate.name
 }
+
+output "tfstate_storage_account_name" {
+  value = azurerm_storage_account.tfstate.name
+}
