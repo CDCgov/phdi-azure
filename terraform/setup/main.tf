@@ -8,6 +8,7 @@
 #
 ###########################################################################################
 
+
 terraform {
   required_providers {
     azurerm = {
@@ -22,8 +23,10 @@ provider "azurerm" {
   features {}
 }
 
+resource "time_static" "timestamp" {}
+
 resource "azurerm_storage_account" "tfstate" {
-  name                     = "phditfstate${substr(var.subscription_id, 0, 8)}"
+  name                     = "phditfstate${substr(tostring(time_static.timestamp.unix), 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"

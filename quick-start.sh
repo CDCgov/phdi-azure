@@ -83,7 +83,7 @@ else
   NEW_RESOURCE_GROUP=true
   echo "Thank you! We will now attempt to create a new Azure $(pink 'Resource Group') for you."
   echo
-  RESOURCE_GROUP_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Resource Group'). " --placeholder="Resource Group name")
+  RESOURCE_GROUP_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Resource Group'): " --placeholder="Resource Group name")
   spin "Creating $(pink 'Resource Group')..." az group create --name "${RESOURCE_GROUP_NAME}" --location "${LOCATION}"
   RESOURCE_GROUP_ID=$(az group show -n $RESOURCE_GROUP_NAME --query "id" -o tsv)
 fi
