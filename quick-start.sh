@@ -33,6 +33,11 @@ spin() {
   gum spin -s line --title "${title}" -- $@
 }
 
+# Create text box
+box() {
+  gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "$1"
+}
+
 ### Main ###
 
 # Install gum
@@ -47,7 +52,7 @@ clear
 
 
 # Intro text
-gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Welcome to the $(pink 'PHDI Azure') setup script!"
+box "Welcome to the $(pink 'PHDI Azure') setup script!"
 echo "This script will help you setup $(pink 'Azure') authentication for GitHub Actions."
 echo "We need some info from you to get started."
 enter_to_continue
@@ -96,7 +101,8 @@ SUBSCRIPTION_ID="$(az account show --query "id" -o tsv)"
 az config set defaults.group="${RESOURCE_GROUP_NAME}"
 
 # Login to gh CLI
-echo "Project ID $(pink 'set')!"
+clear
+box "Resource Group $(pink 'set')!"
 echo "We will now login to the $(pink 'GitHub CLI')."
 echo "Copy the provided code, press $(pink 'Enter') and then $(pink 'click') the link that will be printed."
 echo "If you are not already logged in to GitHub, you will be prompted to do so."
@@ -125,7 +131,8 @@ else
   spin "Forking repository..." gh repo fork ${ORG_NAME} CDCgov/phdi-azure
   GITHUB_REPO="${GITHUB_USER}/phdi-azure"
 fi
-echo "GitHub repository $(pink 'set')!"
+clear
+box "GitHub repository $(pink 'set')!"
 echo
 
 # Define app registration name, get client ID.
@@ -133,7 +140,7 @@ APP_REG_NAME=grithub
 CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
 
 # Create service principal and grant access to subscription
-az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role owner --name $APP_REG_NAME
+SERVICE_PRINCIPAL=$(az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role owner --name $APP_REG_NAME)
 
 # Create federated credential
 cat << EOF > credentials.json
