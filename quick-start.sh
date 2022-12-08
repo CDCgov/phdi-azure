@@ -140,7 +140,7 @@ APP_REG_NAME=grithub
 CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
 
 # Create service principal and grant access to subscription
-SERVICE_PRINCIPAL=$(az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role owner --name $APP_REG_NAME)
+spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role owner --name $APP_REG_NAME
 
 # Create federated credential
 cat << EOF > credentials.json
@@ -158,7 +158,7 @@ until az ad app show --id $CLIENT_ID &> /dev/null; do
   sleep 5
 done
 
-az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
+spin "Creating federated credential..." az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
 
 echo "Workload Identity Federation setup complete!"
 echo
@@ -174,7 +174,8 @@ spin "Setting TENANT_ID..." gh -R "${GITHUB_REPO}" secret set TENANT_ID --body "
 spin "Setting SMARTY_AUTH_ID..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
 spin "Setting SMARTY_AUTH_TOKEN..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
 
-echo "Repository secrets $(pink 'set')!"
+clear
+box "Repository secrets $(pink 'set')!"
 echo
 
 # Create dev environment in GitHub
