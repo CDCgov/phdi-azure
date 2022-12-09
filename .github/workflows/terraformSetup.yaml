@@ -34,10 +34,12 @@ jobs:
           SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           LOCATION: ${{ secrets.LOCATION }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
           echo location=\""$LOCATION"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
+          echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
 
       - name: terraform
         env:
