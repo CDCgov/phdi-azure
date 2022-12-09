@@ -132,6 +132,7 @@ jobs:
               --name ${{ env.TF_ENVIRONMENT }} \
               --resource-group $RESOURCE_GROUP_NAME \
               --location $LOCATION
+            sleep 30
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter) ]]; then
             az containerapp create \
