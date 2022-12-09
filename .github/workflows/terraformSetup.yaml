@@ -11,7 +11,6 @@ jobs:
     name: Setup a new Azure environment by creating a tfstate bucket
     runs-on: ubuntu-latest
     environment: main
-    permissions: write-all
     defaults:
       run:
         shell: bash
