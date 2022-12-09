@@ -45,6 +45,7 @@ jobs:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
           echo location=\""$LOCATION"\" >> terraform.tfvars
@@ -52,7 +53,7 @@ jobs:
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
-          echo storage_account_name=\"phditfstate"${SUBSCRIPTION_ID:0:8}"\" >> backend.tfvars
+          echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
           echo fhir_converter_url = \"""\" >> terraform.tfvars
           echo ingestion_container_url = \"""\" >> terraform.tfvars
 
@@ -74,7 +75,7 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select ${{ env.TF_ENVIRONMENT }} || terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault_secret.salt" -auto-approve -lock-timeout=30m
+          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault.phdi_key_vault" -target="module.shared.random_uuid.salt" -target="module.shared.azurerm_key_vault_secret.salt" -auto-approve -lock-timeout=30m
           head -n -2 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
@@ -125,12 +126,13 @@ jobs:
           STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
           STORAGE_SHARE_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
           STORAGE_MOUNT_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
-          HASH_SALT=$(az keyvault secret show --vault-name phdi-key-vault -n patient-hash-salt --query "value" -o tsv)
+          HASH_SALT=$(az keyvault secret show --vault-name phdi-${{ env.TF_ENVIRONMENT }}-key-vault -n patient-hash-salt --query "value" -o tsv)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
               --resource-group $RESOURCE_GROUP_NAME \
               --location $LOCATION
+            sleep 30
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter) ]]; then
             az containerapp create \

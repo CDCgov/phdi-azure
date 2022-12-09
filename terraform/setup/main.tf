@@ -23,7 +23,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_storage_account" "tfstate" {
-  name                     = "phditfstate${substr(var.subscription_id, 0, 8)}"
+  name                     = "phditfstate${substr(var.client_id, 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
