@@ -24,8 +24,12 @@ provider "azurerm" {
 
 resource "time_static" "timestamp" {}
 
+locals {
+  tfstate_storage_account_name = "phditfstate${substr(tostring(time_static.timestamp.unix), 0, 8)}"
+}
+
 resource "azurerm_storage_account" "tfstate" {
-  name                     = "phditfstate${substr(tostring(time_static.timestamp.unix), 0, 8)}"
+  name                     = local.tfstate_storage_account_name
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
@@ -43,5 +47,5 @@ resource "azurerm_storage_container" "tfstate" {
 }
 
 output "tfstate_storage_account_name" {
-  value = azurerm_storage_account.tfstate.id
+  value = local.tfstate_storage_account_name
 }
