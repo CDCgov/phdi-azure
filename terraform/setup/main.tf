@@ -22,14 +22,8 @@ provider "azurerm" {
   features {}
 }
 
-resource "time_static" "timestamp" {}
-
-locals {
-  tfstate_storage_account_name = "phditfstate${substr(tostring(time_static.timestamp.unix), 0, 8)}"
-}
-
 resource "azurerm_storage_account" "tfstate" {
-  name                     = local.tfstate_storage_account_name
+  name                     = "phditfstate${substr(var.client_id, 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
@@ -44,8 +38,4 @@ resource "azurerm_storage_account" "tfstate" {
 resource "azurerm_storage_container" "tfstate" {
   name                 = "tfstate"
   storage_account_name = azurerm_storage_account.tfstate.name
-}
-
-output "tfstate_storage_account_name" {
-  value = local.tfstate_storage_account_name
 }
