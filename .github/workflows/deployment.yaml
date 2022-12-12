@@ -130,7 +130,7 @@ jobs:
           STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
           STORAGE_SHARE_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
           STORAGE_MOUNT_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
-          HASH_SALT=$(az keyvault secret show --vault-name phdi-${{ env.TF_ENVIRONMENT }}-key-vault -n patient-hash-salt --query "value" -o tsv)
+          HASH_SALT=$(az keyvault secret show --vault-name ${{ env.TF_ENVIRONMENT }}vault${CLIENT_ID:0:8} -n patient-hash-salt --query "value" -o tsv)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
