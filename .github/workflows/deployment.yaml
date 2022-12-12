@@ -74,17 +74,18 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
         run: |
           terraform init -backend-config=backend.tfvars
-          echo "Hello?"
-          terraform workspace list
-          terraform workspace list | grep ${{ env.TF_ENVIRONMENT }} -c 
-          WORKSPACE_EXISTS=$(terraform workspace list | grep ${{ env.TF_ENVIRONMENT }} -c )
-          echo "WE is"
-          echo $WORKSPACE_EXISTS
-          if [ "$WORKSPACE_EXISTS" != "0" ]; then
-            terraform workspace select ${{ env.TF_ENVIRONMENT }}
-          else
-            terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          fi
+#          echo "Hello?"
+#          terraform workspace list
+#          terraform workspace list | grep ${{ env.TF_ENVIRONMENT }} -c
+#          WORKSPACE_EXISTS=$(terraform workspace list | grep ${{ env.TF_ENVIRONMENT }} -c)
+#          echo "WE is"
+#          echo $WORKSPACE_EXISTS
+#          if [ "$WORKSPACE_EXISTS" != "0" ]; then
+#            terraform workspace select ${{ env.TF_ENVIRONMENT }}
+#          else
+#            terraform workspace new ${{ env.TF_ENVIRONMENT }}
+#          fi
+          terraform workspace new ${{ env.TF_ENVIRONMENT }} || terraform workspace select ${{ env.TF_ENVIRONMENT }}
           terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault.phdi_key_vault" -target="module.shared.random_uuid.salt" -target="module.shared.azurerm_key_vault_secret.salt" -auto-approve -lock-timeout=30m
           head -n -2 terraform.tfvars >> temp.txt
           rm terraform.tfvars
