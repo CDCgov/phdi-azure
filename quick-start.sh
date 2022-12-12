@@ -88,7 +88,11 @@ else
   NEW_RESOURCE_GROUP=true
   echo "Thank you! We will now attempt to create a new Azure $(pink 'Resource Group') for you."
   echo
-  RESOURCE_GROUP_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Resource Group'): " --placeholder="Resource Group name")
+  RESOURCE_GROUP_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Resource Group'). Names may not contain spaces: " --placeholder="Resource Group name")
+  while [[ $RESOURCE_GROUP_NAME = *" "* ]]; do
+    echo "Your Resource Group Name contains spaces. Please create a new name with no spaces."
+    RESOURCE_GROUP_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Resource Group'). Names may not contain spaces: " --placeholder="Resource Group name")
+  done
   spin "Creating $(pink 'Resource Group')..." az group create --name "${RESOURCE_GROUP_NAME}" --location "${LOCATION}"
   RESOURCE_GROUP_ID=$(az group show -n $RESOURCE_GROUP_NAME --query "id" -o tsv)
 fi
@@ -136,7 +140,7 @@ box "GitHub repository $(pink 'set')!"
 echo
 
 # Define app registration name, get client ID.
-APP_REG_NAME=grithub
+APP_REG_NAME=github-$RESOURCE_GROUP_NAME
 CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
 
 # Create service principal and grant access to subscription
@@ -206,7 +210,7 @@ done
 echo "We will now run the $(pink 'Terraform Setup') workflow."
 echo "This will create the necessary storage account for Terraform in Azure."
 echo
-spin "Waiting for $(pink 'Workload Identity') to be ready (this will take a minute)..." sleep 60
+spin "Waiting for $(pink 'Workload Identity') to be ready..." sleep 10
 spin "Starting Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run terraformSetup.yaml
 echo
 
