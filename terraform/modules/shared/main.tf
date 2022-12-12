@@ -51,7 +51,7 @@ resource "azurerm_storage_share" "tables" {
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
-  name                       = "${terraform.workspace}Vault${substr(var.client_id, 0, 8)}"
+  name                       = "${terraform.workspace}vault${substr(var.client_id, 0, 8)}"
   location                   = var.location
   resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -114,7 +114,7 @@ resource "azurerm_key_vault_secret" "smarty_auth_token" {
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
-  name                = "phdi${terraform.workspace}registry"
+  name                = "phdi${terraform.workspace}registry${substr(var.client_id, 0, 8)}"
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "Premium"
