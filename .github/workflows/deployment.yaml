@@ -89,17 +89,19 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push container images to Azure Container Registry
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           docker pull ghcr.io/cdcgov/phdi/fhir-converter:main
           docker pull ghcr.io/cdcgov/phdi/phdi-ingestion:main
           docker pull ghcr.io/cdcgov/phdi/phdi-tabulation:main
-          docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
-          docker tag ghcr.io/cdcgov/phdi/phdi-ingestion:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
-          docker tag ghcr.io/cdcgov/phdi/phdi-tabulation:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulation:latest
-          az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulation:latest
+          docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/fhir-converter:latest
+          docker tag ghcr.io/cdcgov/phdi/phdi-ingestion:main phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/phdi-ingestion:latest
+          docker tag ghcr.io/cdcgov/phdi/phdi-tabulation:main phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/phdi-tabulation:latest
+          az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}
+          docker push phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/fhir-converter:latest
+          docker push phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/phdi-ingestion:latest
+          docker push phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/phdi-tabulation:latest
       - name: "Setup yq"
         uses: dcarbone/install-yq-action@v1.0.0
         with:
@@ -112,12 +114,13 @@ jobs:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           TENANT_ID: ${{ secrets.TENANT_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
           az extension add --name containerapp --upgrade
           az provider register --namespace Microsoft.App
           az provider register --namespace Microsoft.OperationalInsights
-          REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry
+          REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}
           REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
           MANAGED_IDENTITY_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.ManagedIdentity/userAssignedIdentities/phdi-${{ env.TF_ENVIRONMENT }}-pipeline-runner"
