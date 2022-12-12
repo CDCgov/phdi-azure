@@ -51,7 +51,7 @@ resource "azurerm_storage_share" "tables" {
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
-  name                       = "phdi-${terraform.workspace}-key-vault"
+  name                       = "${terraform.workspace}Vault${substr(var.client_id, 0, 8)}"
   location                   = var.location
   resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id

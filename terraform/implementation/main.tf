@@ -6,6 +6,7 @@ module "shared" {
   location            = var.location
   smarty_auth_id      = var.smarty_auth_id
   smarty_auth_token   = var.smarty_auth_token
+  client_id           = var.client_id
 }
 
 

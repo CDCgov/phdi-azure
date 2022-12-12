@@ -54,8 +54,9 @@ jobs:
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
-          echo fhir_converter_url = \"""\" >> terraform.tfvars
-          echo ingestion_container_url = \"""\" >> terraform.tfvars
+          echo fhir_converter_url=\"""\" >> terraform.tfvars
+          echo ingestion_container_url=\"""\" >> terraform.tfvars
+          echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
 
       - name: Set environment
         run: |-
