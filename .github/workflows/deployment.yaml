@@ -76,6 +76,7 @@ jobs:
           terraform init -backend-config=backend.tfvars
           echo "Hello?"
           terraform workspace list
+          terraform workspace list | grep ${{ env.TF_ENVIRONMENT }} -c 
           WORKSPACE_EXISTS=$(terraform workspace list | grep ${{ env.TF_ENVIRONMENT }} -c )
           echo "WE is"
           echo $WORKSPACE_EXISTS
