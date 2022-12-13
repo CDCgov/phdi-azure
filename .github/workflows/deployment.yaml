@@ -135,8 +135,21 @@ jobs:
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
               --resource-group $RESOURCE_GROUP_NAME \
-              --location $LOCATION
-            sleep 30
+              --location $LOCATION \
+            echo "Waiting a minute for environment to provision..."
+            sleep 60
+            ENV_PROVISIONED=$(az containerapp env show -g $RESOURCE_GROUP_NAME -n ${{ env.TF_ENVIRONMENT }} --query "properties.provisioningState" -o tsv)
+            CHECK_COUNT=0
+            while [ $ENV_PROVISIONED != "Succeeded" ]; do
+                if [ $CHECK_COUNT -gt 60 ]; then
+                    echo "Environment failed to provision."
+                    exit 1
+                fi
+                echo "Environment not yet provisioned. Checking again in 10 seconds..."
+                sleep 10
+                CHECK_COUNT=$((CHECK_COUNT+1))
+                ENV_PROVISIONED=$(az containerapp env show -g $RESOURCE_GROUP_NAME -n ${{ env.TF_ENVIRONMENT }} --query "properties.provisioningState" -o tsv)
+            done
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter) ]]; then
             az containerapp create \
