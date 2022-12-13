@@ -41,12 +41,11 @@ box() {
 ### Main ###
 
 # Install gum
+export PATH=$HOME/go/bin:$PATH
 if ! command -v gum &> /dev/null; then
     echo "Installing gum..."
     go install github.com/charmbracelet/gum@v0.8
 fi
-
-export PATH=$HOME/go/bin:$PATH
 
 clear
 
