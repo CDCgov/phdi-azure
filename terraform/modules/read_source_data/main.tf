@@ -27,7 +27,7 @@ resource "azurerm_application_insights" "insights" {
 }
 
 resource "azurerm_linux_function_app" "read_source_data" {
-  name                       = "phdi-${terraform.workspace}-read-source-data"
+  name                       = "${terraform.workspace}-read-source-data-${substr(var.client_id, 0, 8)}"
   location                   = var.location
   resource_group_name        = var.resource_group_name
   service_plan_id            = azurerm_service_plan.function_app_sp.id
