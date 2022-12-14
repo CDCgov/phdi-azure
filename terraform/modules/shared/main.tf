@@ -124,7 +124,7 @@ resource "azurerm_container_registry" "phdi_registry" {
 ##### FHIR Server #####
 
 resource "azurerm_healthcare_service" "fhir_server" {
-  name                = "phdi-${terraform.workspace}-fhir-server-${substr(var.client_id, 0, 8)}"
+  name                = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
   location            = "eastus"
   resource_group_name = var.resource_group_name
   kind                = "fhir-R4"
