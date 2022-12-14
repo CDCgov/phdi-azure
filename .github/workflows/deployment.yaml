@@ -241,12 +241,12 @@ jobs:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           echo 'PUBLISH_PROFILE<<EOF' >> $GITHUB_ENV
-          az functionapp deployment list-publishing-profiles --name phdi-${{ env.TF_ENVIRONMENT }}-read-source-data-${CLIENT_ID:0:8} --xml >> $GITHUB_ENV
+          az functionapp deployment list-publishing-profiles --name ${{ env.TF_ENVIRONMENT }}-read-source-data-${CLIENT_ID:0:8} --xml >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
       - name: "Run Azure Functions Action"
         uses: Azure/functions-action@v1
         with:
-          app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data-${CLIENT_ID:0:8}"
+          app-name: "${{ env.TF_ENVIRONMENT }}-read-source-data-${CLIENT_ID:0:8}"
           package: serverless-functions
           publish-profile: ${{ env.PUBLISH_PROFILE }}
