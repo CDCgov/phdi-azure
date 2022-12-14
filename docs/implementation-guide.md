@@ -55,7 +55,7 @@ We have only provided a brief overview of PHDI, Building Blocks, and the pipelin
 ## Implementing the PHDI Azure Pipelines
 In this section we describe how a STLT can take this repository and use it to spin up all of the functionality that it offers in their own Azure environment.
 
-### Step 1: Prepare Your Azure Environment
+### User Assumptions
 In order to proceed you will need either:
 - a Azure account with permissions to create new resource groups in your organization's Azure environment,
 or
@@ -63,123 +63,30 @@ or
 
 If you do not meet either of these criteria contact the owner of your organization's Azure environment.
 
-### Step 2: Install the Azure and GitHub CLI tools
-The az CLI is a command line tool provided by Microsoft for working with Azure. We will use it to authenticate your local machine with your organization's Azure environment. Follow [this guide](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) to install `az`. Confirm that the installation was successful by running `az --version`. If `az` is installed properly you should get a response similar to what is shown below.
+### Step 1: Ensure you have collected values for geocoding variables
 
-```bash
-❯ az --version
-azure-cli                         2.40.0
+It is not recommended to exit the quick start script partway through so please have all values on hand when you run the script.
 
-core                              2.40.0
-telemetry                          1.0.8
+Required to use geocoding functionality:
+- `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID. More info on the Smarty geocoding service [here](https://www.smarty.com/pricing/us-rooftop-geocoding)
+- `SMARTY_AUTH_TOKEN` - Your SmartyStreet Authorization Token.
 
-Extensions:
-account                            0.2.4
-
-Dependencies:
-msal                            1.18.0b1
-azure-mgmt-resource             21.1.0b1
-
-Python location '/opt/homebrew/Cellar/azure-cli/2.40.0/libexec/bin/python'
-Extensions directory '/Users/myuser/.azure/cliextensions'
-
-Python (Darwin) 3.10.6 (main, Aug 30 2022, 04:58:14) [Clang 13.1.6 (clang-1316.0.21.2.5)]
-
-Legal docs and information: aka.ms/AzureCliLegal
-
-
-Your CLI is up-to-date.
-```
-
-Optionally, you may also install the GitHub CLI tool (`gh`) to enable automatically setting secrets in your repository. Follow [this guide](https://cli.github.com/manual/installation) to install the tool. Confirm that the installation was successful by running `gh --version`. If `gh` is installed properly you should get a response similar to what is shown below.
-
-```bash
-❯ gh --version
-gh version 2.14.7 (2022-08-25)
-https://github.com/cli/cli/releases/tag/v2.14.7
-```
-
-### Step 3: Fork the phdi-azure Repository
-Fork the phdi-azure repository into your organization's, or your personal, GitHub account.
-1. Navigate to [https://github.com/CDCgov/phdi-azure](https://github.com/CDCgov/phdi-azure).
-2. Click on the `Fork` button in the top right.
-![fork-repo-1](./images/fork-repo-1.png)
-3. Select the owner of the forked repository. We recommend that this is an organization and not an individual.
-4. Click `Create fork` at the bottom of the page.
-![fork-repo-2](./images/fork-repo-2.png)
-
-### Step 4: Clone the Forked Repository
-Clone the forked version of the phdi-azure repository by running `git clone https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure.git`. If you do not have `git` installed please follow [this guide](https://github.com/git-guides/install-git) to install it.
-
-### Step 5: Run the Quick Start Script
+### Step 2: Run the Quick Start Script in Azure Cloud Shell
 In this step we will work through Azure's [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation) to grant your phdi-azure repo access to deploy the pipelines to your organization's Azure environment. We have provided a script to automate most of this process that we recommend you use. However, if you prefer to work through it manually you may follow [this guide](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azcli).
 
-From your machine's command line:
-1. Navigate to the root directory of the repository you cloned in step 4.
-2. Run the quick start script and follow the prompts.
-    - [quick-start.sh](../quick-start.sh) for Mac and Linux
-    - [quick-start.ps1](../quick-start.ps1) for Windows
+Navigate to the [Azure Cloud Shell](https://shell.azure.com/).
+
+To download and run the quick start script, run the following command in Cloud Shell:
+```bash
+git clone https://github.com/CDCgov/phdi-azure.git && cd phdi-azure && ./quick-start.sh
+```
 
 If you plan to deploy to an existing resource group in your Azure environment, have the resource group name ready and provide it to the quick start script when prompted.
 
-### Step 6: Set Repository Secrets
-If you installed the `gh` CLI and the quick start script set these secrets automatically, you may skip to Step 7.
+The script will take around 20-30 minutes to run. The last step will ask you if you want to deploy your pipeline. If you choose yes, you may skip Step 3 and go directly to Step 4 after the script completes.
 
-Set the following secret values in your forked phdi-azure repository:
-- `RESOURCE_GROUP_NAME` - Specified by the quick start script.
-- `CLIENT_ID` - Specified by the quick start script.
-- `SUBSCRIPTION_ID` - Specified by the quick start script.
-- `TENANT_ID` - Specified by the quick start script.\
-- `LOCATION` - Your choice of Azure location; quick start script suggests `centralus`.
-
-Information about Azure regions and zones is available [here](https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#overview).
-
-If your resource group will utilize the geocoding functionality you will need to set these secret values in your forked phdi-azure repository:
-- `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID.
-- `SMARTY_AUTH_TOKEN` - Your SmartyStreet Authorization Token.
-
-
-To create a repository secret follow these steps.
-1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure` in your browser.
-2. Click on `Settings` in the top right.
-![navigate-to-settings](./images/navigate-to-settings.png)
-3. Click on `Secrets` and then `Actions` in the bottom left.
-![repo-secret-2](./images/repo-secret-2.png)
-4. Click on `New repository secret`.
-![repo-secret-3](./images/repo-secret-3.png)
-5. Fill in `Name` and `Value` fields and then click `Add secret`.
-![repo-secret-4](./images/repo-secret-4.png)
-
-### Step 7: Run the Terraform Setup GitHub Workflow
-In order for Terraform to deploy the PHDI pipelines, it needs a place to store the "state" of your Azure resource group. In this context "state" is simply a record of the current configuration of the resource group. In the first stage of a deployment Terraform compares the configuration specified in the `terraform/` directory of your forked phdi-azure repository to the current state of your Azure resource group. In the second stage Terraform makes the necessary changes to resolve any differences and align the Azure resource group with the repository. To create a Azure storage account for storing the state of your Azure resource group run the `Terraform Setup` GitHub Workflow. For additional information on state please reffer to [this documentation](https://www.terraform.io/language/state) from Terraform.
-
-To run `Terraform Setup` follow the steps below.
-1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure` in your browser.
-2. Click on `Actions` near the center at the top of the page.
-![navigate-to-actions](./images/navigate-to-actions.png)
-3. Select `Terraform Setup` from the list of Workflows on the left side of the screen.
-![terraform-setup-1](./images/terraform-setup-1.png)
-4. Click on `Run workflow` in the middle of the right side of the screen.
-![terraform-setup-2](./images/terraform-setup-2.png)
-5. Ensure the `main` branch is selected and click the green `Run workflow` button.
-![terraform-setup-3](./images/terraform-setup-3.png)
-
-### Step 8: Create a Development Environment
-Your forked version of the phdi-azure repository can deploy multiple instances of the PHDI pipeline infrastructure to your Azure resource group, each managed by its own [terraform workspace](https://www.terraform.io/language/state/workspaces). This allows you to easily create and maintain instances of the PHDI pipelines dedicated for distinct purposes like development, testing, and production. We recommend that your organization maintain at least two instances of the PHDI pipelines, one for production and at least one other for development and testing purposes. Each instance of the PHDI pipelines is associated with a GitHub Environment. To create a new Environemnt in your forked version of the phdi-azure respository follow the steps below.
-
-To create a repository secret follow this steps.
-1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure` in your browser.
-2. Click on `Settings` in the top right.
-![navigate-to-settings](./images/navigate-to-settings.png)
-3. Click on `Environments` in the middle of the left side of the screen.
-![create-environment-1](./images/create-environment-1.png)
-4. Click on `New environment` in the top right.
-![create-environment-2](./images/create-environment-2.png)
-5. Enter a name for your development environment (e.g. `dev`) and click `Configure environment`. No additional configuration of the environment is required at this time you proceed to step 9.
-![create-environment-3](./images/create-environment-3.png)
-
-### Step 9: Run the Deployment GitHub Workflow
-At this point we have completed all of the necessary setup. We are now ready to deploy the PHDI pipelines to your Azure resource group with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously, follow the steps below.
+### Step 3: Run the Deployment GitHub Workflow
+If you choose to skip deployment in the Quick Start script, you are now ready to deploy the PHDI pipelines to your Azure resource group with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously, follow the steps below.
 
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure` in your browser.
 2. Click on `Actions` near the center at the top of the page.
@@ -191,10 +98,54 @@ At this point we have completed all of the necessary setup. We are now ready to 
 5. Ensure the `main` branch is selected and choose the environment you wish to deploy to and click the green `Run workflow` button. In the screenshot below we are deploying to our development environment which we have called `dev` 
 ![deployment-3](./images/deployment-3.png)
 
-### Step 10: Run End-to-end Functional Tests
-TODO: Design some basic tests and describe how to run them here.
+### Step 4: Run an Hl7v2 vaccination message through the pipeline 
+Now that the starter kit has been deployed we can run some data through it! The `sample-data/` directory in your forked version of the repository contains some dummy VXU messages that can be used to test the sucess and failure modes of the ingestion pipeline. To start let's lets use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
+1. The patient's name is mixed case and contains a numeric character.
+2. The patient's phone number is not in a standard format.
+3. The patient's address is non-standard and has not been geocoded.
 
-## Estimated Costs
-TODO: Conduct cost analysis for the ingestion pipeline.
+```diff
+PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M11^test1|PATID7758^^^test5|
+- doe .^ John1 ^A.
+|TEST^Mother, of^L|198505101126+0215|M||2106-3^White^HL70005|
+- 555 E. 3065 S.^^Salt Lake CIty^ut^84106^USA
+||
+- 801-540-3661^^CP
+|||M^Married||4880776||||N^NOT HISPANIC OR LATINO^HL70189||N||US^United States of America^ISO3166_1||||N|||20080110015014+0315|||||||
+```
 
+If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice. To run this message through the ingestion pipeline follow the steps below.
 
+1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser.![azure-portal](./images/azure-portal.png)
+1. Ensure that you are using the account that has access to the Azure resource group we have used so far.![azure-portal-check-account](./images/azure-portal-check-account.png)
+1. Search for and select `Storage accounts` to view all of storage accounts we have deployed.![azure-search-cloud-storage](./images/azure-search-cloud-storage.png)
+1. Select the PHI storage account, which is where all Protect Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{timestamp}`, eg `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
+1. View containers by clicking `Containers` in the sidebar on the left. ![azure-select-containers](./images/azure-select-containers.png)
+1. Select the `source-data` container. ![azure-select-source-data-container](./images/azure-select-source-data-container.png)
+1. Upload the `VXU_single_messy_demo.hl7` file from the `sample-data/` directory of your forked version of the repository to the `source-data/vxu/` directory of your PHI bucket. This can be done easily with the `Upload` button, clicking `Advanced`, typing `vxu` into the box labeled `Upload to folder`, and then clicking the blue button with a folder icon in the top left and choosing the file. Once the file is chosen, click the blue `Upload` button at the bottom of the left sidebar to finish the upload. Note that because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.![azure-upload-file](./images/azure-upload-file.png)
+1. To see that the pipeline has executed search for `Data factories` and go to the Data factories page.![azure-search-data-factories](./images/azure-search-data-factories.png)
+1. Select your data factory, which will be titled `phdi-{environment}-data-factory`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
+1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`.![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
+1. Select your ingestion pipeline, which will be titled `phdi-{environment}-ingestion`.![azure-select-ingestion-pipeline-in-studio](./images/azure-select-ingestion-pipeline-in-studio.png)
+1. You should now see a diagram showing the steps of the pipeline. To view the status of our attempted run, click `Monitor` on the left sidebar.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
+1. We should now see that the ingestion pipeline has processed one message successfully.![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png)
+1. To view the JSON configuration for the pipeline and a visualization of the process go to the `AUTHOR` tab.![azure-workflow-source](./images/azure-workflow-source.png)
+1. To view the cleaned and enriched data in the FHIR server, visit https://shell.azure.com to open the Cloud Shell.![azure-cloud-shell](./images/azure-cloud-shell.png)
+1. Type the command `az login` and press enter. Copy the code provided, click the link, and paste the code. Then follow the prompts to complete login.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)![azure-device-login](./images/azure-device-login.png)
+1. To search for a patient named John Doe, enter the following commands, replacing `dev` with whichever environment you are currently searching in:
+```bash
+token=$(az account get-access-token --resource=https://phdi-dev-fhir-server.azurehealthcareapis.com --query accessToken --output tsv)
+RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" https://phdi-dev-fhir-server.azurehealthcareapis.com/Patient?family=DOE&given=JOHN)
+echo $RESPONSE | jq
+```
+![azure-fhir-api-response](./images/azure-fhir-api-response.png)
+
+The table below describes the contents and expected ingestion pipeline behavior for each of the other files include in `sample-data/`. Feel free to try them out for yourself! 
+
+| Test File | File Contents | Expected Outcome |
+| --------- | --------------| ---------------- |
+|VXU-V04-01_success_single.hl7| A single valid VXU message.|The ingestion pipeline will process a single message and upload it to the FHIR server.|
+|VXU-V04-02_failedConversion.hl7| A single invalid VXU message that cannot be converted to FHIR.| The ingestion process will fail during the initial conversion to FHIR step. Information about the failure is written to `failed_fhir_conversion\vxu\`.
+|VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
+|VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
+|VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully process the data and uploads to the FHIR server. On the other execution it fails.|
