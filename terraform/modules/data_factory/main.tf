@@ -1,5 +1,5 @@
 resource "azurerm_data_factory" "phdi_data_factory" {
-  name                            = "phdi-${terraform.workspace}-data-factory"
+  name                            = "phdi-${terraform.workspace}-data-factory-${substr(var.client_id, 0, 8)}"
   location                        = var.location
   resource_group_name             = var.resource_group_name
   public_network_enabled          = false

@@ -47,3 +47,8 @@ variable "fhir_conversion_failures_container_name" {
   type        = string
   description = "Container name for failed FHIR conversions"
 }
+
+variable "client_id" {
+  type        = string
+  description = "Client ID"
+}
