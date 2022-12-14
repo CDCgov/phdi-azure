@@ -237,14 +237,16 @@ jobs:
           pip install -r requirements.txt --target=".python_packages/lib/site-packages"
 
       - name: Get publish profile
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           echo 'PUBLISH_PROFILE<<EOF' >> $GITHUB_ENV
-          az functionapp deployment list-publishing-profiles --name phdi-${{ env.TF_ENVIRONMENT }}-read-source-data --xml >> $GITHUB_ENV
+          az functionapp deployment list-publishing-profiles --name phdi-${{ env.TF_ENVIRONMENT }}-read-source-data-${CLIENT_ID:0:8} --xml >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
       - name: "Run Azure Functions Action"
         uses: Azure/functions-action@v1
         with:
-          app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data"
+          app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data-${CLIENT_ID:0:8}"
           package: serverless-functions
           publish-profile: ${{ env.PUBLISH_PROFILE }}
