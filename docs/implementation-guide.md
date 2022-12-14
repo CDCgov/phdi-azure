@@ -76,14 +76,9 @@ In this step we will work through Azure's [Workload Identity Federation](https:/
 
 Navigate to the [Azure Cloud Shell](https://shell.azure.com/).
 
-From your Azure account's command line:
-1. Clone this repository by running the following command:
+To download and run the quick start script, run the following command in Cloud Shell:
 ```bash
-git clone https://github.com/CDCgov/phdi-azure.git && cd phdi-azure
-```
-2. Run the quick start script:
-```bash
-./quickstart.sh
+git clone https://github.com/CDCgov/phdi-azure.git && cd phdi-azure && ./quick-start.sh
 ```
 
 If you plan to deploy to an existing resource group in your Azure environment, have the resource group name ready and provide it to the quick start script when prompted.
