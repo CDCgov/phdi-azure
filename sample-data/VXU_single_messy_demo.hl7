@@ -1,0 +1,11 @@
+MSH|^~\&|IMMAPP|GHHSFacility^2.16.840.1.122848.1.30^ISO|EHRApp^2.Edu^ISO|GHHRFacility^2.16.840.1.1122848.1.32^ISO|202108181126+0215|SECURITY|VXU^V04^VXU_V04|MSG00004|P|2.8|||||USA||en-US|||22 GHH Inc.|23 GHH Inc.|24GHH^2.16.840.1.114884.10.20^ISO|25GHH^2.16.840.1.114884.10.23^ISO
+SFT|Orion|2.4.3.52854|Rhapsody|2.4.3|Testactivity|20080825121624
+PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M11^test1|PATID7758^^^test5|doe .^ John1 ^A.|TEST^Mother, of^L|198505101126+0215|M||2106-3^White^HL70005|555 E. 3065 S.^^Salt Lake CIty^ut^84106^USA||801-540-3661^^CP|||M^Married||4880776||||N^NOT HISPANIC OR LATINO^HL70189||N||US^United States of America^ISO3166_1||||N|||20080110015014+0315|||||||
+PV1|1|P|ISO^NWG^2|E|||1122334^Alaz^Mohammed^Mahi^JR^Dr.^MD^^PERSONNELt|||SUR||||||||Inpatient|48887716^^^AccMng|||||||||||||||||||||||||20150208113419+0110||||||||||
+OBX|1|NM|8867-4^heartrate^LN||60~120|beats/min^^ISO|70-80|A^A^HL7nnnn~B^B|||S|||19990702|Org15^ID of producer^CAS|1134^Aly^Zafar^Mahendra^JR^Dr.^MD^^PERSt&1.23&HCD^B^^^BR^^^^^^19241010^19241015^Al~2234^Pauly^Berrie^Raud|OBS^This is test method^AS4|EI12.3^NI2^426d2726-51fc-00fe-a946-8596e80a80eb^GUID~^^1.3.6.1.4.1.44750.1.2.2^ISO|19990702|BU^Observation site^E5|EI21^OII||FairOaks Hspital|Research Park^Fairfax^VA^22031^USA|MD-25^Atchinson^Christopher^^MD|||||||PAI-1^FAI-1
+RXA|0|1|20210818||49281021588^TENIVAC^NDC|0.5|mL^mL^UCUM||00^New Record^NIP001|7824^Jackson^Lily^Suzanne^^^^^NIST-PI-1^L^^^PRN|^^^NIST-Clinic-1||||315841|20211216|PMC^Sanofi Pasteur^MVX|||CP|A||||||HUH AE OMU&9.8&ISO^OMU B^Bed 03^HOMERTON UNIVER^^C^Homerton UH^Floor5|0007&Hospital Lane^Ste. 123^Ann Arbor ^MI^99999^USA^M^^&W^^^20000110&20000120^^^^^^^Near Highway
+RXR|C28161^Intramuscular^NCIT|RD^Right Deltoid^HL70163
+OBX|1|CE|30963-3^Vaccine Funding Source^LN|1|PHC70^Private^CDCPHINVS||||||F|||20210818
+OBX|2|CE|64994-7^Vaccine Funding Program Eligibility^LN|2|V01^Not VFC Eligible^HL70064||||||F|||20210818|||VXC40^per immunization^CDCPHINVS
+OBX|3|CE|69764-9^Document Type^LN|3|253088698300028811170411^Tetanus/Diphtheria (Td) Vaccine VIS^cdcgs1vis||||||F|||20210818
+OBX|4|DT|29769-7^Date Vis Presented^LN|3|20210818||||||F|||20210818
