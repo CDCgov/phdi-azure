@@ -71,6 +71,28 @@ echo "More info: https://www.smarty.com/docs/cloud/authentication"
 echo
 SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 
+# Login to gh CLI
+clear
+box "Resource Group $(pink 'set')!"
+echo "We will now login to the $(pink 'GitHub CLI')."
+echo "Copy the provided code, press $(pink 'Enter') and then $(pink 'click') the link that will be printed."
+echo "If you are not already logged in to GitHub, you will be prompted to do so."
+echo "If your account has $(pink '2FA') enabled, you will be prompted to enter a 2FA code (this is $(pink 'different') from the code you copied)."
+echo "After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
+echo "Then return to this terminal!"
+enter_to_continue
+
+gh auth login --hostname github.com -p https -w
+GITHUB_USER=$(gh api user -q '.login')
+
+while [[ -z $GITHUB_USER ]]; do
+  echo "You must log in to $(pink 'GitHub') to continue or exit the script."
+  gh auth login --hostname github.com -p https -w
+  GITHUB_USER=$(gh api user -q '.login')
+done
+
+
+
 # Check if new project, create a project if needed and get the project ID
 if gum confirm "Do you already have a $(pink 'Resource Group') in Azure?"; then
   NEW_RESOURCE_GROUP=false
@@ -102,20 +124,6 @@ SUBSCRIPTION_ID="$(az account show --query "id" -o tsv)"
 
 # Set the current resource group to the RESOURCE_GROUP_NAME specified above
 az config set defaults.group="${RESOURCE_GROUP_NAME}"
-
-# Login to gh CLI
-clear
-box "Resource Group $(pink 'set')!"
-echo "We will now login to the $(pink 'GitHub CLI')."
-echo "Copy the provided code, press $(pink 'Enter') and then $(pink 'click') the link that will be printed."
-echo "If you are not already logged in to GitHub, you will be prompted to do so."
-echo "If your account has $(pink '2FA') enabled, you will be prompted to enter a 2FA code (this is $(pink 'different') from the code you copied)."
-echo "After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
-echo "Then return to this terminal!"
-enter_to_continue
-
-gh auth login --hostname github.com -p https -w
-GITHUB_USER=$(gh api user -q '.login')
 
 # Check if repo already forked, fork if needed, get repository name
 if gum confirm "Have you already forked the $(pink 'phdi-azure') repository on GitHub?"; then
