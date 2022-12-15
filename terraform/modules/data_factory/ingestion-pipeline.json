@@ -77,7 +77,7 @@
                     "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_names",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"data\":@{activity('convert_to_fhir').output.response.FhirResource}\n}",
+                        "value": "{\n    \"data\": @{activity('convert_to_fhir').output.response.FhirResource}\n}",
                         "type": "Expression"
                     }
                 }
@@ -106,7 +106,7 @@
                     "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_phones",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"data\":@{activity('standardize_name').output.bundle}\n}",
+                        "value": "{\n    \"data\": @{activity('standardize_name').output.bundle}\n}",
                         "type": "Expression"
                     }
                 }
@@ -135,7 +135,7 @@
                     "url": "${ingestion_container_url}/fhir/geospatial/geocode/geocode_bundle",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\":@{activity('standardize_phone').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
+                        "value": "{\n    \"bundle\": @{activity('standardize_phone').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
                         "type": "Expression"
                     }
                 }
@@ -164,7 +164,7 @@
                     "url": "${ingestion_container_url}/fhir/linkage/link/add_patient_identifier_in_bundle",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\":@{activity('geocode').output.bundle},\n}",
+                        "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
                         "type": "Expression"
                     }
                 }

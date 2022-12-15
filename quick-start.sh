@@ -192,7 +192,7 @@ spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}
 # Enable GitHub Actions
 echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
 echo
-echo "Please open $(pink'https://github.com/${GITHUB_REPO}/actions') in a new tab."
+echo "Please open $(pink 'https://github.com/${GITHUB_REPO}/actions') in a new tab."
 echo "Click the green button to enable $(pink 'GitHub Workflows')."
 echo
 echo "Continuing from this point will begin a series of GitHub actions that may take 20+ minutes to complete"
