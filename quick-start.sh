@@ -35,6 +35,7 @@ spin() {
 
 # Create text box
 box() {
+  clear
   gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "$1"
 }
 
@@ -46,9 +47,6 @@ if ! command -v gum &> /dev/null; then
     echo "Installing gum..."
     go install github.com/charmbracelet/gum@v0.8
 fi
-
-clear
-
 
 # Intro text
 box "Welcome to the $(pink 'PHDI Azure') setup script!"
@@ -73,13 +71,14 @@ SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 
 # Login to gh CLI
 clear
-box "Resource Group $(pink 'set')!"
 echo "We will now login to the $(pink 'GitHub CLI')."
-echo "Copy the provided code, press $(pink 'Enter') and then $(pink 'click') the link that will be printed."
-echo "If you are not already logged in to GitHub, you will be prompted to do so."
-echo "If your account has $(pink '2FA') enabled, you will be prompted to enter a 2FA code (this is $(pink 'different') from the code you copied)."
-echo "After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
-echo "Then return to this terminal!"
+echo
+echo "• After pressing enter, copy the provided code, and then $(pink 'press') enter."
+echo "• $(pink 'Azure will fail to open the url'), so please copy it and manually navigate there in a $(pink 'new tab')"
+echo "• If your account has $(pink '2FA') enabled, you will be prompted to enter a 2FA code (this is $(pink 'different') from the code you copied)."
+echo "• After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
+echo "• Then return to this terminal!"
+echo
 enter_to_continue
 
 gh auth login --hostname github.com -p https -w
@@ -90,8 +89,6 @@ while [[ -z $GITHUB_USER ]]; do
   gh auth login --hostname github.com -p https -w
   GITHUB_USER=$(gh api user -q '.login')
 done
-
-
 
 # Check if new project, create a project if needed and get the project ID
 if gum confirm "Do you already have a $(pink 'Resource Group') in Azure?"; then
@@ -125,6 +122,7 @@ SUBSCRIPTION_ID="$(az account show --query "id" -o tsv)"
 # Set the current resource group to the RESOURCE_GROUP_NAME specified above
 az config set defaults.group="${RESOURCE_GROUP_NAME}"
 
+box "Resource Group $(pink 'set')!"
 # Check if repo already forked, fork if needed, get repository name
 if gum confirm "Have you already forked the $(pink 'phdi-azure') repository on GitHub?"; then
   echo "Please choose repository you would like to use:"
@@ -142,7 +140,7 @@ else
   spin "Forking repository..." gh repo fork ${ORG_NAME} CDCgov/phdi-azure
   GITHUB_REPO="${GITHUB_USER}/phdi-azure"
 fi
-clear
+
 box "GitHub repository $(pink 'set')!"
 echo
 
@@ -185,7 +183,6 @@ spin "Setting TENANT_ID..." gh -R "${GITHUB_REPO}" secret set TENANT_ID --body "
 spin "Setting SMARTY_AUTH_ID..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
 spin "Setting SMARTY_AUTH_TOKEN..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
 
-clear
 box "Repository secrets $(pink 'set')!"
 echo
 
