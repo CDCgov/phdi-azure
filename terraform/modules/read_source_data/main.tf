@@ -19,11 +19,19 @@ resource "azurerm_service_plan" "function_app_sp" {
   sku_name            = "Y1"
 }
 
+resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
+  name                = "workspace-${terraform.workspace}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  retention_in_days   = 30
+}
+
 resource "azurerm_application_insights" "insights" {
   name                = "phdi-${terraform.workspace}-insights"
   location            = var.location
   resource_group_name = var.resource_group_name
   application_type    = "web"
+  workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
 }
 
 resource "azurerm_linux_function_app" "read_source_data" {
