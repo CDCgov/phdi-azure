@@ -214,6 +214,9 @@ while [ "$WORKFLOWS_ENABLED" = "0" ]; do
   fi
 done
 
+echo "If you would like to see the following workflows run in more detail please click here:"
+echo "https://github.com/${GITHUB_REPO}/actions"
+
 # Run Terraform Setup workflow
 echo "We will now run the $(pink 'Terraform Setup') workflow."
 echo "This will create the necessary storage account for Terraform in Azure."
