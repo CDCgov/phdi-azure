@@ -41,7 +41,7 @@ resource "azurerm_storage_blob" "ecr" {
   source_content         = ""
 }
 
-resource "azurerm_storage_blob" "vxu" {
+resource "azurerm_storage_blob" "elr" {
   name                   = "elr/.keep"
   storage_account_name   = azurerm_storage_account.phi.name
   storage_container_name = azurerm_storage_container.source_data.name
