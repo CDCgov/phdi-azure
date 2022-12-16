@@ -6,6 +6,7 @@ module "shared" {
   location            = var.location
   smarty_auth_id      = var.smarty_auth_id
   smarty_auth_token   = var.smarty_auth_token
+  client_id           = var.client_id
 }
 
 
@@ -21,6 +22,7 @@ module "data_factory" {
   pipeline_runner_principal_id            = module.shared.pipeline_runner_principal_id
   fhir_upload_failures_container_name     = module.shared.fhir_upload_failures_container_name
   fhir_conversion_failures_container_name = module.shared.fhir_conversion_failures_container_name
+  client_id                               = var.client_id
 }
 
 
@@ -35,4 +37,5 @@ module "read_source_data" {
   time_stamp                            = module.shared.time_stamp
   pipeline_runner_id                    = module.shared.pipeline_runner_id
   pipeline_runner_client_id             = module.shared.pipeline_runner_client_id
+  client_id                             = var.client_id
 }

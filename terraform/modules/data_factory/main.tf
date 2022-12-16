@@ -1,5 +1,5 @@
 resource "azurerm_data_factory" "phdi_data_factory" {
-  name                            = "phdi-${terraform.workspace}-data-factory"
+  name                            = "phdi-${terraform.workspace}-data-factory-${substr(var.client_id, 0, 8)}"
   location                        = var.location
   resource_group_name             = var.resource_group_name
   public_network_enabled          = false
@@ -33,7 +33,7 @@ locals {
 }
 
 resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
-  name            = "phdi-ingestion"
+  name            = "phdi-${terraform.workspace}-ingestion"
   data_factory_id = azurerm_data_factory.phdi_data_factory.id
   concurrency     = 10 // Max concurrent instances of the pipeline, between 1 and 50. May need to tune this in the future. 
   parameters = {

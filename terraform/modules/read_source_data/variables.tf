@@ -42,3 +42,8 @@ variable "pipeline_runner_client_id" {
   type        = string
   description = "Client ID of the pipeline runner identity"
 }
+
+variable "client_id" {
+  type        = string
+  description = "Client ID of the app registration used to authenticate to Azure"
+}

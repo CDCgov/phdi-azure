@@ -57,15 +57,15 @@ In this section we describe how a STLT can take this repository and use it to sp
 
 ### User Assumptions
 In order to proceed you will need either:
-- a Azure account with permissions to create new resource groups in your organization's Azure environment,
+- an Azure account with permissions to create new resource groups in your organization's Azure environment,
 or
-- a Azure account with `Owner` access to a resource group in your organizations’ Azure environment that was created to house the PHDI Azure pipelines, and the name of this resource group.
+- an Azure account with `Owner` access to a resource group in your organizations’ Azure environment that was created to house the PHDI Azure pipelines, and the name of this resource group.
 
 If you do not meet either of these criteria contact the owner of your organization's Azure environment.
 
 ### Step 1: Ensure you have collected values for geocoding variables
 
-It is not recommended to exit the quick start script partway through so please have all values on hand when you run the script.
+Exiting the quick start script partway through is not recommended, so please have all values on hand when you run the script.
 
 Required to use geocoding functionality:
 - `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID. More info on the Smarty geocoding service [here](https://www.smarty.com/pricing/us-rooftop-geocoding)

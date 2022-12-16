@@ -52,10 +52,11 @@ jobs:
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
+          echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
-          echo fhir_converter_url = \"""\" >> terraform.tfvars
-          echo ingestion_container_url = \"""\" >> terraform.tfvars
+          echo fhir_converter_url=\"""\" >> terraform.tfvars
+          echo ingestion_container_url=\"""\" >> terraform.tfvars
 
       - name: Set environment
         run: |-
@@ -74,12 +75,7 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
         run: |
           terraform init -backend-config=backend.tfvars
-          WORKSPACE_EXISTS=$(terraform workspace list | grep ${{ env.TF_ENVIRONMENT }} -c )
-          if [ "$WORKSPACE_EXISTS" != "0" ]; then
-            terraform workspace select ${{ env.TF_ENVIRONMENT }}
-          else
-            terraform workspace new ${{ env.TF_ENVIRONMENT }}
-          fi
+          terraform workspace new ${{ env.TF_ENVIRONMENT }} || terraform workspace select ${{ env.TF_ENVIRONMENT }}
           terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault.phdi_key_vault" -target="module.shared.random_uuid.salt" -target="module.shared.azurerm_key_vault_secret.salt" -auto-approve -lock-timeout=30m
           head -n -2 terraform.tfvars >> temp.txt
           rm terraform.tfvars
@@ -93,17 +89,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push container images to Azure Container Registry
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
-          docker pull ghcr.io/cdcgov/phdi/fhir-converter:main
-          docker pull ghcr.io/cdcgov/phdi/phdi-ingestion:main
-          docker pull ghcr.io/cdcgov/phdi/phdi-tabulation:main
-          docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
-          docker tag ghcr.io/cdcgov/phdi/phdi-ingestion:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
-          docker tag ghcr.io/cdcgov/phdi/phdi-tabulation:main phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulation:latest
-          az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/fhir-converter:latest
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-ingestion:latest
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry.azurecr.io/phdi/phdi-tabulation:latest
+          IMAGES=('fhir-converter' 'phdi-ingestion' 'phdi-tabulation')
+          for IMAGE in "${IMAGES[@]}"; do
+            docker pull ghcr.io/cdcgov/phdi/$IMAGE:main
+            docker tag ghcr.io/cdcgov/phdi/$IMAGE:main phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/$IMAGE:latest
+            docker push phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/$IMAGE:latest
+          done
       - name: "Setup yq"
         uses: dcarbone/install-yq-action@v1.0.0
         with:
@@ -116,12 +110,13 @@ jobs:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           TENANT_ID: ${{ secrets.TENANT_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
           az extension add --name containerapp --upgrade
           az provider register --namespace Microsoft.App
           az provider register --namespace Microsoft.OperationalInsights
-          REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry
+          REGISTRY_NAME=phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}
           REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
           REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
           MANAGED_IDENTITY_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.ManagedIdentity/userAssignedIdentities/phdi-${{ env.TF_ENVIRONMENT }}-pipeline-runner"
@@ -131,13 +126,24 @@ jobs:
           STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
           STORAGE_SHARE_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
           STORAGE_MOUNT_NAME=phdi${{ env.TF_ENVIRONMENT }}tables
-          HASH_SALT=$(az keyvault secret show --vault-name phdi-${{ env.TF_ENVIRONMENT }}-key-vault -n patient-hash-salt --query "value" -o tsv)
+          HASH_SALT=$(az keyvault secret show --vault-name ${{ env.TF_ENVIRONMENT }}vault${CLIENT_ID:0:8} -n patient-hash-salt --query "value" -o tsv)
           if [[ ! $(az containerapp env show -n ${{ env.TF_ENVIRONMENT }}) ]]; then
             az containerapp env create \
               --name ${{ env.TF_ENVIRONMENT }} \
               --resource-group $RESOURCE_GROUP_NAME \
               --location $LOCATION
-            sleep 30
+            ENV_PROVISIONED=$(az containerapp env show -n ${{ env.TF_ENVIRONMENT }} --query "properties.provisioningState" -o tsv)
+            CHECK_COUNT=0
+            while [ $ENV_PROVISIONED != "Succeeded" ]; do
+                if [ $CHECK_COUNT -gt 60 ]; then
+                    echo "Environment failed to provision."
+                    exit 1
+                fi
+                echo "Environment not yet provisioned. Checking again in 10 seconds..."
+                sleep 10
+                CHECK_COUNT=$((CHECK_COUNT+1))
+                ENV_PROVISIONED=$(az containerapp env show -n ${{ env.TF_ENVIRONMENT }} --query "properties.provisioningState" -o tsv)
+            done
           fi
           if [[ ! $(az containerapp show -n phdi-${{ env.TF_ENVIRONMENT }}-fhir-converter) ]]; then
             az containerapp create \
@@ -225,14 +231,16 @@ jobs:
           pip install -r requirements.txt --target=".python_packages/lib/site-packages"
 
       - name: Get publish profile
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
           echo 'PUBLISH_PROFILE<<EOF' >> $GITHUB_ENV
-          az functionapp deployment list-publishing-profiles --name phdi-${{ env.TF_ENVIRONMENT }}-read-source-data --xml >> $GITHUB_ENV
+          az functionapp deployment list-publishing-profiles --name ${{ env.TF_ENVIRONMENT }}-read-source-data-${CLIENT_ID:0:8} --xml >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
       - name: "Run Azure Functions Action"
         uses: Azure/functions-action@v1
         with:
-          app-name: "phdi-${{ env.TF_ENVIRONMENT }}-read-source-data"
+          app-name: "${{ env.TF_ENVIRONMENT }}-read-source-data-${CLIENT_ID:0:8}"
           package: serverless-functions
           publish-profile: ${{ env.PUBLISH_PROFILE }}

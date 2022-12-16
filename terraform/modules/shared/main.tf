@@ -25,6 +25,30 @@ resource "azurerm_storage_container" "source_data" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
+resource "azurerm_storage_blob" "vxu" {
+  name                   = "vxu/.keep"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_container.source_data.name
+  type                   = "Block"
+  source_content         = ""
+}
+
+resource "azurerm_storage_blob" "ecr" {
+  name                   = "ecr/.keep"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_container.source_data.name
+  type                   = "Block"
+  source_content         = ""
+}
+
+resource "azurerm_storage_blob" "elr" {
+  name                   = "elr/.keep"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_container.source_data.name
+  type                   = "Block"
+  source_content         = ""
+}
+
 resource "azurerm_storage_container" "fhir_conversion_failures_container_name" {
   name                 = "fhir-conversion-failures"
   storage_account_name = azurerm_storage_account.phi.name
@@ -51,7 +75,7 @@ resource "azurerm_storage_share" "tables" {
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
-  name                       = "phdi-${terraform.workspace}-key-vault"
+  name                       = "${terraform.workspace}vault${substr(var.client_id, 0, 8)}"
   location                   = var.location
   resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -114,7 +138,7 @@ resource "azurerm_key_vault_secret" "smarty_auth_token" {
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
-  name                = "phdi${terraform.workspace}registry"
+  name                = "phdi${terraform.workspace}registry${substr(var.client_id, 0, 8)}"
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "Premium"
@@ -124,7 +148,7 @@ resource "azurerm_container_registry" "phdi_registry" {
 ##### FHIR Server #####
 
 resource "azurerm_healthcare_service" "fhir_server" {
-  name                = "phdi-${terraform.workspace}-fhir-server"
+  name                = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
   location            = "eastus"
   resource_group_name = var.resource_group_name
   kind                = "fhir-R4"
