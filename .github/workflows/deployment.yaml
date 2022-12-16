@@ -92,16 +92,12 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
-          docker pull ghcr.io/cdcgov/phdi/fhir-converter:main
-          docker pull ghcr.io/cdcgov/phdi/phdi-ingestion:main
-          docker pull ghcr.io/cdcgov/phdi/phdi-tabulation:main
-          docker tag ghcr.io/cdcgov/phdi/fhir-converter:main phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/fhir-converter:latest
-          docker tag ghcr.io/cdcgov/phdi/phdi-ingestion:main phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/phdi-ingestion:latest
-          docker tag ghcr.io/cdcgov/phdi/phdi-tabulation:main phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/phdi-tabulation:latest
-          az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/fhir-converter:latest
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/phdi-ingestion:latest
-          docker push phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/phdi-tabulation:latest
+          IMAGES=('fhir-converter' 'phdi-ingestion' 'phdi-tabulation')
+          for IMAGE in "${IMAGES[@]}"; do
+            docker pull ghcr.io/cdcgov/phdi/$IMAGE:main
+            docker tag ghcr.io/cdcgov/phdi/$IMAGE:main phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/$IMAGE:latest
+            docker push phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}.azurecr.io/phdi/$IMAGE:latest
+          done
       - name: "Setup yq"
         uses: dcarbone/install-yq-action@v1.0.0
         with:
@@ -136,8 +132,6 @@ jobs:
               --name ${{ env.TF_ENVIRONMENT }} \
               --resource-group $RESOURCE_GROUP_NAME \
               --location $LOCATION
-            echo "Waiting a minute for environment to provision..."
-            sleep 60
             ENV_PROVISIONED=$(az containerapp env show -n ${{ env.TF_ENVIRONMENT }} --query "properties.provisioningState" -o tsv)
             CHECK_COUNT=0
             while [ $ENV_PROVISIONED != "Succeeded" ]; do
