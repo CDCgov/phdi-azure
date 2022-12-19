@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "function_app_sa" {
-  name                     = "phdi${terraform.workspace}funcs${substr(var.time_stamp, 0, 10)}"
+  name                     = "phdi${terraform.workspace}funcs${substr(var.client_id, 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"

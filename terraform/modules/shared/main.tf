@@ -1,9 +1,7 @@
 ##### PHI Storage Account #####
 
-resource "time_static" "timestamp" {}
-
 resource "azurerm_storage_account" "phi" {
-  name                     = "phdi${terraform.workspace}phi${substr(tostring(time_static.timestamp.unix), 0, 8)}"
+  name                     = "phdi${terraform.workspace}phi${substr(var.client_id, 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
