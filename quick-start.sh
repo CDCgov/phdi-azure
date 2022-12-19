@@ -124,7 +124,9 @@ az config set defaults.group="${RESOURCE_GROUP_NAME}"
 
 box "Resource Group $(pink 'set')!"
 # Check if repo already forked, fork if needed, get repository name
-if gum confirm "Have you already forked the $(pink 'phdi-azure') repository on GitHub?"; then
+if [ "$1" = "base" ]; then
+  GITHUB_REPO="CDCgov/phdi-azure"
+elif gum confirm "Have you already forked the $(pink 'phdi-azure') repository on GitHub?"; then
   echo "Please choose repository you would like to use:"
   echo
   REPO_NAME=$(gh repo list --fork --json name --jq ".[].name" | gum choose)
@@ -251,7 +253,7 @@ fi
 echo "We will now run the $(pink 'Terraform Deploy') workflow."
 echo "This will deploy the infrastructure to your Azure Resource Group."
 echo
-spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev -r gordon/quick-start-updates
+spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev -r nick/e2e-test
 echo
 
 # Watch deployment workflow until complete
