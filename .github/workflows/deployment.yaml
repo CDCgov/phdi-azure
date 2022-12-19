@@ -92,6 +92,7 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
+          az acr login --name phdi${{ env.TF_ENVIRONMENT }}registry${CLIENT_ID:0:8}
           IMAGES=('fhir-converter' 'phdi-ingestion' 'phdi-tabulation')
           for IMAGE in "${IMAGES[@]}"; do
             docker pull ghcr.io/cdcgov/phdi/$IMAGE:main
