@@ -43,7 +43,7 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |
-          az storage blob upload --account-name phdi${{ env.TF_ENVIRONMENT }}phi${CLIENT_ID:0:8} --container-name source-data --name VXU-V04-01_success_single.hl7 --file sample-data/VXU-V04-01_success_single.hl7
+          az storage blob upload --account-name phdi${{ env.TF_ENVIRONMENT }}phi${CLIENT_ID:0:8} --container-name source-data --name vxu/VXU-V04-01_success_single.hl7 --file sample-data/VXU-V04-01_success_single.hl7
       - name: Check pipeline run
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
