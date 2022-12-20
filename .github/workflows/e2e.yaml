@@ -12,9 +12,14 @@ on:
     workflows: [Deployment]
     types: [completed]
 
+permissions:
+  id-token: write
+  contents: read
+  packages: write
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    environment: main
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
