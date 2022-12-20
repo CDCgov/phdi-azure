@@ -63,11 +63,13 @@ jobs:
           TIMESTAMP: ${{ steps.upload-sample-data.outputs.timestamp }}
         run: |
           az extension add --name datafactory --upgrade
-          END_DATE=$(date --date="1 hour" "+%Y-%m-%dT%H:%M:%S")
+          START_DATE=$(date --date="1 day ago" "+%Y-%m-%dT%H:%M:%S")
+          END_DATE=$(date --date="1 day" "+%Y-%m-%dT%H:%M:%S")
+          SOURCE_FILE="source-data/vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7"
           CHECK_COUNT=0
 
           check_pipeline_run_count() {
-            az datafactory pipeline-run query-by-factory --factory-name "phdi-$TF_ENV-data-factory-$SHORT_CID" --filters operand="PipelineName" operator="Equals" values="phdi-$TF_ENV-ingestion" --filters operand="Status" operator="Equals" values="$1" --last-updated-after "$TIMESTAMP" --last-updated-before "$END_DATE" --query "value" | jq 'map(select(.parameters.filename == "source-data/vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7")) | length'
+            az datafactory pipeline-run query-by-factory --factory-name "phdi-$TF_ENV-data-factory-$SHORT_CID" --filters operand="PipelineName" operator="Equals" values="phdi-$TF_ENV-ingestion" --filters operand="Status" operator="Equals" values="$1" --last-updated-after "$TIMESTAMP" --last-updated-before "$END_DATE" --query "value" | jq --arg SOURCE_FILE "$SOURCE_FILE" 'map(select(.parameters.filename == $SOURCE_FILE)) | length'
           }
 
           check_pipeline_success_count() {
