@@ -192,9 +192,10 @@ echo
 spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}/environments/dev" --silent
 
 # Enable GitHub Actions
+GITHUB_ACTIONS_URL="https://github.com/${GITHUB_REPO}/actions"
 echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
 echo
-echo "Please open $(pink 'https://github.com/${GITHUB_REPO}/actions') in a new tab."
+echo "Please open $(pink $GITHUB_ACTIONS_URL) in a new tab."
 echo "Click the green button to enable $(pink 'GitHub Workflows')."
 echo
 echo "Continuing from this point will begin a series of GitHub actions that may take 20+ minutes to complete"
@@ -204,7 +205,7 @@ enter_to_continue
 WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
 while [ "$WORKFLOWS_ENABLED" = "0" ]; do
   echo "Looks like that didn't work! Please try again."
-  echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab."
+  echo "Please open $GITHUB_ACTIONS_URL in a new tab."
   echo "Click the green button to enable $(pink 'GitHub Workflows')."
   echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
   echo
@@ -217,7 +218,7 @@ while [ "$WORKFLOWS_ENABLED" = "0" ]; do
 done
 
 echo "If you would like to see the following workflows run in more detail please click here:"
-echo "https://github.com/${GITHUB_REPO}/actions"
+echo $(pink $GITHUB_ACTIONS_URL)
 
 # Run Terraform Setup workflow
 echo "We will now run the $(pink 'Terraform Setup') workflow."
@@ -275,7 +276,7 @@ gh -R "${GITHUB_REPO}" run watch $DEPLOYMENT_WORKFLOW_ID
 DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json conclusion -q '.[].conclusion')
 if [ "$DEPLOY_SUCCESS" != "success" ]; then
   echo "Looks like that didn't work! Please contact the PHDI team for help."
-  echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
+  echo "To view the status of your workflows, go to $GITHUB_ACTIONS_URL."
   echo
   exit 1
 fi
