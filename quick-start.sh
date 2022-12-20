@@ -254,7 +254,7 @@ fi
 echo "We will now run the $(pink 'Terraform Deploy') workflow."
 echo "This will deploy the infrastructure to your Azure Resource Group."
 echo
-spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev -r nick/e2e-test
+spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev
 echo
 
 # Watch deployment workflow until complete
