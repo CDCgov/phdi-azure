@@ -36,6 +36,8 @@ jobs:
         run: az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
       - name: Set environment
         id: set-environment
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |-
           echo "tf_env=$(
           if "${{ github.event.inputs.environment }}"; then
@@ -44,27 +46,27 @@ jobs:
             echo dev
           fi
           )" >> $GITHUB_OUTPUT
+          echo "short_cid=${CLIENT_ID:0:8}" >> $GITHUB_OUTPUT
       - name: Upload sample data
         id: upload-sample-data
         env:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
         run: |
           TIMESTAMP=$(date "+%Y-%m-%dT%H:%M:%S")
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
-          az storage blob upload --account-name phdi$TF_ENVphi${CLIENT_ID:0:8} --container-name source-data --name vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7 --file sample-data/VXU-V04-01_success_single.hl7
+          az storage blob upload --account-name phdi${TF_ENV}phi${SHORT_CID} --container-name source-data --name vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7 --file sample-data/VXU-V04-01_success_single.hl7
       - name: Check pipeline run
         env:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
           TIMESTAMP: ${{ steps.upload-sample-data.outputs.timestamp }}
         run: |
           az extension add --name datafactory --upgrade
-          START_DATE=$(date --date="5 min ago" "+%Y-%m-%dT%H:%M:%S")
           END_DATE=$(date --date="1 hour" "+%Y-%m-%dT%H:%M:%S")
           CHECK_COUNT=0
           check_pipeline_run_count() {
-            az datafactory pipeline-run query-by-factory --factory-name "phdi-$TF_ENV-data-factory-${CLIENT_ID:0:8}" --filters operand="PipelineName" operator="Equals" values="phdi-$TF_ENV-ingestion" --filters operand="Status" operator="Equals" values="$1" --last-updated-after "$START_DATE" --last-updated-before "$END_DATE"  | jq 'map(select(.parameters.filename == "source-data/vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7")) | length'
+            az datafactory pipeline-run query-by-factory --factory-name "phdi-$TF_ENV-data-factory-$SHORT_CID" --filters operand="PipelineName" operator="Equals" values="phdi-$TF_ENV-ingestion" --filters operand="Status" operator="Equals" values="$1" --last-updated-after "$TIMESTAMP" --last-updated-before "$END_DATE"  | jq 'map(select(.parameters.filename == "source-data/vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7")) | length'
           check_pipeline_success_count() {
             check_pipeline_run_count "Succeeded"
           }
