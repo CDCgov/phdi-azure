@@ -52,7 +52,7 @@ jobs:
         run: |
           TIMESTAMP=$(date "+%Y-%m-%dT%H:%M:%S")
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
-          az storage blob upload --account-name phdi$TF_ENV${CLIENT_ID:0:8} --container-name source-data --name vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7 --file sample-data/VXU-V04-01_success_single.hl7
+          az storage blob upload --account-name phdi$TF_ENVphi${CLIENT_ID:0:8} --container-name source-data --name vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7 --file sample-data/VXU-V04-01_success_single.hl7
       - name: Check pipeline run
         env:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
