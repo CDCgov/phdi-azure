@@ -97,8 +97,7 @@ jobs:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
           SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
         run: |
-          az account get-access-token --resource=https://${TF_ENV}fhir${SHORT_CID}.azurehealthcareapis.com
           TOKEN=$(az account get-access-token --resource=https://${TF_ENV}fhir${SHORT_CID}.azurehealthcareapis.com --query accessToken --output tsv)
-          RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://devfhirf0cbe780.azurehealthcareapis.com/Patient?family=DOE&given=JOHN")
+          RESPONSE=$(curl -X GET --header "Authorization: Bearer $TOKEN" "https://devfhirf0cbe780.azurehealthcareapis.com/Patient?family=DOE&given=JOHN")
           echo $RESPONSE
           echo $RESPONSE | jq -e '.entry[0].resource.name[0].family == "DOE" and .entry[0].resource.name[0].given[0] == "JOHN"'
