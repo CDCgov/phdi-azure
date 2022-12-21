@@ -154,7 +154,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
 
   access_policy_object_ids = [
     azurerm_user_assigned_identity.pipeline_runner.principal_id,
-    var.client_id
+    var.object_id
   ]
 
   lifecycle {
@@ -165,6 +165,12 @@ resource "azurerm_healthcare_service" "fhir_server" {
     environment = terraform.workspace
     managed-by  = "terraform"
   }
+}
+
+resource "azurerm_role_assignment" "fhir_contributor" {
+  scope                = azurerm_healthcare_service.fhir_server.id
+  role_definition_name = "FHIR Data Contributor"
+  principal_id         = var.object_id
 }
 
 #### User Assigned Identity ####

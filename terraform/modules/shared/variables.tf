@@ -22,3 +22,8 @@ variable "client_id" {
   type        = string
   description = "Client ID"
 }
+
+variable "object_id" {
+  type        = string
+  description = "Object ID"
+}

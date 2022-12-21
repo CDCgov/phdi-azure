@@ -152,6 +152,7 @@ CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output
 
 # Create service principal and grant access to subscription
 spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role owner --name $APP_REG_NAME
+OBJECT_ID=$(az ad sp show --id $CLIENT_ID --query id --output tsv)
 
 # Create federated credential
 cat << EOF > credentials.json
@@ -180,6 +181,7 @@ echo
 spin "Setting RESOURCE_GROUP_NAME..." gh -R "${GITHUB_REPO}" secret set RESOURCE_GROUP_NAME --body "${RESOURCE_GROUP_NAME}"
 spin "Setting SUBSCRIPTION_ID..." gh -R "${GITHUB_REPO}" secret set SUBSCRIPTION_ID --body "${SUBSCRIPTION_ID}"
 spin "Setting CLIENT_ID..." gh -R "${GITHUB_REPO}" secret set CLIENT_ID --body "${CLIENT_ID}"
+spin "Setting OBJECT_ID..." gh -R "${GITHUB_REPO}" secret set OBJECT_ID --body "${OBJECT_ID}"
 spin "Setting LOCATION..." gh -R "${GITHUB_REPO}" secret set LOCATION --body "${LOCATION}"
 spin "Setting TENANT_ID..." gh -R "${GITHUB_REPO}" secret set TENANT_ID --body "${TENANT_ID}"
 spin "Setting SMARTY_AUTH_ID..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
