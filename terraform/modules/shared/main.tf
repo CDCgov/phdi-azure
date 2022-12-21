@@ -153,7 +153,8 @@ resource "azurerm_healthcare_service" "fhir_server" {
   cosmosdb_throughput = 1400
 
   access_policy_object_ids = [
-    azurerm_user_assigned_identity.pipeline_runner.principal_id
+    azurerm_user_assigned_identity.pipeline_runner.principal_id,
+    var.client_id
   ]
 
   lifecycle {
