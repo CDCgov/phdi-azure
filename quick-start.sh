@@ -125,7 +125,7 @@ az config set defaults.group="${RESOURCE_GROUP_NAME}"
 box "Resource Group $(pink 'set')!"
 
 # Get organization name
-if gum confirm "Would you like to fork into an organization or your personal account?" --affirmative="Organization" --negative="Personal account"; then
+if gum confirm "Will you be using an organization account or your personal account?" --affirmative="Organization" --negative="Personal account"; then
   # Organization
   echo "Please choose organization you would like to use:"
   echo
