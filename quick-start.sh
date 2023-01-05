@@ -167,6 +167,8 @@ fi
 box "GitHub repository $(pink 'set')!"
 echo
 
+exit
+
 # Define app registration name, get client ID.
 APP_REG_NAME=github-$RESOURCE_GROUP_NAME
 CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
