@@ -146,13 +146,12 @@ if gum confirm "Have you already forked or copied the $(pink 'phdi-azure') repos
   GITHUB_REPO="${GITHUB_USER}/${REPO_NAME}"
 else
   # Repo needs to be created
+  GITHUB_REPO="${ORG_NAME}/phdi-azure"
   if gum confirm "Would you like to use a public or private repository?" --affirmative="Public" --negative="Private"; then
     # Public repo
     spin "Forking repository..." gh repo fork ${ORG_FLAG} CDCgov/phdi-azure
-    GITHUB_REPO="${ORG_NAME}/phdi-azure"
   else
     # Private repo
-    GITHUB_REPO="${ORG_NAME}/phdi-azure"
     spin "Creating private repo..." gh repo create --private $GITHUB_REPO
     spin "Copying files..." git push --mirror https://github.com/${GITHUB_REPO}.git
   fi
