@@ -123,22 +123,38 @@ SUBSCRIPTION_ID="$(az account show --query "id" -o tsv)"
 az config set defaults.group="${RESOURCE_GROUP_NAME}"
 
 box "Resource Group $(pink 'set')!"
-# Check if repo already forked, fork if needed, get repository name
-if gum confirm "Have you already forked the $(pink 'phdi-azure') repository on GitHub?"; then
+
+# Get organization name
+if gum confirm "Will you be using an organization account or your personal account?" --affirmative="Organization" --negative="Personal account"; then
+  # Organization
+  echo "Please choose organization you would like to use:"
+  echo
+  ORG_NAME=$(gh api user/orgs -q '.[].login' | gum choose)
+  ORG_FLAG="--org ${ORG_NAME}"
+else
+  # Personal account
+  ORG_NAME="${GITHUB_USER}"
+  ORG_FLAG=""
+fi
+
+# Get repo name or create a new repo
+if gum confirm "Have you already forked or copied the $(pink 'phdi-azure') repository on GitHub?"; then
+  # Repo already exists
   echo "Please choose repository you would like to use:"
   echo
-  REPO_NAME=$(gh repo list --fork --json name --jq ".[].name" | gum choose)
+  REPO_NAME=$(gh repo list $ORG_NAME --json name --jq ".[].name" | gum choose)
   GITHUB_REPO="${GITHUB_USER}/${REPO_NAME}"
 else
-  if gum confirm "Would you like to fork into an organization or your personal account?" --affirmative="Organization" --negative="Personal account"; then
-    echo "Please choose organization you would like to fork into:"
-    echo
-    ORG_NAME="--org $(gh api user/orgs -q '.[].login' | gum choose)"
+  # Repo needs to be created
+  GITHUB_REPO="${ORG_NAME}/phdi-azure"
+  if gum confirm "Would you like to use a public or private repository?" --affirmative="Public" --negative="Private"; then
+    # Public repo
+    spin "Forking repository..." gh repo fork ${ORG_FLAG} CDCgov/phdi-azure
   else
-    ORG_NAME=""
+    # Private repo
+    spin "Creating private repo..." gh repo create --private $GITHUB_REPO
+    spin "Copying files..." git push --mirror https://github.com/${GITHUB_REPO}.git
   fi
-  spin "Forking repository..." gh repo fork ${ORG_NAME} CDCgov/phdi-azure
-  GITHUB_REPO="${GITHUB_USER}/phdi-azure"
 fi
 
 box "GitHub repository $(pink 'set')!"
