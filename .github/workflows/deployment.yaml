@@ -227,7 +227,7 @@ jobs:
               --registry-server $REGISTRY_URL \
               --registry-username $REGISTRY_NAME \
               --registry-password $REGISTRY_PASSWORD \
-              --user-assigned $MANAGED_IDENTITY_ID \ 
+              --user-assigned $MANAGED_IDENTITY_ID \
               --env-vars AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" COMMUNICATION_SERVICE_NAME="$COMMUNICATION_SERVICE_NAME"
           fi
       - name: load container urls
