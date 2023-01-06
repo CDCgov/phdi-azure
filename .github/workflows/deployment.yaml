@@ -201,8 +201,8 @@ jobs:
               --name phdi-$TF_ENV-tabulation \
               --resource-group $RESOURCE_GROUP_NAME \
               --output yaml > tabulation.yaml
-            yq -i '.properties.template += {"volumes": [{"name":"phdi${TF_ENV}tables","storageName":"phdi${TF_ENV}tables","storageType":"AzureFile"}]}' tabulation.yaml
-            yq -i '.properties.template.containers[0] += {"volumeMounts": [{"volumeName":"phdi${TF_ENV}tables", "mountPath":"/tables"}]}' tabulation.yaml
+            yq -i ".properties.template += {\"volumes\": [{\"name\":\"phdi${TF_ENV}tables\",\"storageName\":\"phdi${TF_ENV}tables\",\"storageType\":\"AzureFile\"}]}" tabulation.yaml
+            yq -i ".properties.template.containers[0] += {\"volumeMounts\": [{\"volumeName\":\"phdi${TF_ENV}tables\", \"mountPath\":\"/tables\"}]}"" tabulation.yaml
             az containerapp env storage set \
               --access-mode ReadWrite \
               --azure-file-account-name $STORAGE_ACCOUNT_NAME \
