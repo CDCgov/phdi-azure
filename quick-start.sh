@@ -143,7 +143,7 @@ if gum confirm "Have you already forked or copied the $(pink 'phdi-azure') repos
   echo "Please choose repository you would like to use:"
   echo
   REPO_NAME=$(gh repo list $ORG_NAME --json name --jq ".[].name" | gum choose)
-  GITHUB_REPO="${GITHUB_USER}/${REPO_NAME}"
+  GITHUB_REPO="${ORG_NAME}/${REPO_NAME}"
 else
   # Repo needs to be created
   GITHUB_REPO="${ORG_NAME}/phdi-azure"
