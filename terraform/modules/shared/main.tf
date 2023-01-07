@@ -168,10 +168,18 @@ resource "azurerm_healthcare_service" "fhir_server" {
   }
 }
 
-#### User Assigned Identity ####
+##### User Assigned Identity #####
 
 resource "azurerm_user_assigned_identity" "pipeline_runner" {
   location            = var.location
   name                = "phdi-${terraform.workspace}-pipeline-runner"
   resource_group_name = var.resource_group_name
+}
+
+##### Communication Service #####
+
+resource "azurerm_communication_service" "communication_service" {
+  name                = "${terraform.workspace}communication${substr(var.client_id, 0, 8)}"
+  resource_group_name = var.resource_group_name
+  data_location       = "United States"
 }
