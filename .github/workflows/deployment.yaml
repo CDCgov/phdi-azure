@@ -46,6 +46,7 @@ jobs:
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          OBJECT_ID: ${{ secrets.OBJECT_ID }}
         run: |
           echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
           echo location=\""$LOCATION"\" >> terraform.tfvars
@@ -53,6 +54,7 @@ jobs:
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
           echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
+          echo object_id=\""$OBJECT_ID"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
           echo fhir_converter_url=\"""\" >> terraform.tfvars

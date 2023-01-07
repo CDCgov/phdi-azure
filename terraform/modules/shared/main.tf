@@ -1,9 +1,7 @@
 ##### PHI Storage Account #####
 
-resource "time_static" "timestamp" {}
-
 resource "azurerm_storage_account" "phi" {
-  name                     = "phdi${terraform.workspace}phi${substr(tostring(time_static.timestamp.unix), 0, 8)}"
+  name                     = "phdi${terraform.workspace}phi${substr(var.client_id, 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
@@ -155,7 +153,8 @@ resource "azurerm_healthcare_service" "fhir_server" {
   cosmosdb_throughput = 1400
 
   access_policy_object_ids = [
-    azurerm_user_assigned_identity.pipeline_runner.principal_id
+    azurerm_user_assigned_identity.pipeline_runner.principal_id,
+    var.object_id
   ]
 
   lifecycle {
@@ -166,6 +165,12 @@ resource "azurerm_healthcare_service" "fhir_server" {
     environment = terraform.workspace
     managed-by  = "terraform"
   }
+}
+
+resource "azurerm_role_assignment" "fhir_contributor" {
+  scope                = azurerm_healthcare_service.fhir_server.id
+  role_definition_name = "FHIR Data Contributor"
+  principal_id         = var.object_id
 }
 
 ##### User Assigned Identity #####

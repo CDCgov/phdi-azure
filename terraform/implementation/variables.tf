@@ -30,3 +30,7 @@ variable "ingestion_container_url" {
 variable "client_id" {
   description = "Client ID"
 }
+
+variable "object_id" {
+  description = "Object ID"
+}

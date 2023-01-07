@@ -7,6 +7,7 @@ module "shared" {
   smarty_auth_id      = var.smarty_auth_id
   smarty_auth_token   = var.smarty_auth_token
   client_id           = var.client_id
+  object_id           = var.object_id
 }
 
 
@@ -34,7 +35,6 @@ module "read_source_data" {
   phdi_data_factory_name                = module.data_factory.phdi_data_factory_name
   ingestion_pipeline_name               = module.data_factory.ingestion_pipeline_name
   subscription_id                       = var.subscription_id
-  time_stamp                            = module.shared.time_stamp
   pipeline_runner_id                    = module.shared.pipeline_runner_id
   pipeline_runner_client_id             = module.shared.pipeline_runner_client_id
   client_id                             = var.client_id

@@ -166,6 +166,7 @@ CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output
 
 # Create service principal and grant access to subscription
 spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role owner --name $APP_REG_NAME
+OBJECT_ID=$(az ad sp show --id $CLIENT_ID --query id --output tsv)
 
 # Create federated credential
 cat << EOF > credentials.json
@@ -194,6 +195,7 @@ echo
 spin "Setting RESOURCE_GROUP_NAME..." gh -R "${GITHUB_REPO}" secret set RESOURCE_GROUP_NAME --body "${RESOURCE_GROUP_NAME}"
 spin "Setting SUBSCRIPTION_ID..." gh -R "${GITHUB_REPO}" secret set SUBSCRIPTION_ID --body "${SUBSCRIPTION_ID}"
 spin "Setting CLIENT_ID..." gh -R "${GITHUB_REPO}" secret set CLIENT_ID --body "${CLIENT_ID}"
+spin "Setting OBJECT_ID..." gh -R "${GITHUB_REPO}" secret set OBJECT_ID --body "${OBJECT_ID}"
 spin "Setting LOCATION..." gh -R "${GITHUB_REPO}" secret set LOCATION --body "${LOCATION}"
 spin "Setting TENANT_ID..." gh -R "${GITHUB_REPO}" secret set TENANT_ID --body "${TENANT_ID}"
 spin "Setting SMARTY_AUTH_ID..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
@@ -206,9 +208,10 @@ echo
 spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}/environments/dev" --silent
 
 # Enable GitHub Actions
+GITHUB_ACTIONS_URL="https://github.com/${GITHUB_REPO}/actions"
 echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
 echo
-echo "Please open $(pink 'https://github.com/${GITHUB_REPO}/actions') in a new tab."
+echo "Please open $(pink $GITHUB_ACTIONS_URL) in a new tab."
 echo "Click the green button to enable $(pink 'GitHub Workflows')."
 echo
 echo "Continuing from this point will begin a series of GitHub actions that may take 20+ minutes to complete"
@@ -218,7 +221,7 @@ enter_to_continue
 WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
 while [ "$WORKFLOWS_ENABLED" = "0" ]; do
   echo "Looks like that didn't work! Please try again."
-  echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab."
+  echo "Please open $GITHUB_ACTIONS_URL in a new tab."
   echo "Click the green button to enable $(pink 'GitHub Workflows')."
   echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
   echo
@@ -231,7 +234,7 @@ while [ "$WORKFLOWS_ENABLED" = "0" ]; do
 done
 
 echo "If you would like to see the following workflows run in more detail please click here:"
-echo "https://github.com/${GITHUB_REPO}/actions"
+echo $(pink $GITHUB_ACTIONS_URL)
 
 # Run Terraform Setup workflow
 echo "We will now run the $(pink 'Terraform Setup') workflow."
@@ -267,7 +270,7 @@ fi
 echo "We will now run the $(pink 'Terraform Deploy') workflow."
 echo "This will deploy the infrastructure to your Azure Resource Group."
 echo
-spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev -r gordon/quick-start-updates
+spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev
 echo
 
 # Watch deployment workflow until complete
@@ -289,7 +292,7 @@ gh -R "${GITHUB_REPO}" run watch $DEPLOYMENT_WORKFLOW_ID
 DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json conclusion -q '.[].conclusion')
 if [ "$DEPLOY_SUCCESS" != "success" ]; then
   echo "Looks like that didn't work! Please contact the PHDI team for help."
-  echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
+  echo "To view the status of your workflows, go to $GITHUB_ACTIONS_URL."
   echo
   exit 1
 fi
