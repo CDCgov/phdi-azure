@@ -46,6 +46,7 @@ jobs:
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          ALERTS_CONFIG: ${{ secrets.ALERTS_CONFIG }}
         run: |
           echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
           echo location=\""$LOCATION"\" >> terraform.tfvars
