@@ -23,6 +23,8 @@ module "data_factory" {
   fhir_upload_failures_container_name     = module.shared.fhir_upload_failures_container_name
   fhir_conversion_failures_container_name = module.shared.fhir_conversion_failures_container_name
   client_id                               = var.client_id
+  alerts_container_url                    = var.alerts_container_url
+  alerts_config                           = var.alerts_config
 }
 
 

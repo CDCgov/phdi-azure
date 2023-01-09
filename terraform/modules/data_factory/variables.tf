@@ -52,3 +52,26 @@ variable "client_id" {
   type        = string
   description = "Client ID"
 }
+
+variable "alerts_container_url" {
+  type        = string
+  description = "URL of the alerts container"
+}
+
+variable "alerts_config" {
+  description = "Configuration for alerts"
+  type = object({
+    sms = object({
+      enabled     = bool
+      destination = string
+    })
+    slack = object({
+      enabled     = bool
+      destination = string
+    })
+    teams = object({
+      enabled     = bool
+      destination = string
+    })
+  })
+}

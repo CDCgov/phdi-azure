@@ -53,10 +53,12 @@ jobs:
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
           echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
+          echo alerts_config=$ALERTS_CONFIG >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
           echo fhir_converter_url=\"""\" >> terraform.tfvars
           echo ingestion_container_url=\"""\" >> terraform.tfvars
+          echo alerts_container_url=\"""\" >> terraform.tfvars
 
       - name: Set environment
         id: set-environment
@@ -82,7 +84,7 @@ jobs:
           terraform init -backend-config=backend.tfvars
           terraform workspace new $TF_ENV || terraform workspace select $TF_ENV
           terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault.phdi_key_vault" -target="module.shared.random_uuid.salt" -target="module.shared.azurerm_key_vault_secret.salt" -auto-approve -lock-timeout=30m
-          head -n -2 terraform.tfvars >> temp.txt
+          head -n -3 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
 
@@ -237,9 +239,10 @@ jobs:
         run: |
           FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
           INGESTION_CONTAINER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)"
-          TABULATE_CONTAINER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-tabulation" --query "properties.configuration.ingress.fqdn" -o tsv)"
+          ALERTS_CONTAINER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-alerts" --query "properties.configuration.ingress.fqdn" -o tsv)"
           echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
           echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
+          echo alerts_container_url=\""$ALERTS_CONTAINER_URL"\" >> terraform.tfvars
       - name: terraform
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}

@@ -53,6 +53,37 @@
                     }
                 }
             },
+            %{ for alert_type, alert_config in alerts_config }
+            {
+                "name": "alert_fhir_conversion_failure_${alert_type}",
+                "description": "Alert on FHIR conversion failures.\n",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "convert_to_fhir",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${alerts_container_url}/${alert_type}-alert",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    ${alert_config.destination}    \"message\": \"A message failed to be converted into a FHIR bundle. Please check the ${fhir_conversion_failures_container_name} container in your storage account to see the failed message.\"\n}",
+                        "type": "Expression"
+                    }
+                }
+            },
+            %{ endfor ~}
             {
                 "name": "standardize_name",
                 "description": "Standardize patient name.",
@@ -226,7 +257,40 @@
                         "type": "Expression"
                     }
                 }
-            }
+            },
+            %{ for alert_type, alert_config in alerts_config }
+            %{ if alert_config.enabled == true }
+            {
+                "name": "alert_fhir_upload_failure_${alert_type}",
+                "description": "Alert on FHIR upload failures.\n",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "upload_fhir_bundle",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${alerts_container_url}/${alert_type}-alert",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    ${alert_config.destination}    \"message\": \"A bundle failed to be uploaded into the FHIR server. Please check the ${fhir_upload_failures_container_name} container in your storage account to see the failed bundle.\"\n}",
+                        "type": "Expression"
+                    }
+                }
+            },
+            %{ endif }
+            %{ endfor ~}
         ],
         "parameters": {
             "message": {
