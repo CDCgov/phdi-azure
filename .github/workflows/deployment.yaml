@@ -100,7 +100,7 @@ jobs:
         run: |
           REGISTRY_NAME=phdi${TF_ENV}registry${SHORT_CID}
           az acr login --name $REGISTRY_NAME
-          IMAGES=('fhir-converter' 'phdi-ingestion' 'tabulation' 'phdi-alerts')
+          IMAGES=('fhir-converter' 'ingestion' 'tabulation' 'alerts')
           for IMAGE in "${IMAGES[@]}"; do
             GH_IMAGE_NAME=ghcr.io/cdcgov/phdi/$IMAGE:main
             AZURE_IMAGE_NAME=$REGISTRY_NAME.azurecr.io/phdi/$IMAGE:latest
@@ -175,7 +175,7 @@ jobs:
               --name phdi-$TF_ENV-ingestion \
               --resource-group $RESOURCE_GROUP_NAME \
               --environment $TF_ENV \
-              --image $REGISTRY_URL/phdi/phdi-ingestion:latest \
+              --image $REGISTRY_URL/phdi/ingestion:latest \
               --target-port 8080 \
               --ingress 'external' \
               --registry-server $REGISTRY_URL \
@@ -221,7 +221,7 @@ jobs:
               --name phdi-$TF_ENV-alerts \
               --resource-group $RESOURCE_GROUP_NAME \
               --environment $TF_ENV \
-              --image $REGISTRY_URL/phdi/phdi-alerts:latest \
+              --image $REGISTRY_URL/phdi/alerts:latest \
               --target-port 8080 \
               --ingress 'external' \
               --registry-server $REGISTRY_URL \
