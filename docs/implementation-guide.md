@@ -71,34 +71,37 @@ Required to use geocoding functionality:
 - `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID. More info on the Smarty geocoding service [here](https://www.smarty.com/pricing/us-rooftop-geocoding)
 - `SMARTY_AUTH_TOKEN` - Your SmartyStreet Authorization Token.
 
+Keep these values easily accessible so that they can be entered later when the script prompts for them.
+
 ### Step 2: Run the Quick Start Script in Azure Cloud Shell
 In this step we will work through Azure's [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation) to grant your phdi-azure repo access to deploy the pipelines to your organization's Azure environment. We have provided a script to automate most of this process that we recommend you use. However, if you prefer to work through it manually you may follow [this guide](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azcli).
 
-Navigate to the [Azure Cloud Shell](https://shell.azure.com/).
+Navigate to the [Azure Cloud Shell](https://shell.azure.com/).  
+  
+Choose Bash as your shell environment:
+![azure-cloud-shell-bash](./images/azure-cloud-shell-bash.png)  
+  
+Create storage for your Cloud Shell:  
+![azure-cloud-shell-storage](./images/azure-cloud-shell-storage.png)  
+  
+When your shell is ready to receive commands, it will look like this:
+![azure-cloud-shell-ready](./images/azure-cloud-shell-ready.png)
 
 To download and run the quick start script, run the following command in Cloud Shell:
 ```bash
 git clone https://github.com/CDCgov/phdi-azure.git && cd phdi-azure && ./quick-start.sh
 ```
 
+When the script is ready for your input, it will look like this:  
+![quick-start-ready](./images/quick-start-ready.png)  
+  
+Press enter to begin the script.
+
 If you plan to deploy to an existing resource group in your Azure environment, have the resource group name ready and provide it to the quick start script when prompted.
 
-The script will take around 20-30 minutes to run. The last step will ask you if you want to deploy your pipeline. If you choose yes, you may skip Step 3 and go directly to Step 4 after the script completes.
+The script will take around 20-30 minutes to run.
 
-### Step 3: Run the Deployment GitHub Workflow
-If you choose to skip deployment in the Quick Start script, you are now ready to deploy the PHDI pipelines to your Azure resource group with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously, follow the steps below.
-
-1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-azure` in your browser.
-2. Click on `Actions` near the center at the top of the page.
-![navigate-to-actions](./images/navigate-to-actions.png)
-3. Select `Deployment` from the list of Workflows on the left side of the screen.
-![deployment-1](./images/deployment-1.png)
-4. Click on `Run workflow` in the middle of the right side of the screen.
-![deployment-2](./images/deployment-2.png)
-5. Ensure the `main` branch is selected and choose the environment you wish to deploy to and click the green `Run workflow` button. In the screenshot below we are deploying to our development environment which we have called `dev` 
-![deployment-3](./images/deployment-3.png)
-
-### Step 4: Run an Hl7v2 vaccination message through the pipeline 
+### Step 3: Run an Hl7v2 vaccination message through the pipeline 
 Now that the starter kit has been deployed we can run some data through it! The `sample-data/` directory in your forked version of the repository contains some dummy VXU messages that can be used to test the sucess and failure modes of the ingestion pipeline. To start let's lets use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
 2. The patient's phone number is not in a standard format.

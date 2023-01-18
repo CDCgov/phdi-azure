@@ -152,6 +152,7 @@ else
     spin "Forking repository..." gh repo fork ${ORG_FLAG} CDCgov/phdi-azure
   else
     # Private repo
+    PRIVATE="true"
     spin "Creating private repo..." gh repo create --private $GITHUB_REPO
     spin "Copying files..." git push --mirror https://github.com/${GITHUB_REPO}.git
   fi
@@ -206,29 +207,31 @@ echo
 spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}/environments/dev" --silent
 
 # Enable GitHub Actions
-echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
-echo
-echo "Please open $(pink 'https://github.com/${GITHUB_REPO}/actions') in a new tab."
-echo "Click the green button to enable $(pink 'GitHub Workflows')."
-echo
-echo "Continuing from this point will begin a series of GitHub actions that may take 20+ minutes to complete"
-
-enter_to_continue
-
-WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
-while [ "$WORKFLOWS_ENABLED" = "0" ]; do
-  echo "Looks like that didn't work! Please try again."
-  echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab."
-  echo "Click the green button to enable $(pink 'GitHub Workflows')."
-  echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
+if [[ $PRIVATE != "true" ]]; then
+  echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
   echo
-  read SHOULD_CONTINUE
-  if [ "$SHOULD_CONTINUE" = "exit" ]; then
-    exit 1
-  else
-    WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
-  fi
-done
+  echo "Please open $(pink "https://github.com/${GITHUB_REPO}/actions") in a new tab."
+  echo "Click the green button to enable $(pink 'GitHub Workflows')."
+  echo
+  echo "Continuing from this point will begin a series of GitHub actions that may take 20+ minutes to complete"
+
+  enter_to_continue
+
+  WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
+  while [ "$WORKFLOWS_ENABLED" = "0" ]; do
+    echo "Looks like that didn't work! Please try again."
+    echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab."
+    echo "Click the green button to enable $(pink 'GitHub Workflows')."
+    echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
+    echo
+    read SHOULD_CONTINUE
+    if [ "$SHOULD_CONTINUE" = "exit" ]; then
+      exit 1
+    else
+      WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
+    fi
+  done
+fi
 
 echo "If you would like to see the following workflows run in more detail please click here:"
 echo "https://github.com/${GITHUB_REPO}/actions"
@@ -242,7 +245,8 @@ spin "Starting Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run 
 echo
 
 # Watch Terraform Setup workflow until complete
-TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId -q ". | length")
+TIMESTAMP=$(date --date="5 min ago" +"%s")
+TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | length")
 CHECK_COUNT=0
 while [ "$TF_SETUP_STARTED" = "0" ]; do
   if [ "$CHECK_COUNT" -gt 60 ]; then
@@ -250,14 +254,14 @@ while [ "$TF_SETUP_STARTED" = "0" ]; do
     exit 1
   fi
   spin "Waiting for Terraform Setup workflow to start..." sleep 1
-  TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId -q ". | length")
+  TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | length")
   CHECK_COUNT=$((CHECK_COUNT+1))
 done
-TF_SETUP_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml -L 1 --json databaseId -q ".[0].databaseId")
+TF_SETUP_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | .[0].databaseId")
 gh -R "${GITHUB_REPO}" run watch $TF_SETUP_WORKFLOW_ID
 
 # Check for Terraform Setup workflow success
-TF_SETUP_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json conclusion -q '.[].conclusion')
+TF_SETUP_SUCCESS=$(gh -R "${GITHUB_REPO}" run view $TF_SETUP_WORKFLOW_ID --json conclusion -q '.conclusion')
 if [ "$TF_SETUP_SUCCESS" != "success" ]; then
   echo "Looks like that didn't work! Please contact the PHDI team for help."
   exit 1
@@ -267,11 +271,12 @@ fi
 echo "We will now run the $(pink 'Terraform Deploy') workflow."
 echo "This will deploy the infrastructure to your Azure Resource Group."
 echo
-spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev -r gordon/quick-start-updates
+spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev
 echo
 
 # Watch deployment workflow until complete
-DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId -q ". | length")
+TIMESTAMP=$(date --date="5 min ago" +"%s")
+DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml  --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | length")
 CHECK_COUNT=0
 while [ "$DEPLOYMENT_STARTED" = "0" ]; do
   if [ "$CHECK_COUNT" -gt 60 ]; then
@@ -279,14 +284,14 @@ while [ "$DEPLOYMENT_STARTED" = "0" ]; do
     exit 1
   fi
   spin "Waiting for deployment workflow to start..." sleep 1
-  DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId -q ". | length")
+  DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml  --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | length")
   CHECK_COUNT=$((CHECK_COUNT+1))
 done
-DEPLOYMENT_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml -L 1 --json databaseId -q ".[0].databaseId")
+DEPLOYMENT_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | .[0].databaseId")
 gh -R "${GITHUB_REPO}" run watch $DEPLOYMENT_WORKFLOW_ID
 
 # Check for deployment workflow success
-DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json conclusion -q '.[].conclusion')
+DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run view $DEPLOYMENT_WORKFLOW_ID --json conclusion -q '.conclusion')
 if [ "$DEPLOY_SUCCESS" != "success" ]; then
   echo "Looks like that didn't work! Please contact the PHDI team for help."
   echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
