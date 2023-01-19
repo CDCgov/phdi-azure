@@ -30,7 +30,7 @@ pink() {
 spin() {
   local -r title="${1}"
   shift 1
-  gum spin -s line --title "${title}" -- $@
+  gum spin --show-output -s line --title "${title}" -- $@
 }
 
 # Create text box
