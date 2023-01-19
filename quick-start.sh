@@ -246,7 +246,7 @@ echo
 
 # Watch Terraform Setup workflow until complete
 TIMESTAMP=$(date --date="5 min ago" +"%s")
-TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | length")
+TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | length")
 CHECK_COUNT=0
 while [ "$TF_SETUP_STARTED" = "0" ]; do
   if [ "$CHECK_COUNT" -gt 60 ]; then
@@ -254,10 +254,10 @@ while [ "$TF_SETUP_STARTED" = "0" ]; do
     exit 1
   fi
   spin "Waiting for Terraform Setup workflow to start..." sleep 1
-  TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | length")
+  TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | length")
   CHECK_COUNT=$((CHECK_COUNT+1))
 done
-TF_SETUP_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | .[0].databaseId")
+TF_SETUP_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | .[0].databaseId")
 gh -R "${GITHUB_REPO}" run watch $TF_SETUP_WORKFLOW_ID
 
 # Check for Terraform Setup workflow success
@@ -276,7 +276,7 @@ echo
 
 # Watch deployment workflow until complete
 TIMESTAMP=$(date --date="5 min ago" +"%s")
-DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml  --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | length")
+DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml  --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | length")
 CHECK_COUNT=0
 while [ "$DEPLOYMENT_STARTED" = "0" ]; do
   if [ "$CHECK_COUNT" -gt 60 ]; then
@@ -284,10 +284,10 @@ while [ "$DEPLOYMENT_STARTED" = "0" ]; do
     exit 1
   fi
   spin "Waiting for deployment workflow to start..." sleep 1
-  DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml  --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | length")
+  DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml  --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | length")
   CHECK_COUNT=$((CHECK_COUNT+1))
 done
-DEPLOYMENT_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId,startedAt -q "map(select(.startedAt | fromdateiso8601 > $TIMESTAMP)) | .[0].databaseId")
+DEPLOYMENT_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | .[0].databaseId")
 gh -R "${GITHUB_REPO}" run watch $DEPLOYMENT_WORKFLOW_ID
 
 # Check for deployment workflow success
