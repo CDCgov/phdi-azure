@@ -165,8 +165,23 @@ echo
 APP_REG_NAME=github-$RESOURCE_GROUP_NAME
 CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
 
-# Create service principal and grant access to subscription
+# Create custom role needed for container app creation
+cat << EOF > role.json
+{
+    "Name": "App Resource Provider Registrant",
+    "Description": "Register Microsoft.App resource provider for the subscription",
+    "Actions": [
+        "Microsoft.App/register/action",
+        "Microsoft.OperationalInsights/register/action"
+    ],
+    "AssignableScopes": ["/subscriptions/$SUBSCRIPTION_ID"]
+}
+EOF
+spin "Creating custom role..." az role definition create --role-definition role.json
+
+# Create service principal and grant necessary roles
 spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME --role owner --name $APP_REG_NAME
+spin "Assigning custom role..." az role assignment create --role "App Resource Provider Registrant" --assignee $CLIENT_ID
 
 # Create federated credential
 cat << EOF > credentials.json
