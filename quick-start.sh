@@ -57,7 +57,7 @@ enter_to_continue
 echo "Please select the $(pink 'location') you would like to deploy to."
 echo "More info: https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#overview"
 echo
-LOCATION=$(gum choose "eastus" "eastus2" "westus" "westus2" "westus3" "southcentralus" "centralus")
+LOCATION=$(gum choose "eastus" "eastus2" "westus" "westus3" "northcentralus" "southcentralus" "centralus")
 
 echo "Please enter the $(pink 'Authorization ID') of your Smarty Street Account."
 echo "More info: https://www.smarty.com/docs/cloud/authentication"
