@@ -10,7 +10,6 @@ This is a guide for getting started as a user and/or developer with the PHDI Azu
         - [Terraform State Storage Account](#terraform-state-storage-account)
     - [Azure Data Factory (ADF): Orchestration](#azure-data-factory-adf-orchestration)
     - [Azure Functions: Cloud-native event-driven processing](#azure-functions-cloud-native-event-driven-processing)
-    - [Azure Project Configuration](#azure-project-configuration)
   - [Infrastructure as Code (IaC)](#infrastructure-as-code-iac)
     - [Running Terraform Locally](#running-terraform-locally)
   - [Continuous Integration and Continuous Deployment (CI/CD)](#continuous-integration-and-continuous-deployment-cicd)
@@ -69,7 +68,7 @@ The second storage account in the starter kit is the Azure Functions Storage Acc
 The third and final storage account in the starter kit is the Terraform State Storage Account. This account is shared across all deployed environments of the starter kit (dev, prod, QA, etc..) and is used to store the Terraform state of each environment. For more information Terraform state please refer to the [Infrastructure as Code (IaC)](#infrastructure-as-code-iac) section of this doc.
 
 ### Azure Data Factory (ADF): Orchestration
-We use [Azure Data Factory (ADF)](https://learn.microsoft.com/en-us/azure/data-factory/control-flow-azure-function-activity) to define processes that require the use of multiple Building Blocks. These data flows can be developed using [The Azure Function Activity UI](https://learn.microsoft.com/en-us/azure/data-factory/control-flow-azure-function-activity#create-an-azure-function-activity-with-ui). However for best Infrastructure as Code (IaC) best practices we recommend deploying ADF pipelines in production from JSON configuration files. This allows consistency and reproducibility between deployments and the use of source control to track changes to the pipline over time. The JSON configuration file for the ingestion pipeline is available in [`/terraform/modules/data_factory/ingestion-pipeline.json`](../terraform/modules/data_factory/ingestion-pipeline.json) in this repository.
+We use [Azure Data Factory (ADF)](https://learn.microsoft.com/en-us/azure/data-factory/control-flow-azure-function-activity) to define processes that require the use of multiple Building Blocks. These data flows can be developed using [The Azure Function Activity UI](https://learn.microsoft.com/en-us/azure/data-factory/control-flow-azure-function-activity#create-an-azure-function-activity-with-ui). However for best Infrastructure as Code (IaC) practices we recommend deploying ADF pipelines in production from JSON configuration files. This allows consistency and reproducibility between deployments and the use of source control to track changes to the pipeline over time. The JSON configuration file for the ingestion pipeline is available in [`/terraform/modules/data_factory/ingestion-pipeline.json`](../terraform/modules/data_factory/ingestion-pipeline.json) in this repository.
 
 The table below summarizes these pipelines, their purposes, triggers, inputs, steps, and results:
 
@@ -95,22 +94,6 @@ The table below summarizes these functions, their purposes, triggers, inputs, an
 | Fhir-converter | Convert Hl7v2 and C-CDA data to FHIR at the beginning of the ingestion pipeline. |  [https://github.com/CDCgov/phdi/tree/main/containers/fhir-converter](https://github.com/CDCgov/phdi/tree/main/containers/fhir-converter) |
 | Ingestion | Provide endpoints for each step of the ingestion pipeline except conversion to FHIR. | [https://github.com/CDCgov/phdi/tree/main/containers/ingestion](https://github.com/CDCgov/phdi/tree/main/containers/ingestion) |
 | Tabulation | Extract and tabularize data from the FHIR server according to user-defined schema. |  [https://github.com/CDCgov/phdi/tree/main/containers/tabulation](https://github.com/CDCgov/phdi/tree/main/containers/tabulation) |
-
-### Azure Project Configuration
-
-Unknown - TODO??
-
-We use Azure KeyVault for sensitive information, and the "Configuration" properties of each function to store relevant variables. We tie the two together using [Azure KeyVault References](https://docs.microsoft.com/en-us/azure/app-service/app-service-key-vault-references).
-
-You can easily download the environment variable configuration for a given function app using the azure CLI with:
-
-```bash
-cd src/FunctionApps/NAME
-func azure functionapp fetch-app-settings pitest-python-functionapp --output-file local.settings.json
-func settings decrypt
-```
-
-You can then further customize this file.
 
 
 ## Infrastructure as Code (IaC)
