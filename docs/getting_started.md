@@ -63,7 +63,7 @@ phdi{ENV NAME}phi{UNIX TIME OF CREATION}/
 ```
 
 #### Azure Functions Storage Account
-The second storage account in the starter kit is the Azure Functions Storage Account. This account is used for all storage needs related to Azure Functions. The starter kit currently creates a containers in this account to store the source code for the [`read-source-data](#azure-functions) function.
+The second storage account in the starter kit is the Azure Functions Storage Account. This account is used for all storage needs related to Azure Functions. The starter kit currently creates a container in this account to store the source code for the [`read-source-data](#azure-functions) function.
 
 #### Terraform State Storage Account
 The third and final storage account in the starter kit is the Terraform State Storage Account. This account is shared across all deployed environments of the starter kit (dev, prod, QA, etc..) and is used to store the Terraform state of each environment. For more information Terraform state please refer to the [Infrastructure as Code (IaC)](#infrastructure-as-code-iac) section of this doc.
