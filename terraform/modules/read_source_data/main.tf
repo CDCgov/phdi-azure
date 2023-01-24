@@ -57,6 +57,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
     AZURE_CLIENT_ID                 = var.pipeline_runner_client_id
     AZURE_TENANT_ID                 = data.azurerm_client_config.current.tenant_id
     AZURE_SUBSCRIPTION_ID           = var.subscription_id
+    INGESTION_CONTAINER_URL         = var.ingestion_container_url
   }
 
   lifecycle {

@@ -1,5 +1,6 @@
 import os
 import json
+import requests
 import azure.functions as func
 
 from azure.mgmt.datafactory import DataFactoryManagementClient
@@ -38,6 +39,22 @@ def main(blob: func.InputStream) -> None:
 
     else:
         raise Exception("Invalid file type.")
+
+    # Skip empty files.
+    if filename_parts[2] == ".keep":
+        # Make a request to the write_blob_to_storage endpoint on the ingestion container app
+        # to create a new empty file.
+        ingestion_container_url = os.environ["INGESTION_CONTAINER_URL"]
+        requests.post(
+            f"{ingestion_container_url}/cloud/storage/write_blob_to_storage",
+            json={
+                "blob": {},
+                "file_name": ".keep",
+                "bucket_name": "empty-files",
+                "cloud_provider": "azure",
+            },
+        )
+        return
 
     blob_contents = blob.read().decode("utf-8", errors="ignore")
 

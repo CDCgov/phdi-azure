@@ -47,3 +47,8 @@ variable "client_id" {
   type        = string
   description = "Client ID of the app registration used to authenticate to Azure"
 }
+
+variable "ingestion_container_url" {
+  type        = string
+  description = "The URL of the ingestion container."
+}
