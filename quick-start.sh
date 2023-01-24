@@ -181,7 +181,6 @@ spin "Creating custom role..." az role definition create --role-definition role.
 
 # Create service principal and grant necessary roles
 spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME --role owner --name $APP_REG_NAME
-spin "Assigning custom role..." az role assignment create --scope /subscriptions/$SUBSCRIPTION_ID --role "App Resource Provider Registrant" --assignee $CLIENT_ID
 
 # Create federated credential
 cat << EOF > credentials.json
@@ -200,6 +199,7 @@ until az ad app show --id $CLIENT_ID &> /dev/null; do
 done
 
 spin "Creating federated credential..." az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
+spin "Assigning custom role..." az role assignment create --scope /subscriptions/$SUBSCRIPTION_ID --role "App Resource Provider Registrant" --assignee $CLIENT_ID
 
 echo "Workload Identity Federation setup complete!"
 echo
