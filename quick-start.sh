@@ -199,7 +199,7 @@ until az ad app show --id $CLIENT_ID &> /dev/null; do
 done
 
 spin "Creating federated credential..." az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
-spin "Assigning custom role..." az role assignment create --scope /subscriptions/$SUBSCRIPTION_ID --role "App Resource Provider Registrant" --assignee $CLIENT_ID
+az role assignment create --assignee "$CLIENT_ID" --role "App Resource Provider Registrant" --scope "/subscriptions/$SUBSCRIPTION_ID"  
 
 # Cleanup
 rm role.json
