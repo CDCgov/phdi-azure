@@ -82,6 +82,6 @@ resource "azurerm_eventgrid_event_subscription" "blobTrigger" {
   scope = var.phi_storage_account_id
 
   azure_function_endpoint {
-    function_app_resource_id = azurerm_linux_function_app.read_source_data.id
+    function_id = azurerm_linux_function_app.read_source_data.id
   }
 }
