@@ -42,8 +42,8 @@ def main(blob: func.InputStream) -> None:
 
     # Skip empty files.
     if filename_parts[2] == ".keep":
-        # Make a request to the write_blob_to_storage endpoint on the ingestion container app
-        # to create a new empty file.
+        # Make a request to the write_blob_to_storage endpoint
+        # on the ingestion container app to create a new empty file.
         ingestion_container_url = os.environ["INGESTION_CONTAINER_URL"]
         requests.post(
             f"{ingestion_container_url}/cloud/storage/write_blob_to_storage",
