@@ -291,10 +291,10 @@ jobs:
 
           touch .keep
           az storage blob upload -f ./.keep -c source-data -n vxu/.keep --account-name phdi${TF_ENV}phi${SHORT_CID}
-          FUNCTION_TRIGGERED=$(az storage blob exists -c empty-files -n vxu/.keep --account-name phdi${TF_ENV}phi${SHORT_CID} --query "exists")
+          FUNCTION_TRIGGERED=$(az storage blob list -c empty-files --account-name phdi${TF_ENV}phi${SHORT_CID} --only-show-errors --query "[].name" | grep -c .keep)
           CHECK_COUNT=0
           UPLOAD_ATTEMPTS=0
-          while [ $FUNCTION_TRIGGERED != "true" ]; do
+          while [ $FUNCTION_TRIGGERED == "0" ]; do
               if [ $UPLOAD_ATTEMPTS -gt 12 ]; then
                       echo "ReadSourceData function not triggered after 5 attempts. Exiting."
                       exit 1
@@ -309,7 +309,7 @@ jobs:
               echo "ReadSourceData function not yet triggered. Checking again in 10 seconds..."
               sleep 10
               CHECK_COUNT=$((CHECK_COUNT+1))
-              FUNCTION_TRIGGERED=$(az storage blob exists -c empty-files -n vxu/.keep --account-name phdi${TF_ENV}phi${SHORT_CID} --query "exists")
+              FUNCTION_TRIGGERED=$(az storage blob list -c empty-files --account-name phdi${TF_ENV}phi${SHORT_CID} --only-show-errors --query "[].name" | grep -c .keep)
           done
 
           echo "ReadSourceData function triggered."

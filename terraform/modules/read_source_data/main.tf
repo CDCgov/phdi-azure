@@ -76,3 +76,12 @@ resource "azurerm_linux_function_app" "read_source_data" {
     application_insights_key = azurerm_application_insights.insights.instrumentation_key
   }
 }
+
+resource "azurerm_eventgrid_event_subscription" "blobTrigger" {
+  name  = "blobTrigger"
+  scope = var.phi_storage_account_id
+
+  azure_function_endpoint {
+    function_app_resource_id = azurerm_linux_function_app.read_source_data.id
+  }
+}

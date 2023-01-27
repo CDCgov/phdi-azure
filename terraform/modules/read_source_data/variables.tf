@@ -47,3 +47,8 @@ variable "ingestion_container_url" {
   type        = string
   description = "The URL of the ingestion container."
 }
+
+variable "phi_storage_account_id" {
+  type        = string
+  description = "The ID of the storage account where the PHI data is stored."
+}

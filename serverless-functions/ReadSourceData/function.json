@@ -6,6 +6,7 @@
       "type": "blobTrigger",
       "direction": "in",
       "path": "source-data/{name}",
+      "source": "EventGrid",
       "connection": "PhiStorage"
     }
   ]
