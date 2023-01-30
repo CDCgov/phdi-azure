@@ -50,8 +50,10 @@ fi
 
 # Intro text
 box "Welcome to the $(pink 'PHDI Azure') setup script!"
-echo "This script will help you setup $(pink 'Azure') authentication for GitHub Actions."
-echo "We need some info from you to get started."
+echo "This script will help you setup the PHDI Starter Kit in $(pink 'Azure'), including authentication for GitHub Actions."
+echo "In order for the script to work properly you will need:"
+echo "  1. Owner access to the Azure subscription where you would like to deploy the PHDI Starter Kit."
+echo "  2. Admin access to the GitHub account or organization where your copy of this repository will be created."
 enter_to_continue
 
 echo "Please select the $(pink 'location') you would like to deploy to."
