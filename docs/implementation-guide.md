@@ -54,7 +54,7 @@ In this section we describe how a STLT can take this repository and use it to sp
 ### User Requirements
 In order to proceed you will need:
 1. `Owner` access to the Azure subscription where you would like to deploy the PHDI Starter Kit.
-2. `Admin` access to the GitHub account or organization where your copy of this repository will be created.
+2. To be able to create new repositories in the GitHub account or organization where your copy of this repository will be created.
 
 If you do not meet either of these criteria contact the owner of your organization's Azure subscription and/or GitHub organization.
 
