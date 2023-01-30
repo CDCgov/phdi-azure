@@ -99,6 +99,9 @@ resource "azurerm_function_app_function" "read_source_data" {
 resource "azurerm_eventgrid_event_subscription" "blob_trigger" {
   name  = "blobTrigger"
   scope = var.phi_storage_account_id
+  depends_on = [
+    azurerm_function_app_function.read_source_data
+  ]
 
   azure_function_endpoint {
     function_id = format("%s/functions/%s", azurerm_linux_function_app.read_source_data.id, "ReadSourceData")
