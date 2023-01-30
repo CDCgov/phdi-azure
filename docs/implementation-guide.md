@@ -9,6 +9,7 @@
             - [Tabulation Service](#tabulation-service)
         - [Additional References](#additional-references)
     - [Implementing the PHDI Azure Pipelines](#implementing-the-phdi-azure-pipelines)
+        - [User Requirments](#user-requirments)
         - [Step 1: Ensure you have collected values for geocoding variables](#step-1-ensure-you-have-collected-values-for-geocoding-variables)
         - [Step 2: Run the Quick Start Script in Azure Cloud Shell](#step-2-run-the-quick-start-script-in-azure-cloud-shell)
         - [Step 3: Run an Hl7v2 vaccination message through the pipeline](#step-3-run-an-hl7v2-vaccination-message-through-the-pipeline)
@@ -50,7 +51,7 @@ We have only provided a brief overview of PHDI, Building Blocks, and the pipelin
 ## Implementing the PHDI Azure Pipelines
 In this section we describe how a STLT can take this repository and use it to spin up all of the functionality that it offers in their own Azure environment.
 
-### User Assumptions
+### User Requirments
 In order to proceed you will need either:
 - an Azure account with permissions to create new resource groups in your organization's Azure environment,
 or
