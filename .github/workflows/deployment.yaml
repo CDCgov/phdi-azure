@@ -280,17 +280,19 @@ jobs:
 
       - name: Add Event Grid subscription
         env:
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
           SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
         run: |
           BLOB_EXTENSION_KEY=$(az functionapp keys list -n $TF_ENV-read-source-data-$SHORT_CID --query "systemKeys.blobs_extension" -o tsv)
-          az eventgrid event-subscription create -g $RESOURCE_GROUP_NAME \
-            --provider-namespace Microsoft.Storage --resource-type storageAccounts \
-            --resource-name phdi${TF_ENV}phi${SHORT_CID} --name phdi${TF_ENV}phi${SHORT_CID}Sub \
+          az eventgrid event-subscription create \
+            --name phdi${TF_ENV}phi${SHORT_CID}Sub \
+            --source-resource-id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageaccounts/phdi${TF_ENV}phi${SHORT_CID}"
             --included-event-types Microsoft.Storage.BlobCreated \
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
-            --endpoint https://${TF_ENV}-read-source-data-${SHORT_CID}.azurewebsites.net/runtime/webhooks/blobs?functionName=Host.Functions.BlobTriggerEventGrid&code=${BLOB_EXTENSION_KEY}
+            --endpoint https://${TF_ENV}-read-source-data-${SHORT_CID}.azurewebsites.net/runtime/webhooks/blobs?functionName=Host.Functions.BlobTriggerEventGrid&code=${BLOB_EXTENSION_KEY} \
+            --endpoint-type azurefunction
 
       - name: Wait for function to be ready
         env:
