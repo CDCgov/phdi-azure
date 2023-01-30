@@ -4,22 +4,14 @@
     - [Introduction](#introduction)
         - [What is PHDI?](#what-is-phdi)
         - [What are Building Blocks?](#what-are-building-blocks)
-        - [PHDI Pipelines](#phdi-pipelines)
+        - [PHDI Starter Kit Architecture](#phdi-starter-kit-architecture)
             - [Ingestion Pipeline](#ingestion-pipeline)
             - [Analytics Pipeline](#analytics-pipeline)
         - [Additional References](#additional-references)
     - [Implementing the PHDI Azure Pipelines](#implementing-the-phdi-azure-pipelines)
-        - [Step 1: Prepare Your Azure Environment](#step-1-prepare-your-azure-environment)
-        - [Step 2: Install the az CLI](#step-2-install-the-az-cli)
-        - [Step 3: Fork the phdi-azure Repository](#step-3-fork-the-phdi-azure-repository)
-        - [Step 4: Clone the Forked Repository](#step-4-clone-the-forked-repository)
-        - [Step 5: Run the Quick Start Script](#step-5-run-the-quick-start-script)
-        - [Step 6: Set Repository Secrets](#step-6-set-repository-secrets)
-        - [Step 7: Run the Terraform Setup GitHub Workflow](#step-7-run-the-terraform-setup-github-workflow)
-        - [Step 8: Create a Development Environment](#step-8-create-a-development-environment)
-        - [Step 9: Run the Deployment GitHub Workflow](#step-9-run-the-deployment-github-workflow)
-        - [Step 10: Run End-to-end Functional Tests](#step-10-run-end-to-end-functional-tests)
-    - [Estimated Costs](#estimated-costs)
+        - [Step 1: Ensure you have collected values for geocoding variables](#step-1-ensure-you-have-collected-values-for-geocoding-variables)
+        - [Step 2: Run the Quick Start Script in Azure Cloud Shell](#step-2-run-the-quick-start-script-in-azure-cloud-shell)
+        - [Step 3: Run an Hl7v2 vaccination message through the pipeline](#step-3-run-an-hl7v2-vaccination-message-through-the-pipeline)
 
 ## Introduction
 This document provides a detailed guide for implementing the PHDI pipelines provided in this repository.
@@ -30,13 +22,13 @@ The Public Health Data Infrastructure (PHDI) project is part of the Pandemic-Rea
 ### What are Building Blocks?
 PHDI's goal is to provide STLTs with modern tools to solve challenges working with public health data. We refer to each of these tools as a "Building Block". Some Building Blocks offer relatively simple functionality, like standardizing patient names, while others perform more complex tasks, including geocoding and standardizing addresses. Importantly, the Building Blocks have been carefully designed with common inputs and outputs making them easily composable.  
 
-### PHDI Pipelines
-The composable nature of Building Blocks allows them to be strung together into data pipelines where each Building Block represents a single step in a pipeline. As an example, let's consider a hypothetical case where a STLT would like to improve the quality of their patient address data and ensure that patient names are written consistently. They could solve this problem by using the name standardization and geocoding Building Blocks, mentioned in the previous section, to build a simple pipeline that standardizes patients' names and geocodes their addresses. Non-standardized data would be sent into the pipeline, where it would pass through each of the Building Blocks, and then exit the pipeline with standardized name and address fields. STLTs are welcome to use Building Blocks to create their own custom pipelines. However, because many STLTs are facing similar challenges with their data this repository implements two pipelines, developed by the PHDI team, centered around a Azure FHIR Store. The complete architecture for this system is shown in the diagram below.
+### PHDI Starter Kit Architecture
+The composable nature of Building Blocks allows them to be strung together into data pipelines where each Building Block represents a single step in a pipeline. As an example, let's consider a hypothetical case where a STLT would like to improve the quality of their patient address data and ensure that patient names are written consistently. They could solve this problem by using the name standardization and geocoding Building Blocks, mentioned in the previous section, to build a simple pipeline that standardizes patients' names and geocodes their addresses. Non-standardized data would be sent into the pipeline, where it would pass through each of the Building Blocks, and then exit the pipeline with standardized name and address fields. STLTs are welcome to use Building Blocks to create their own custom pipelines. However, because many STLTs face similar challenges processing data this repository implements a basic architecture in the form of a starter kit. The goal of this starter kit is to help STLTs easily get up and running with modern modular tooling for processing public health data in the cloud. We also fully understand that all STLTs do not face the same challenges. Our intention is for STLTs to modify and expand on this starter kit architecture to make it fit their specific needs. The starter kit has two main components: an ingestion pipeline that cleans and stores data in a FHIR server, and tabulation service that allows data to be easily extracted from the FHIR server. The complete architecture for the starter kit is shown in the diagram below.
 
 ![Architecture Diagram](./images/azure-starter-kit-arch.drawio.png)
 
 #### Ingestion Pipeline
-The ingestion pipeline is intended to allow STLTs to easily bring data that is reported to them into their system after performing standardizations and enrichments. Source data can be provided in either Hl7v2 or C-CDA formats allowing this single pipeline to manage ingestion of ELR, VXU, ADT, and eCR messages. The pipeline is able to support both data types because the inital step is to convert to FHIR. After this conversion the pipeline is able to handle all reported data the same way by simply processing the FHIR bundles, collections of FHIR resources, that result from the conversion. Once data has be converted to FHIR the following standardizations and enrichments are made:
+The ingestion pipeline is intended to allow STLTs to easily bring data that is reported to them into their system after performing standardizations and enrichments. Source data can be provided in either Hl7v2 or C-CDA formats allowing this single pipeline to manage ingestion of ELR, VXU, ADT, and eCR messages. The pipeline is able to support both data types because the initial step is to convert to FHIR. After this conversion the pipeline is able to handle all reported data the same way by simply processing the FHIR bundles, collections of FHIR resources, that result from the conversion. Once data has be converted to FHIR the following standardizations and enrichments are made:
 1. Patient names are standardized.
 2. Patient phone numbers are transformed into the ISO E.164 standard international format.
 3. Patient addresses are geocoded for standardization and enrichment with latitude and longitude.
@@ -44,8 +36,11 @@ The ingestion pipeline is intended to allow STLTs to easily bring data that is r
 
 After the data has been cleaned and enriched it is uploaded to a FHIR Store where it can serve as a single source of truth for all downstream reporting and analytics needs.
 
-#### Analytics Pipeline
-The analytics pipeline provides a mechanism for extracting and tabularizing desired data from the FHIR Store. Users define schemas describing the table(s) they would like from the FHIR Store and submit them to the analytics pipeline. The pipeline then interprets the schemas, queries the FHIR for the necessary data, transforms the un-structured FHIR resources into tables, and makes these tables available for reporting and analysis.
+#### Tabulation Service
+The tabulation service provides a mechanism for extracting and tabulating data from the FHIR server. Users define schemas describing the table(s) they would like to extract from the FHIR Store and submit them to the tabulation service. The service then conducts a basic Extract Transform and Load (ETL process) with the following steps:
+1. Extraction - The service identifies the data required for a given schema and extracts it from the FHIR server using the FHIR API. 
+2. Transform - The non-tabular and nested JSON FHIR data is transformed into the tabular format specified by the schema.
+3. Load - The tabulated data is loaded into a flat file format (CSV, Parquet, or SQLite) and stored in an Azure File share. The data specified in the schema is now available downstream reporting and analytical workloads.
 
 ### Additional References
 We have only provided a brief overview of PHDI, Building Blocks, and the pipelines we have designed. For additional information please refer to the documents linked below.
@@ -102,7 +97,7 @@ If you plan to deploy to an existing resource group in your Azure environment, h
 The script will take around 20-30 minutes to run.
 
 ### Step 3: Run an Hl7v2 vaccination message through the pipeline 
-Now that the starter kit has been deployed we can run some data through it! The `sample-data/` directory in your forked version of the repository contains some dummy VXU messages that can be used to test the sucess and failure modes of the ingestion pipeline. To start let's lets use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
+Now that the starter kit has been deployed we can run some data through it! The `sample-data/` directory in your forked version of the repository contains some dummy VXU messages that can be used to test the sucess and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
 2. The patient's phone number is not in a standard format.
 3. The patient's address is non-standard and has not been geocoded.
@@ -143,7 +138,7 @@ echo $RESPONSE | jq
 ```
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 
-The table below describes the contents and expected ingestion pipeline behavior for each of the other files include in `sample-data/`. Feel free to try them out for yourself! 
+The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Feel free to try them out for yourself! 
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
@@ -151,4 +146,4 @@ The table below describes the contents and expected ingestion pipeline behavior 
 |VXU-V04-02_failedConversion.hl7| A single invalid VXU message that cannot be converted to FHIR.| The ingestion process will fail during the initial conversion to FHIR step. Information about the failure is written to `failed_fhir_conversion\vxu\`.
 |VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
 |VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
-|VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully process the data and uploads to the FHIR server. On the other execution it fails.|
+|VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
