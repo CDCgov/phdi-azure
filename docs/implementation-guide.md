@@ -6,7 +6,7 @@
         - [What are Building Blocks?](#what-are-building-blocks)
         - [PHDI Starter Kit Architecture](#phdi-starter-kit-architecture)
             - [Ingestion Pipeline](#ingestion-pipeline)
-            - [Analytics Pipeline](#analytics-pipeline)
+            - [Tabulation Service](#tabulation-service)
         - [Additional References](#additional-references)
     - [Implementing the PHDI Azure Pipelines](#implementing-the-phdi-azure-pipelines)
         - [Step 1: Ensure you have collected values for geocoding variables](#step-1-ensure-you-have-collected-values-for-geocoding-variables)
