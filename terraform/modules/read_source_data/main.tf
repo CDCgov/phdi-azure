@@ -77,7 +77,26 @@ resource "azurerm_linux_function_app" "read_source_data" {
   }
 }
 
-resource "azurerm_eventgrid_event_subscription" "blobTrigger" {
+resource "azurerm_function_app_function" "read_source_data" {
+  name            = "ReadSourceData"
+  function_app_id = azurerm_linux_function_app.read_source_data.id
+  language        = "Python"
+  config_json = jsonencode({
+    "scriptFile" = "__init__.py",
+    "bindings" = [
+      {
+        "name"       = "blob",
+        "type"       = "blobTrigger",
+        "direction"  = "in",
+        "path"       = "source-data/{name}",
+        "source"     = "EventGrid",
+        "connection" = "PhiStorage"
+      }
+    ]
+  })
+}
+
+resource "azurerm_eventgrid_event_subscription" "blob_trigger" {
   name  = "blobTrigger"
   scope = var.phi_storage_account_id
 
