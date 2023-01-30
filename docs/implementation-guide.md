@@ -52,12 +52,11 @@ We have only provided a brief overview of PHDI, Building Blocks, and the pipelin
 In this section we describe how a STLT can take this repository and use it to spin up all of the functionality that it offers in their own Azure environment.
 
 ### User Requirments
-In order to proceed you will need either:
-- an Azure account with permissions to create new resource groups in your organization's Azure environment,
-or
-- an Azure account with `Owner` access to a resource group in your organizations’ Azure environment that was created to house the PHDI Azure pipelines, and the name of this resource group.
+In order to proceed you will need:
+1. `Owner` access to the Azure subscription where you would like to deploy the PHDI Starter Kit.
+2. `Admin` access to the GitHub account or organization where your copy of this repository will be created.
 
-If you do not meet either of these criteria contact the owner of your organization's Azure environment.
+If you do not meet either of these criteria contact the owner of your organization's Azure subscription and/or GitHub organization.
 
 ### Step 1: Ensure you have collected values for geocoding variables
 
