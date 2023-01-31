@@ -2,12 +2,9 @@
   "scriptFile": "__init__.py",
   "bindings": [
     {
-      "name": "blob",
-      "type": "blobTrigger",
-      "direction": "in",
-      "path": "source-data/{name}",
-      "source": "EventGrid",
-      "connection": "PhiStorage"
+      "type": "eventGridTrigger",
+      "name": "event",
+      "direction": "in"
     }
   ]
 }

@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 import requests
 import azure.functions as func
 
@@ -10,7 +11,7 @@ from phdi.harmonization.hl7 import (
 )
 
 
-def main(blob: func.InputStream) -> None:
+def main(event: func.EventGridEvent) -> None:
     """
     When this function is triggered with a blob payload, read the new file if its
     name begins with 'source-data/', identify each individual messsage
@@ -20,6 +21,18 @@ def main(blob: func.InputStream) -> None:
     :param blob: An input stream of the blob that was uploaded to the blob storage
     :return: None
     """
+
+    result = json.dumps(
+        {
+            "id": event.id,
+            "data": event.get_json(),
+            "topic": event.topic,
+            "subject": event.subject,
+            "event_type": event.event_type,
+        }
+    )
+
+    logging.info("Python EventGrid trigger processed an event: %s", result)
 
     # Determine data type and root template.
     filename_parts = blob.name.split("/")
