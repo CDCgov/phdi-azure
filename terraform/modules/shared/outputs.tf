@@ -10,10 +10,6 @@ output "phi_storage_account_key" {
   value = azurerm_storage_account.phi.primary_access_key
 }
 
-output "phi_storage_account_id" {
-  value = azurerm_storage_account.phi.id
-}
-
 output "fhir_server_name" {
   value = azurerm_healthcare_service.fhir_server.name
 }

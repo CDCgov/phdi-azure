@@ -37,6 +37,4 @@ module "read_source_data" {
   pipeline_runner_id                    = module.shared.pipeline_runner_id
   pipeline_runner_client_id             = module.shared.pipeline_runner_client_id
   client_id                             = var.client_id
-  ingestion_container_url               = var.ingestion_container_url
-  phi_storage_account_id                = module.shared.phi_storage_account_id
 }

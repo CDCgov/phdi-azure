@@ -1,11 +1,9 @@
 import os
 import json
-import logging
-import requests
 import azure.functions as func
 
 from azure.mgmt.datafactory import DataFactoryManagementClient
-from phdi.cloud.azure import AzureCredentialManager
+from phdi.cloud.azure import AzureCredentialManager, AzureCloudContainerConnection
 from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
@@ -22,54 +20,37 @@ def main(event: func.EventGridEvent) -> None:
     :return: None
     """
 
-    result = json.dumps(
-        {
-            "id": event.id,
-            "data": event.get_json(),
-            "topic": event.topic,
-            "subject": event.subject,
-            "event_type": event.event_type,
-        }
-    )
-
-    logging.info("Python EventGrid trigger processed an event: %s", result)
+    # Get blob info
+    container_name = "source-data"
+    blob_url = event.get_json()["url"]
+    storage_account_url, filename = blob_url.split(f"/{container_name}/")
 
     # Determine data type and root template.
-    filename_parts = blob.name.split("/")
-    if filename_parts[0] == "source-data":
+    filename_parts = filename.split("/")
 
-        if filename_parts[1] == "elr":
-            message_type = "hl7v2"
-            root_template = "ORU_R01"
+    if filename_parts[0] == "elr":
+        message_type = "hl7v2"
+        root_template = "ORU_R01"
 
-        elif filename_parts[1] == "vxu":
-            message_type = "hl7v2"
-            root_template = "VXU_V04"
+    elif filename_parts[0] == "vxu":
+        message_type = "hl7v2"
+        root_template = "VXU_V04"
 
-        elif filename_parts[1] == "ecr":
-            message_type = "ccda"
-            root_template = "CCD"
+    elif filename_parts[0] == "ecr":
+        message_type = "ccda"
+        root_template = "CCD"
 
     else:
         raise Exception("Invalid file type.")
-
-    # Skip empty files.
-    if filename_parts[2] == ".keep":
-        # Make a request to the write_blob_to_storage endpoint
-        # on the ingestion container app to create a new empty file.
-        ingestion_container_url = os.environ["INGESTION_CONTAINER_URL"]
-        requests.post(
-            f"{ingestion_container_url}/cloud/storage/write_blob_to_storage",
-            json={
-                "blob": {},
-                "file_name": ".keep",
-                "bucket_name": "empty-files",
-                "cloud_provider": "azure",
-            },
-        )
-        return
-
-    blob_contents = blob.read().decode("utf-8", errors="ignore")
+    
+    # Download blob contents.
+    cred_manager = AzureCredentialManager(resource_location=storage_account_url)
+    cloud_container_connection = AzureCloudContainerConnection(
+        storage_account_url=storage_account_url, cred_manager=cred_manager
+    )
+    blob_contents = cloud_container_connection.download_object(
+        container_name=container_name, filename=filename
+    )
 
     # Handle batch Hl7v2 messages.
     if message_type == "hl7v2":
@@ -101,7 +82,7 @@ def main(event: func.EventGridEvent) -> None:
             "message": json.dumps(message),
             "message_type": message_type,
             "root_template": root_template,
-            "filename": blob.name,
+            "filename": f"{container_name}/{filename}",
         }
 
         try:
@@ -118,6 +99,6 @@ def main(event: func.EventGridEvent) -> None:
         raise Exception(
             (
                 "The ingestion pipeline was not triggered for some messages in "
-                f"{blob.name}. Failed messages: {failed_pipeline_executions}"
+                f"{container_name}/{filename}". Failed messages: {failed_pipeline_executions}"
             )
         )
