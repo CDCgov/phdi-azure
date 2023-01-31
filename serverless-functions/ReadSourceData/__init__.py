@@ -99,6 +99,7 @@ def main(event: func.EventGridEvent) -> None:
         raise Exception(
             (
                 "The ingestion pipeline was not triggered for some messages in "
-                f"{container_name}/{filename}. Failed messages: {failed_pipeline_executions}"
+                f"{container_name}/{filename}. "
+                f"Failed messages: {failed_pipeline_executions}"
             )
         )
