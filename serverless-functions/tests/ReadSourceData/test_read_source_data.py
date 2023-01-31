@@ -39,7 +39,10 @@ def test_handle_batch_hl7(
 
     event = mock.MagicMock()
     event.get_json.return_value = {
-        "url": "https://phdidevphi87b9f133.blob.core.windows.net/source-data/elr/some-filename.hl7"
+        "url": (
+            "https://phdidevphi87b9f133.blob.core.windows.net/"
+            "source-data/elr/some-filename.hl7"
+        )
     }
 
     patched_batch_converter.return_value = ["some-message"]
@@ -96,7 +99,10 @@ def test_pipeline_trigger_success(
 
         event = mock.MagicMock()
         event.get_json.return_value = {
-            "url": f"https://phdidevphi87b9f133.blob.core.windows.net/source-data/{source_data_subdirectory}/some-filename.hl7"
+            "url": (
+                "https://phdidevphi87b9f133.blob.core.windows.net/"
+                f"source-data/{source_data_subdirectory}/some-filename.hl7"
+            )
         }
         patched_batch_converter.return_value = ["some-message"]
 
