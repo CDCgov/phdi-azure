@@ -151,5 +151,8 @@ Examples:
 Add a total found record count:  
 `&_total=accurate`
 
+Set number of items returned per page:
+`_count=<desired number of items>`
+
 De-paginates a request response, if the bundle size would be paginated:  
 `$everything`
