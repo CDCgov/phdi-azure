@@ -1,0 +1,473 @@
+{
+	"info": {
+		"_postman_id": "033fde75-928b-46df-b0a4-7cc410010e27",
+		"name": "PHDI FHIR API Template",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23741077"
+	},
+	"item": [
+		{
+			"name": "Metadata (unauthenticated)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://tabulationdebug-server1.fhir.azurehealthcareapis.com/Metadata",
+					"protocol": "https",
+					"host": [
+						"tabulationdebug-server1",
+						"fhir",
+						"azurehealthcareapis",
+						"com"
+					],
+					"path": [
+						"Metadata"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Patients",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Immunizations",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Immunization",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Immunization"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient/{{patient-id}}",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient",
+						"{{patient-id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Observations for Patient",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient/{{patient-id}}/Observation",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient",
+						"{{patient-id}}",
+						"Observation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient By Name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient?family={{family-name}}&given={{given-name}}",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "family",
+							"value": "{{family-name}}"
+						},
+						{
+							"key": "given",
+							"value": "{{given-name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Immunizations for Patient",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient/{{patient-id}}/Immunization",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient",
+						"{{patient-id}}",
+						"Immunization"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Immunizations by Name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Immunization?subject.family={{family-name}}",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Immunization"
+					],
+					"query": [
+						{
+							"key": "subject.family",
+							"value": "{{family-name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Observation Resources AND the Patient resources referenced within",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Observation?_include=Observation:subject",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "_include",
+							"value": "Observation:subject"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Observation Resource by Id AND the Performer referenced within",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Observation?_id={{observation-id}}&_include=Observation:performer",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Observation"
+					],
+					"query": [
+						{
+							"key": "_id",
+							"value": "{{observation-id}}"
+						},
+						{
+							"key": "_include",
+							"value": "Observation:performer"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Claim resource by Id AND the Provider referenced within",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Claim?_id={{claim-id}}&_include=Claim:provider",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Claim"
+					],
+					"query": [
+						{
+							"key": "_id",
+							"value": "{{claim-id}}"
+						},
+						{
+							"key": "_include",
+							"value": "Claim:provider"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Patient resources AND all Observation resources referencing those Patients",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient?_revinclude=Observation:subject",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "_revinclude",
+							"value": "Observation:subject"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient Resource by id AND all Immunization resources referencing that Patient",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient?_id={{patient-id}}&_revinclude=Immunization:patient",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient"
+					],
+					"query": [
+						{
+							"key": "_id",
+							"value": "{{patient-id}}"
+						},
+						{
+							"key": "_revinclude",
+							"value": "Immunization:patient"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Practitioner Resource by id AND all Encounters referencing that Practitioner",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Practitioner?_id={{practitioner-id}}&_revinclude=Encounter:practitioner",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Practitioner"
+					],
+					"query": [
+						{
+							"key": "_id",
+							"value": "{{practitioner-id}}"
+						},
+						{
+							"key": "_revinclude",
+							"value": "Encounter:practitioner"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient By Id (replace id in body)",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"resourceType\": \"Patient\",\n    \"id\": \"f6c1d9df-e829-459b-b5f6-8dd24f56369b\", \n    \"name\": [\n        {\n            \"use\": \"official\",\n            \"family\": \"Haag279\",\n            \"given\": [\n                \"Carter549\",\n                \"New Second Given Name\"\n            ],\n            \"prefix\": [\n                \"Mr.\"\n            ]\n        }\n    ],\n    \"telecom\": [\n        {\n            \"system\": \"phone\",\n            \"value\": \"555-964-0000\",\n            \"use\": \"home\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient/{{patient-id}}",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient",
+						"{{patient-id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"resourceType\": \"Patient\",\n    \"name\": [\n        {\n            \"use\": \"official\",\n            \"family\": \"Catski\",\n            \"given\": [\n                \"Josephine\",\n                \"Cat\"\n            ],\n            \"prefix\": [\n                \"Ms.\"\n            ]\n        }\n    ],\n    \"telecom\": [\n        {\n            \"system\": \"phone\",\n            \"value\": \"123-456-7890\",\n            \"use\": \"home\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patient",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{FHIR-server-url}}/Patient/{{deleted-patient-id}}",
+					"host": [
+						"{{FHIR-server-url}}"
+					],
+					"path": [
+						"Patient",
+						"{{deleted-patient-id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiJodHRwczovL3RhYnVsYXRpb25kZWJ1Zy1zZXJ2ZXIxLmZoaXIuYXp1cmVoZWFsdGhjYXJlYXBpcy5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8yOGNmNThkZi1lZmU4LTQxMzUtYjJkMS1mNjk3ZWU3NGMwMGMvIiwiaWF0IjoxNjc1MTkwOTc1LCJuYmYiOjE2NzUxOTA5NzUsImV4cCI6MTY3NTE5NDkzMSwiYWNyIjoiMSIsImFpbyI6IkFWUUFxLzhUQUFBQVNxcFpJY3ByZnlGelV4a3k5dXJWeEIzeFRuakJPZWY1VzJHb2I4MjY1TEt3R25Uc3h4RkhQL1VGL0VwcEMrVVFqUVZJNkFJaWl4RW5pNzNpREowQmdvaUt5UHUyK3lVajZmcTZybUdPWGY4PSIsImFtciI6WyJwd2QiLCJtZmEiXSwiYXBwaWQiOiIwNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDYiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IkZhcnJlbGwiLCJnaXZlbl9uYW1lIjoiR29yZG9uIiwiaXBhZGRyIjoiNjcuMTY2LjI2LjgwIiwibmFtZSI6IkdvcmRvbiBGYXJyZWxsIiwib2lkIjoiODViMmVlYTAtODJjMC00NThlLWFlMzgtYzZmMGY4NGZjYjEwIiwicHVpZCI6IjEwMDMyMDAyNTJFNjJENDQiLCJyaCI6IjAuQVVVQTMxalBLT2p2TlVHeTBmYVg3blRBRE5oNFowX3ZXdHhEb2Ytd2MzSkxsSlZGQUIwLiIsInNjcCI6InVzZXJfaW1wZXJzb25hdGlvbiIsInN1YiI6IkpReGw0a1Vqa09sZVBVc3RwaXV3Rm5qbFFybWtYS3RrWEV4X2FZN1FFaWsiLCJ0aWQiOiIyOGNmNThkZi1lZmU4LTQxMzUtYjJkMS1mNjk3ZWU3NGMwMGMiLCJ1bmlxdWVfbmFtZSI6ImdvcmRvbkBza3lsaWdodGhxLm9ubWljcm9zb2Z0LmNvbSIsInVwbiI6ImdvcmRvbkBza3lsaWdodGhxLm9ubWljcm9zb2Z0LmNvbSIsInV0aSI6IjFpRWp3c1JZOTBlbVlIZFgxd2NwQUEiLCJ2ZXIiOiIxLjAifQ.BnG5uGD59X7QjIZzeFoNR9KeMLoW3nVpJULBmXxNkBX6od7NlQhd7v9GB4n4C0d7_LxBD_oi8I2u6Q5sgUNXha6OrqkGOu1ZeIWXxo7WePkXCmxi13FdsTG3KPPxafq2DeZVjLDIYNft8Je1NWhNLkYLXExOF-WUKQxB0x4j55YI8lr4JBjbA4OR62qWkC2o5HO3jJ8ThBFI-pAKmFm1TebKx_v94XsIACTll_Q2B3WnuSqxFlC3oFLuklInV3UkS14Cbc-gJRip26r7Z6bzFur1KNMx774YaYyYn2MC9yt6d01OyderhqX8Xa9RYH3LNCKeml6XvO1aU9QQyZnsVQ",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "FHIR-server-url",
+			"value": "https://tabulationdebug-server1.fhir.azurehealthcareapis.com",
+			"type": "string"
+		},
+		{
+			"key": "patient-id",
+			"value": "f6c1d9df-e829-459b-b5f6-8dd24f56369b",
+			"type": "string"
+		},
+		{
+			"key": "family-name",
+			"value": "Haag279",
+			"type": "string"
+		},
+		{
+			"key": "given-name",
+			"value": "Carter549",
+			"type": "string"
+		},
+		{
+			"key": "resource-id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "observation-id",
+			"value": "bdd07b57-c865-4567-9206-7eb26553ca8f",
+			"type": "string"
+		},
+		{
+			"key": "claim-id",
+			"value": "2be2d11f-c89c-4861-a6f9-a60ea9f29012",
+			"type": "string"
+		},
+		{
+			"key": "encounter-id",
+			"value": "e49a051e-c422-466e-9e58-14699695e484",
+			"type": "string"
+		},
+		{
+			"key": "deleted-patient-id",
+			"value": "c160b968a5e24c77a94965692c07be25",
+			"type": "string"
+		}
+	]
+}
