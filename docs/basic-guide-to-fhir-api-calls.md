@@ -46,19 +46,21 @@ Examples:
     `{{FHIR-server-url}}/Immunization`
 
 
-Template to GET all resources associated with a specific resource:  
-`{{FHIR-server-url}}/{{Resource Name}}/<id>/{{Other Resource Name}}`
+Template format to GET a specific resource by id:  
+`{{FHIR-server-url}}/{{Resource Name}}/<id>`
 
-Examples:
-
-    GET all Observations associated with a Patient ID:  
-    `{{FHIR-server-url}}/Patient/<PatientID>/Observation`
-    
-    Template format to GET a specific resource:  
-    `{{FHIR-server-url}}/{{Resource Name}}/<id>`
+Example:
 
     GET a specific Patient by id:  
     `{{FHIR-server-url}}/Patient/<id>`
+
+Template DORMAT to GET all resources associated with a specific resource:  
+`{{FHIR-server-url}}/{{Resource Name}}/<id>/{{Other Resource Name}}`
+
+Example:
+
+    GET all Observations associated with a Patient ID:  
+    `{{FHIR-server-url}}/Patient/<PatientID>/Observation`
 
 Template format resources with specific fields. Can be chained with multiple search fields and values using &:  
 `{{FHIR-server-url}}/{{Resource Name}}?{{first search field name}}={{search value}}&{{second search field name}}={{search value}}`
