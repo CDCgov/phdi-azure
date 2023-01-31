@@ -42,7 +42,7 @@ def main(event: func.EventGridEvent) -> None:
 
     else:
         raise Exception("Invalid file type.")
-    
+
     # Download blob contents.
     cred_manager = AzureCredentialManager(resource_location=storage_account_url)
     cloud_container_connection = AzureCloudContainerConnection(
@@ -99,6 +99,6 @@ def main(event: func.EventGridEvent) -> None:
         raise Exception(
             (
                 "The ingestion pipeline was not triggered for some messages in "
-                f"{container_name}/{filename}". Failed messages: {failed_pipeline_executions}"
+                f"{container_name}/{filename}. Failed messages: {failed_pipeline_executions}"
             )
         )
