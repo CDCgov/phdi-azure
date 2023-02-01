@@ -426,47 +426,47 @@
 	"variable": [
 		{
 			"key": "FHIR-server-url",
-			"value": "https://tabulationdebug-server1.fhir.azurehealthcareapis.com",
+			"value": "REPLACE ME",
 			"type": "string"
 		},
 		{
 			"key": "patient-id",
-			"value": "f6c1d9df-e829-459b-b5f6-8dd24f56369b",
+			"value": "REPLACE ME",
 			"type": "string"
 		},
 		{
 			"key": "family-name",
-			"value": "Haag279",
+			"value": "REPLACE ME",
 			"type": "string"
 		},
 		{
 			"key": "given-name",
-			"value": "Carter549",
+			"value": "REPLACE ME",
 			"type": "string"
 		},
 		{
 			"key": "resource-id",
-			"value": "",
+			"value": "REPLACE ME",
 			"type": "string"
 		},
 		{
 			"key": "observation-id",
-			"value": "bdd07b57-c865-4567-9206-7eb26553ca8f",
+			"value": "REPLACE ME",
 			"type": "string"
 		},
 		{
 			"key": "claim-id",
-			"value": "2be2d11f-c89c-4861-a6f9-a60ea9f29012",
+			"value": "REPLACE ME",
 			"type": "string"
 		},
 		{
 			"key": "encounter-id",
-			"value": "e49a051e-c422-466e-9e58-14699695e484",
+			"value": "REPLACE ME",
 			"type": "string"
 		},
 		{
 			"key": "deleted-patient-id",
-			"value": "c160b968a5e24c77a94965692c07be25",
+			"value": "REPLACE ME",
 			"type": "string"
 		}
 	]
