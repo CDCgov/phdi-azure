@@ -84,7 +84,6 @@ def test_pipeline_trigger_success(
     adf_client.pipelines.create_run.return_value = good_response
     patched_adf_management_client.return_value = adf_client
     for source_data_subdirectory in ["elr", "vxu", "ecr"]:
-
         if source_data_subdirectory == "elr":
             message_type = "hl7v2"
             root_template = "ORU_R01"
@@ -132,7 +131,6 @@ def test_publishing_failure(
     patched_azure_cred_manager,
     patched_adf_management_client,
 ):
-
     patched_os.environ = {
         "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
         "RESOURCE_GROUP_NAME": "some-resource-group",

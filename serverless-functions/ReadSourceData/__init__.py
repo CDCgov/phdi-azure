@@ -77,7 +77,6 @@ def main(event: func.EventGridEvent) -> None:
 
     failed_pipeline_executions = {}
     for idx, message in enumerate(messages):
-
         pipeline_parameters = {
             "message": json.dumps(message),
             "message_type": message_type,
