@@ -74,10 +74,12 @@ SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 # Login to gh CLI
 clear
 echo "We will now login to the $(pink 'GitHub CLI')."
+echo "For this step, you will need a GitHub account with a verified email address."
 echo
 echo "• After pressing enter, copy the provided code, and then $(pink 'press') enter."
 echo "• $(pink 'Azure will fail to open the url'), so please copy it and manually navigate there in a $(pink 'new tab')"
 echo "• If your account has $(pink '2FA') enabled, you will be prompted to enter a 2FA code (this is $(pink 'different') from the code you copied)."
+echo "• If you plan to use an $(pink 'organization') account, be sure to click the green \"Authorize\" button next to that organization when prompted."
 echo "• After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
 echo "• Then return to this terminal!"
 echo
