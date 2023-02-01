@@ -17,12 +17,15 @@ For additional information visit the [Microsoft FHIR API docs](https://learn.mic
 - An API tool - Postman, Insomnia, or curl. Make sure to set up your auth header using the generated token.
     - Postman Example Auth Header key value pair: `Authorization: Bearer <Your Token>`
     - The end of Step 4 of this guide has a CURL example
+
+- Curl request example from command line: `curl -X GET --header "Authorization: Bearer <Your Token>" <Your FHIR server URL>/Patient`
   
 - Shortcut for Postman Users:
   - You can import the phdi-fhir-api-template.postman_collection.json in this directory into Postman to auto-load this collection.
   - In Postman, import the collection with the Import button.
   - Click the three dots by the collection name and select Edit
   - Add your generated authorization token to the Authorization tab and your FHIR server url to the variables tab.
+  - Update any and all variables in the variable tab for requests you want to try
   - DON'T FORGET TO HIT SAVE IN THE TOP RIGHT AFTER DOING THIS or Postman will not apply the changes. The save button may be obscured by the Collection Details panel, so close that if you can't find save 
 
 #### Gotchas:
@@ -152,7 +155,7 @@ Add a total found record count:
 `&_total=accurate`
 
 Set number of items returned per page:
-`_count=<desired number of items>`
+`?_count=<desired number of items>`
 
 De-paginates a request response, if the bundle size would be paginated:  
 `$everything`
