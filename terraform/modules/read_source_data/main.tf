@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "function_app_sa" {
-  name                     = "phdi${terraform.workspace}funcs${substr(var.time_stamp, 0, 10)}"
+  name                     = "phdi${terraform.workspace}funcs${substr(var.client_id, 0, 8)}"
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_tier             = "Standard"
@@ -50,7 +50,6 @@ resource "azurerm_linux_function_app" "read_source_data" {
     WEBSITE_ENABLE_SYNC_UPDATE_SITE = true
     FUNCTIONS_WORKER_RUNTIME        = "python"
     SCM_DO_BUILD_DURING_DEPLOYMENT  = 1
-    AzureWebJobsPhiStorage          = var.phi_storage_account_connection_string
     RESOURCE_GROUP_NAME             = var.resource_group_name
     FACTORY_NAME                    = var.phdi_data_factory_name
     PIPELINE_NAME                   = var.ingestion_pipeline_name
