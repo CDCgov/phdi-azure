@@ -445,11 +445,6 @@
 			"type": "string"
 		},
 		{
-			"key": "resource-id",
-			"value": "REPLACE ME",
-			"type": "string"
-		},
-		{
 			"key": "observation-id",
 			"value": "REPLACE ME",
 			"type": "string"
