@@ -50,14 +50,16 @@ fi
 
 # Intro text
 box "Welcome to the $(pink 'PHDI Azure') setup script!"
-echo "This script will help you setup $(pink 'Azure') authentication for GitHub Actions."
-echo "We need some info from you to get started."
+echo "This script will help you setup the PHDI Starter Kit in $(pink 'Azure'), including authentication for GitHub Actions."
+echo "In order for the script to work properly you will need:"
+echo "  1. Owner access to the Azure subscription where you would like to deploy the PHDI Starter Kit."
+echo "  2. To be able to create new repositories in the GitHub account or organization where your copy of CDCgov/phdi-azure will be created."
 enter_to_continue
 
 echo "Please select the $(pink 'location') you would like to deploy to."
 echo "More info: https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#overview"
 echo
-LOCATION=$(gum choose "eastus" "eastus2" "westus" "westus2" "westus3" "southcentralus" "centralus")
+LOCATION=$(gum choose "eastus" "eastus2" "westus" "westus3" "northcentralus" "southcentralus" "centralus")
 
 echo "Please enter the $(pink 'Authorization ID') of your Smarty Street Account."
 echo "More info: https://www.smarty.com/docs/cloud/authentication"
@@ -72,10 +74,12 @@ SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 # Login to gh CLI
 clear
 echo "We will now login to the $(pink 'GitHub CLI')."
+echo "For this step, you will need a GitHub account with a verified email address."
 echo
 echo "• After pressing enter, copy the provided code, and then $(pink 'press') enter."
 echo "• $(pink 'Azure will fail to open the url'), so please copy it and manually navigate there in a $(pink 'new tab')"
 echo "• If your account has $(pink '2FA') enabled, you will be prompted to enter a 2FA code (this is $(pink 'different') from the code you copied)."
+echo "• If you plan to use an $(pink 'organization') account, be sure to click the green \"Authorize\" button next to that organization when prompted."
 echo "• After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
 echo "• Then return to this terminal!"
 echo
@@ -152,6 +156,7 @@ else
     spin "Forking repository..." gh repo fork ${ORG_FLAG} CDCgov/phdi-azure
   else
     # Private repo
+    PRIVATE="true"
     spin "Creating private repo..." gh repo create --private $GITHUB_REPO
     spin "Copying files..." git push --mirror https://github.com/${GITHUB_REPO}.git
   fi
@@ -164,8 +169,22 @@ echo
 APP_REG_NAME=github-$RESOURCE_GROUP_NAME
 CLIENT_ID=$(az ad app create --display-name $APP_REG_NAME --query appId --output tsv)
 
-# Create service principal and grant access to subscription
-spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID --role owner --name $APP_REG_NAME
+# Create custom role needed for container app creation
+cat << EOF > role.json
+{
+    "Name": "App Resource Provider Registrant",
+    "Description": "Register Microsoft.App resource provider for the subscription",
+    "Actions": [
+        "Microsoft.App/register/action",
+        "Microsoft.OperationalInsights/register/action"
+    ],
+    "AssignableScopes": ["/subscriptions/$SUBSCRIPTION_ID"]
+}
+EOF
+spin "Creating custom role..." az role definition create --role-definition role.json
+
+# Create service principal and grant necessary roles
+spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME --role owner --name $APP_REG_NAME
 OBJECT_ID=$(az ad sp show --id $CLIENT_ID --query id --output tsv)
 
 # Create federated credential
@@ -185,6 +204,11 @@ until az ad app show --id $CLIENT_ID &> /dev/null; do
 done
 
 spin "Creating federated credential..." az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
+az role assignment create --assignee "$CLIENT_ID" --role "App Resource Provider Registrant" --scope "/subscriptions/$SUBSCRIPTION_ID"  
+
+# Cleanup
+rm role.json
+rm credentials.json
 
 echo "Workload Identity Federation setup complete!"
 echo
@@ -209,29 +233,31 @@ spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}
 
 # Enable GitHub Actions
 GITHUB_ACTIONS_URL="https://github.com/${GITHUB_REPO}/actions"
-echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
-echo
-echo "Please open $(pink $GITHUB_ACTIONS_URL) in a new tab."
-echo "Click the green button to enable $(pink 'GitHub Workflows')."
-echo
-echo "Continuing from this point will begin a series of GitHub actions that may take 20+ minutes to complete"
-
-enter_to_continue
-
-WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
-while [ "$WORKFLOWS_ENABLED" = "0" ]; do
-  echo "Looks like that didn't work! Please try again."
-  echo "Please open $GITHUB_ACTIONS_URL in a new tab."
-  echo "Click the green button to enable $(pink 'GitHub Workflows')."
-  echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
+if [[ $PRIVATE != "true" ]]; then
+  echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
   echo
-  read SHOULD_CONTINUE
-  if [ "$SHOULD_CONTINUE" = "exit" ]; then
-    exit 1
-  else
-    WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
-  fi
-done
+  echo "Please open $(pink $GITHUB_ACTIONS_URL) in a new tab."
+  echo "Click the green button to enable $(pink 'GitHub Workflows')."
+  echo
+  echo "Continuing from this point will begin a series of GitHub actions that may take 20+ minutes to complete"
+
+  enter_to_continue
+
+  WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
+  while [ "$WORKFLOWS_ENABLED" = "0" ]; do
+    echo "Looks like that didn't work! Please try again."
+    echo "Please open $GITHUB_ACTIONS_URL in a new tab."
+    echo "Click the green button to enable $(pink 'GitHub Workflows')."
+    echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
+    echo
+    read SHOULD_CONTINUE
+    if [ "$SHOULD_CONTINUE" = "exit" ]; then
+      exit 1
+    else
+      WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
+    fi
+  done
+fi
 
 echo "If you would like to see the following workflows run in more detail please click here:"
 echo $(pink $GITHUB_ACTIONS_URL)
@@ -245,7 +271,8 @@ spin "Starting Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run 
 echo
 
 # Watch Terraform Setup workflow until complete
-TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId -q ". | length")
+TIMESTAMP=$(date --date="5 min ago" +"%s")
+TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | length")
 CHECK_COUNT=0
 while [ "$TF_SETUP_STARTED" = "0" ]; do
   if [ "$CHECK_COUNT" -gt 60 ]; then
@@ -253,14 +280,14 @@ while [ "$TF_SETUP_STARTED" = "0" ]; do
     exit 1
   fi
   spin "Waiting for Terraform Setup workflow to start..." sleep 1
-  TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId -q ". | length")
+  TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | length")
   CHECK_COUNT=$((CHECK_COUNT+1))
 done
-TF_SETUP_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml -L 1 --json databaseId -q ".[0].databaseId")
+TF_SETUP_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | .[0].databaseId")
 gh -R "${GITHUB_REPO}" run watch $TF_SETUP_WORKFLOW_ID
 
 # Check for Terraform Setup workflow success
-TF_SETUP_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json conclusion -q '.[].conclusion')
+TF_SETUP_SUCCESS=$(gh -R "${GITHUB_REPO}" run view $TF_SETUP_WORKFLOW_ID --json conclusion -q '.conclusion')
 if [ "$TF_SETUP_SUCCESS" != "success" ]; then
   echo "Looks like that didn't work! Please contact the PHDI team for help."
   exit 1
@@ -274,7 +301,8 @@ spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run 
 echo
 
 # Watch deployment workflow until complete
-DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId -q ". | length")
+TIMESTAMP=$(date --date="5 min ago" +"%s")
+DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml  --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | length")
 CHECK_COUNT=0
 while [ "$DEPLOYMENT_STARTED" = "0" ]; do
   if [ "$CHECK_COUNT" -gt 60 ]; then
@@ -282,14 +310,14 @@ while [ "$DEPLOYMENT_STARTED" = "0" ]; do
     exit 1
   fi
   spin "Waiting for deployment workflow to start..." sleep 1
-  DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId -q ". | length")
+  DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml  --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | length")
   CHECK_COUNT=$((CHECK_COUNT+1))
 done
-DEPLOYMENT_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml -L 1 --json databaseId -q ".[0].databaseId")
+DEPLOYMENT_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId,createdAt -q "map(select(.createdAt | fromdateiso8601 > $TIMESTAMP)) | .[0].databaseId")
 gh -R "${GITHUB_REPO}" run watch $DEPLOYMENT_WORKFLOW_ID
 
 # Check for deployment workflow success
-DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json conclusion -q '.[].conclusion')
+DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run view $DEPLOYMENT_WORKFLOW_ID --json conclusion -q '.conclusion')
 if [ "$DEPLOY_SUCCESS" != "success" ]; then
   echo "Looks like that didn't work! Please contact the PHDI team for help."
   echo "To view the status of your workflows, go to $GITHUB_ACTIONS_URL."

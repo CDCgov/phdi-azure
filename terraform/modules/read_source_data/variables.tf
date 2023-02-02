@@ -8,11 +8,6 @@ variable "location" {
   description = "The Azure location where the resources should be created."
 }
 
-variable "phi_storage_account_connection_string" {
-  type        = string
-  description = "The connection string for the storage account where the PHI data is stored."
-}
-
 variable "phdi_data_factory_name" {
   type        = string
   description = "The name of the PHDI ADF resource."
