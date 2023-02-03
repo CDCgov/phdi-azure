@@ -40,6 +40,10 @@ def main(event: func.EventGridEvent) -> None:
         message_type = "ccda"
         root_template = "CCD"
 
+        if any([name for name in ["RR", "html"] if name in filename_parts[1]]):
+            raise Exception("Invalid file type.")
+
+
     else:
         raise Exception("Invalid file type.")
 
@@ -48,16 +52,25 @@ def main(event: func.EventGridEvent) -> None:
     cloud_container_connection = AzureCloudContainerConnection(
         storage_account_url=storage_account_url, cred_manager=cred_manager
     )
-    blob_contents = cloud_container_connection.download_object(
-        container_name=container_name, filename=filename
-    )
+
+    # Handle eICR + Reportability Response messages
+    if message_type == "ccda":
+        eicr = cloud_container_connection.download_object(
+            container_name=container_name, filename=filename
+        )
+
+        reportability_response = cloud_container_connection.download_object(
+            container_name=container_name, filename=filename.replace("eICR", "RR")
+        )
+
+        messages = [{"eicr": eicr, "rr": reportability_response}]
 
     # Handle batch Hl7v2 messages.
-    if message_type == "hl7v2":
+    elif message_type == "hl7v2":
+        blob_contents = cloud_container_connection.download_object(
+            container_name=container_name, filename=filename
+        )
         messages = convert_hl7_batch_messages_to_list(blob_contents)
-
-    else:
-        messages = [blob_contents]
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
