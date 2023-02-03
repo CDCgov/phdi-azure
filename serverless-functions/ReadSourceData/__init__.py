@@ -43,7 +43,6 @@ def main(event: func.EventGridEvent) -> None:
         if any([name for name in ["RR", "html"] if name in filename_parts[1]]):
             raise Exception("Invalid file type.")
 
-
     else:
         raise Exception("Invalid file type.")
 
