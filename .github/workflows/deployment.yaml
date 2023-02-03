@@ -64,7 +64,7 @@ jobs:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |-
           echo "tf_env=$(
-          if "${{ github.event.inputs.environment }}"; then
+          if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
             echo ${{ github.event.inputs.environment }}
           else
             echo dev
@@ -277,3 +277,18 @@ jobs:
           app-name: "$TF_ENV-read-source-data-$SHORT_CID"
           package: serverless-functions
           publish-profile: ${{ env.PUBLISH_PROFILE }}
+
+      - name: Add Event Grid subscription
+        env:
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+        run: |
+          az eventgrid event-subscription create \
+            --name phdi${TF_ENV}phi${SHORT_CID}Sub \
+            --source-resource-id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageaccounts/phdi${TF_ENV}phi${SHORT_CID}" \
+            --included-event-types Microsoft.Storage.BlobCreated \
+            --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
+            --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
+            --endpoint-type azurefunction

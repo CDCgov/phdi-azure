@@ -50,8 +50,10 @@ fi
 
 # Intro text
 box "Welcome to the $(pink 'PHDI Azure') setup script!"
-echo "This script will help you setup $(pink 'Azure') authentication for GitHub Actions."
-echo "We need some info from you to get started."
+echo "This script will help you setup the PHDI Starter Kit in $(pink 'Azure'), including authentication for GitHub Actions."
+echo "In order for the script to work properly you will need:"
+echo "  1. Owner access to the Azure subscription where you would like to deploy the PHDI Starter Kit."
+echo "  2. To be able to create new repositories in the GitHub account or organization where your copy of CDCgov/phdi-azure will be created."
 enter_to_continue
 
 echo "Please select the $(pink 'location') you would like to deploy to."
@@ -72,10 +74,12 @@ SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 # Login to gh CLI
 clear
 echo "We will now login to the $(pink 'GitHub CLI')."
+echo "For this step, you will need a GitHub account with a verified email address."
 echo
 echo "• After pressing enter, copy the provided code, and then $(pink 'press') enter."
 echo "• $(pink 'Azure will fail to open the url'), so please copy it and manually navigate there in a $(pink 'new tab')"
 echo "• If your account has $(pink '2FA') enabled, you will be prompted to enter a 2FA code (this is $(pink 'different') from the code you copied)."
+echo "• If you plan to use an $(pink 'organization') account, be sure to click the green \"Authorize\" button next to that organization when prompted."
 echo "• After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
 echo "• Then return to this terminal!"
 echo
@@ -181,7 +185,6 @@ spin "Creating custom role..." az role definition create --role-definition role.
 
 # Create service principal and grant necessary roles
 spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME --role owner --name $APP_REG_NAME
-spin "Assigning custom role..." az role assignment create --role "App Resource Provider Registrant" --assignee $CLIENT_ID
 
 # Create federated credential
 cat << EOF > credentials.json
@@ -200,6 +203,11 @@ until az ad app show --id $CLIENT_ID &> /dev/null; do
 done
 
 spin "Creating federated credential..." az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
+az role assignment create --assignee "$CLIENT_ID" --role "App Resource Provider Registrant" --scope "/subscriptions/$SUBSCRIPTION_ID"  
+
+# Cleanup
+rm role.json
+rm credentials.json
 
 echo "Workload Identity Federation setup complete!"
 echo
