@@ -305,3 +305,4 @@ jobs:
     uses: ./.github/workflows/end-to-end.yaml
     with:
       environment: ${{ needs.deployment.outputs.tf_env }}
+    secrets: inherit
