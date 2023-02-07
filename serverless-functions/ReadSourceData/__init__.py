@@ -1,7 +1,7 @@
 import os
 import json
 import azure.functions as func
-
+from time import sleep
 from datetime import datetime
 from azure.core.exceptions import ResourceNotFoundError
 from azure.mgmt.datafactory import DataFactoryManagementClient
@@ -68,6 +68,7 @@ def main(event: func.EventGridEvent) -> None:
 
         start_time = datetime.now()
         time_elapsed = 0
+
         reportability_response = get_reportability_response(cloud_container_connection, container_name, filename)
         while (
             reportability_response == ""
@@ -76,8 +77,6 @@ def main(event: func.EventGridEvent) -> None:
             sleep(sleep_time)
             time_elapsed = (datetime.now() - start_time).seconds
             reportability_response = get_reportability_response(cloud_container_connection, container_name, filename)
-
-
         # Determine if we want to raise exception or log a warning TODO
         if reportability_response == "":
             raise Exception(
