@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: "Environment to deploy to"
+        description: "Environment in which to conduct end to end testing."
         type: string
         required: true
 
