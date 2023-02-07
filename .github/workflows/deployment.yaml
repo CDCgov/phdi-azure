@@ -100,7 +100,7 @@ jobs:
         run: |
           REGISTRY_NAME=phdi${TF_ENV}registry${SHORT_CID}
           az acr login --name $REGISTRY_NAME
-          IMAGES=('fhir-converter' 'ingestion' 'tabulation' 'alerts')
+          IMAGES=('fhir-converter' 'ingestion' 'tabulation' 'alerts' 'validation')
           for IMAGE in "${IMAGES[@]}"; do
             GH_IMAGE_NAME=ghcr.io/cdcgov/phdi/$IMAGE:main
             AZURE_IMAGE_NAME=$REGISTRY_NAME.azurecr.io/phdi/$IMAGE:latest
