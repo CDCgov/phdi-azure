@@ -1,4 +1,6 @@
 from ReadSourceData import main as read_source_data
+from ReadSourceData import get_reportability_response
+from azure.core.exceptions import ResourceNotFoundError
 from unittest import mock
 import pytest
 
@@ -160,3 +162,60 @@ def test_publishing_failure(
             "The ingestion pipeline was not triggered for some messages in "
             f"{blob.name}."
         )
+
+def test_get_reportability_response_success():
+    cloud_container_connection = mock.Mock()
+    cloud_container_connection.download_object.return_value = "rr contents"
+    container_name = "ecr"
+    filename = "source-data/ecr/12345eICR.html"
+
+    assert get_reportability_response(cloud_container_connection, container_name, filename) == "rr contents"
+
+def test_get_reportability_response_failure():
+    cloud_container_connection = mock.Mock()
+    cloud_container_connection.download_object.side_effect = ResourceNotFoundError
+    container_name = "ecr"
+    filename = "source-data/ecr/12345eICR.html"
+
+    assert get_reportability_response(cloud_container_connection, container_name, filename) == ""
+
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.AzureCloudContainerConnection")
+@mock.patch("ReadSourceData.get_reportability_response")
+def test_handle_ecr_with_no_rr(
+    patched_get_reportability_response,
+    patched_cloud_container_connection,
+    patched_azure_cred_manager,
+):
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    patched_cloud_container_connection.return_value.download_object.return_value = (
+        "some-message"
+    )
+    
+    patched_get_reportability_response.return_value == ""
+
+    event = mock.MagicMock()
+    event.get_json.return_value = {
+        "url": (                
+            "https://phdidevphi87b9f133.blob.core.windows.net/"
+            f"source-data/ecr/12345eICR.xml"
+        )
+    }
+
+    blob = mock.MagicMock()
+    blob.name = "source-data/ecr/12345eICR.xml"
+    blob.read.return_value = b"some-blob-contents"
+    
+
+    with pytest.raises(Exception) as e:
+        read_source_data(event)
+        assert str(e) == (
+                    "The ingestion pipeline was not triggered for this eCR, because a reportability response was not found for filename "
+                    f"{blob.name}."
+                )
+
+
+

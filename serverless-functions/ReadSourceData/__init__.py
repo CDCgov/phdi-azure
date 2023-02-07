@@ -2,6 +2,8 @@ import os
 import json
 import azure.functions as func
 
+from datetime import datetime
+from azure.core.exceptions import ResourceNotFoundError
 from azure.mgmt.datafactory import DataFactoryManagementClient
 from phdi.cloud.azure import AzureCredentialManager, AzureCloudContainerConnection
 from phdi.harmonization.hl7 import (
@@ -16,6 +18,9 @@ def main(event: func.EventGridEvent) -> None:
     (ELR, VXU, or eCR) contained in the file, and trigger in an Azure Data Factory
     ingestion pipeline for each of them. An exception is raised if pipeline triggering
     fails for any message.
+    When handling eCR data, this function looks for a related RR, and polls until it
+    finds one. By default, this function polls for 10 seconds with 1 second of sleep.
+    These values may be set with the environment variables: WAIT_TIME, SLEEP_TIME
     :param blob: An input stream of the blob that was uploaded to the blob storage
     :return: None
     """
@@ -54,15 +59,37 @@ def main(event: func.EventGridEvent) -> None:
 
     # Handle eICR + Reportability Response messages
     if message_type == "ccda":
-        eicr = cloud_container_connection.download_object(
+        ecr = cloud_container_connection.download_object(
             container_name=container_name, filename=filename
         )
 
-        reportability_response = cloud_container_connection.download_object(
-            container_name=container_name, filename=filename.replace("eICR", "RR")
-        )
+        wait_time = os.environ.get("WAIT_TIME", 10)
+        sleep_time = os.environ.get("SLEEP_TIME", 1)
 
-        messages = [{"eicr": eicr, "rr": reportability_response}]
+        start_time = datetime.now()
+        time_elapsed = 0
+        reportability_response = get_reportability_response(cloud_container_connection, container_name, filename)
+        while (
+            reportability_response == ""
+            and time_elapsed < wait_time
+        ):
+            sleep(sleep_time)
+            time_elapsed = (datetime.now() - start_time).seconds
+            reportability_response = get_reportability_response(cloud_container_connection, container_name, filename)
+
+
+        # Determine if we want to raise exception or log a warning TODO
+        if reportability_response == "":
+            raise Exception(
+                (
+                    "The ingestion pipeline was not triggered for this eCR, because a reportability response was not found for filename "
+                    f"{container_name}/{filename}."
+                )
+            )
+
+        # For eICR, just include contents of eICR. TODO Determine how to incorporate RR directly in eICR when creating the message
+        # We want to import from phdi python package function to takes things from RR and adds them into the eICR where appropriate
+        messages = [ecr]
 
     # Handle batch Hl7v2 messages.
     elif message_type == "hl7v2":
@@ -114,3 +141,14 @@ def main(event: func.EventGridEvent) -> None:
                 f"Failed messages: {failed_pipeline_executions}"
             )
         )
+
+
+def get_reportability_response(cloud_container_connection: AzureCloudContainerConnection, container_name: str, filename: str) -> str:
+    try:
+        reportability_response = cloud_container_connection.download_object(
+            container_name=container_name, filename=filename.replace("eICR", "RR")
+        )
+    except ResourceNotFoundError as e:
+        reportability_response = ""
+    
+    return reportability_response
