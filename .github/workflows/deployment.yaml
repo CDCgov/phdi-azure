@@ -24,6 +24,9 @@ jobs:
       run:
         shell: bash
         working-directory: ./terraform/implementation
+    outputs:
+      tf_env: ${{ steps.set-environment.outputs.tf_env }}
+      short_cid: ${{ steps.set-environment.outputs.short_cid }}
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
@@ -46,6 +49,7 @@ jobs:
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          OBJECT_ID: ${{ secrets.OBJECT_ID }}
         run: |
           echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
           echo location=\""$LOCATION"\" >> terraform.tfvars
@@ -53,6 +57,7 @@ jobs:
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
           echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
+          echo object_id=\""$OBJECT_ID"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
           echo fhir_converter_url=\"""\" >> terraform.tfvars
@@ -292,3 +297,12 @@ jobs:
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
             --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
             --endpoint-type azurefunction
+
+  end-to-end:
+    name: End-to-end tests
+    needs: deployment
+    if: ${{ needs.deployment.outputs.tf_env == 'dev' }}
+    uses: ./.github/workflows/end-to-end.yaml
+    with:
+      environment: ${{ needs.deployment.outputs.tf_env }}
+    secrets: inherit
