@@ -179,6 +179,7 @@ def test_get_reportability_response_failure():
 
     assert get_reportability_response(cloud_container_connection, container_name, filename) == ""
 
+@mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.AzureCloudContainerConnection")
 @mock.patch("ReadSourceData.get_reportability_response")
@@ -186,7 +187,12 @@ def test_handle_ecr_with_no_rr(
     patched_get_reportability_response,
     patched_cloud_container_connection,
     patched_azure_cred_manager,
+    patched_os
 ):
+    patched_os.environ = {
+        "WAIT_TIME": 0.1,
+        "SLEEP_TIME": 0.05
+    }
     patched_azure_cred_manager.return_value.get_credentials.return_value = (
         "some-credentials"
     )
