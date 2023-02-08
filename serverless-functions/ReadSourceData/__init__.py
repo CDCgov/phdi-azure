@@ -63,8 +63,8 @@ def main(event: func.EventGridEvent) -> None:
             container_name=container_name, filename=filename
         )
 
-        wait_time = os.environ.get("WAIT_TIME", 10)
-        sleep_time = os.environ.get("SLEEP_TIME", 1)
+        wait_time = float(os.environ.get("WAIT_TIME", 10))
+        sleep_time = float(os.environ.get("SLEEP_TIME", 1))
 
         start_time = datetime.now()
         time_elapsed = 0
