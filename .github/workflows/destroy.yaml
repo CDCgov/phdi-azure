@@ -1,0 +1,90 @@
+name: Destroy environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to destroy"
+        type: environment
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+jobs:
+  destroy:
+    name: Destroy environment
+    runs-on: ubuntu-latest
+    environment: main
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform/implementation
+    outputs:
+      tf_env: ${{ steps.set-environment.outputs.tf_env }}
+      short_cid: ${{ steps.set-environment.outputs.short_cid }}
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: "Azure login"
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+
+      - name: Load input variables
+        env:
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          LOCATION: ${{ secrets.LOCATION }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
+          SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          OBJECT_ID: ${{ secrets.OBJECT_ID }}
+          GHCR_USERNAME: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
+          echo location=\""$LOCATION"\" >> terraform.tfvars
+          echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
+          echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
+          echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
+          echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
+          echo object_id=\""$OBJECT_ID"\" >> terraform.tfvars
+          echo ghcr_username=\""$GHCR_USERNAME"\" >> terraform.tfvars
+          echo ghcr_token=\""$GHCR_TOKEN"\" >> terraform.tfvars
+          echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
+          echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
+          echo fhir_converter_url=\"""\" >> terraform.tfvars
+          echo ingestion_container_url=\"""\" >> terraform.tfvars
+
+      - name: Set environment
+        id: set-environment
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        run: |-
+          echo "tf_env=$(
+          if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
+            echo ${{ github.event.inputs.environment }}
+          else
+            echo dev
+          fi
+          )" >> $GITHUB_OUTPUT
+          echo "short_cid=${CLIENT_ID:0:8}" >> $GITHUB_OUTPUT
+
+      - name: Destroy environment
+        env:
+          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+        run: |
+          terraform init -backend-config=backend.tfvars
+          terraform workspace new $TF_ENV || terraform workspace select $TF_ENV
+          terraform destroy -auto-approve -lock-timeout=30m
