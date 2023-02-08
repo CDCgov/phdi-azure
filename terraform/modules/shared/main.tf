@@ -189,17 +189,16 @@ resource "docker_image" "ghcr_image" {
 
 resource "docker_tag" "tag_for_azure" {
   for_each     = local.images
+  depends_on   = [docker_image.ghcr_image]
   source_image = data.docker_registry_image.ghcr_data[each.key].name
   target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
 }
 
 resource "docker_registry_image" "acr_image" {
-  for_each = local.images
-  depends_on = [
-    docker_image.ghcr_image,
-    docker_tag.tag_for_azure,
-  ]
-  name = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+  for_each   = local.images
+  depends_on = [docker_tag.tag_for_azure]
+  name       = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+
   triggers = {
     repo_digest = docker_image.ghcr_image[each.key].repo_digest
   }
