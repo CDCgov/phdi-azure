@@ -69,6 +69,11 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
         run: |-
+          if [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
+            echo "Prod environment cannot be destroyed"
+            exit 1
+          fi
+
           echo "tf_env=$(
           if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
             echo ${{ github.event.inputs.environment }}
