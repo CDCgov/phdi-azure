@@ -48,13 +48,15 @@ def main(event: func.EventGridEvent) -> None:
 
         if any([name for name in ["RR", "html"] if name in filename_parts[1]]):
             logging.info(
-                "The read source data function was triggered. Processing will not continue as the file uploaded was not a currently handled type."
+                "The read source data function was triggered. Processing will not "
+                "continue as the file uploaded was not a currently handled type."
             )
             return
 
     else:
         logging.warning(
-            "The read source data function was triggered. We expected a file in the elr, vxu, or ecr folders, but something else was provided."
+            "The read source data function was triggered. We expected a file in the "
+            "elr, vxu, or ecr folders, but something else was provided."
         )
         return
 
@@ -88,13 +90,16 @@ def main(event: func.EventGridEvent) -> None:
 
         if reportability_response == "":
             logging.warning(
-                "The ingestion pipeline was not triggered for this eCR, because a reportability response was not found for filename "
+                "The ingestion pipeline was not triggered for this eCR, because a "
+                "reportability response was not found for filename "
                 f"{container_name}/{filename}."
             )
             return
 
-        # For eICR, just include contents of eICR for now. TODO Determine how to incorporate RR directly in eICR when creating the message
-        # We want to import from phdi python package function to takes things from RR and adds them into the eICR where appropriate.
+        # For eICR, just include contents of eICR for now.
+        # TODO Determine how to incorporate RR directly in eICR when creating the
+        # message. We want to import from phdi python package function to takes things
+        # from RR and adds them into the eICR where appropriate.
         messages = [ecr]
 
     # Handle batch Hl7v2 messages.
@@ -159,7 +164,7 @@ def get_reportability_response(
         reportability_response = cloud_container_connection.download_object(
             container_name=container_name, filename=filename.replace("eICR", "RR")
         )
-    except ResourceNotFoundError as e:
+    except ResourceNotFoundError:
         reportability_response = ""
 
     return reportability_response
