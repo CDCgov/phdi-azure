@@ -1,7 +1,6 @@
 name: Destroy environment
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       environment:
@@ -74,7 +73,7 @@ jobs:
           if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
             echo ${{ github.event.inputs.environment }}
           else
-            echo dev2
+            echo dev
           fi
           )" >> $GITHUB_OUTPUT
           echo "short_cid=${CLIENT_ID:0:8}" >> $GITHUB_OUTPUT

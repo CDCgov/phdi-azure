@@ -110,7 +110,6 @@ jobs:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
           SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
         run: |
-          exit 1
           az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
           az extension add --name containerapp --upgrade
           az provider register --namespace Microsoft.App
