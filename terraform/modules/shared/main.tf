@@ -143,7 +143,17 @@ resource "azurerm_container_registry" "phdi_registry" {
   admin_enabled       = true
 }
 
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "3.0.1"
+    }
+  }
+}
+
 provider "docker" {
+  host = "unix:///var/run/docker.sock"
   registry_auth {
     address  = "ghcr.io"
     username = var.ghcr_username

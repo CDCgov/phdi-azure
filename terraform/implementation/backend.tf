@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "= 3.23.0"
     }
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "3.0.1"
-    }
   }
 
   backend "azurerm" {
@@ -21,8 +17,4 @@ terraform {
 provider "azurerm" {
   use_oidc = true
   features {}
-}
-
-provider "docker" {
-  host = "unix:///var/run/docker.sock"
 }
