@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 import azure.functions as func
 from time import sleep
 from datetime import datetime
@@ -46,10 +47,16 @@ def main(event: func.EventGridEvent) -> None:
         root_template = "CCD"
 
         if any([name for name in ["RR", "html"] if name in filename_parts[1]]):
-            raise Exception("Invalid file type.")
+            logging.info(
+                "The read source data function was triggered. Processing will not continue as the file uploaded was not a currently handled type."
+            )
+            return
 
     else:
-        raise Exception("Invalid file type.")
+        logging.warning(
+            "The read source data function was triggered. We expected a file in the elr, vxu, or ecr folders, but something else was provided."
+        )
+        return
 
     # Download blob contents.
     cred_manager = AzureCredentialManager(resource_location=storage_account_url)
@@ -69,25 +76,25 @@ def main(event: func.EventGridEvent) -> None:
         start_time = datetime.now()
         time_elapsed = 0
 
-        reportability_response = get_reportability_response(cloud_container_connection, container_name, filename)
-        while (
-            reportability_response == ""
-            and time_elapsed < wait_time
-        ):
+        reportability_response = get_reportability_response(
+            cloud_container_connection, container_name, filename
+        )
+        while reportability_response == "" and time_elapsed < wait_time:
             sleep(sleep_time)
             time_elapsed = (datetime.now() - start_time).seconds
-            reportability_response = get_reportability_response(cloud_container_connection, container_name, filename)
-        # Determine if we want to raise exception or log a warning TODO
-        if reportability_response == "":
-            raise Exception(
-                (
-                    "The ingestion pipeline was not triggered for this eCR, because a reportability response was not found for filename "
-                    f"{container_name}/{filename}."
-                )
+            reportability_response = get_reportability_response(
+                cloud_container_connection, container_name, filename
             )
 
-        # For eICR, just include contents of eICR. TODO Determine how to incorporate RR directly in eICR when creating the message
-        # We want to import from phdi python package function to takes things from RR and adds them into the eICR where appropriate
+        if reportability_response == "":
+            logging.warning(
+                "The ingestion pipeline was not triggered for this eCR, because a reportability response was not found for filename "
+                f"{container_name}/{filename}."
+            )
+            return
+
+        # For eICR, just include contents of eICR for now. TODO Determine how to incorporate RR directly in eICR when creating the message
+        # We want to import from phdi python package function to takes things from RR and adds them into the eICR where appropriate.
         messages = [ecr]
 
     # Handle batch Hl7v2 messages.
@@ -133,21 +140,26 @@ def main(event: func.EventGridEvent) -> None:
             failed_pipeline_executions[idx] = e
 
     if failed_pipeline_executions != {}:
-        raise Exception(
-            (
-                "The ingestion pipeline was not triggered for some messages in "
-                f"{container_name}/{filename}. "
-                f"Failed messages: {failed_pipeline_executions}"
-            )
+        exception_message = (
+            "The ingestion pipeline was not triggered for some messages in "
         )
+        f"{container_name}/{filename}. "
+        f"Failed messages: {failed_pipeline_executions}"
+
+        logging.error(exception_message)
+        raise Exception(exception_message)
 
 
-def get_reportability_response(cloud_container_connection: AzureCloudContainerConnection, container_name: str, filename: str) -> str:
+def get_reportability_response(
+    cloud_container_connection: AzureCloudContainerConnection,
+    container_name: str,
+    filename: str,
+) -> str:
     try:
         reportability_response = cloud_container_connection.download_object(
             container_name=container_name, filename=filename.replace("eICR", "RR")
         )
     except ResourceNotFoundError as e:
         reportability_response = ""
-    
+
     return reportability_response
