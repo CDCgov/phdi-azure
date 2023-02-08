@@ -143,6 +143,58 @@ resource "azurerm_container_registry" "phdi_registry" {
   admin_enabled       = true
 }
 
+provider "docker" {
+  registry_auth {
+    address  = "ghcr.io"
+    username = var.ghcr_username
+    password = var.ghcr_token
+  }
+  registry_auth {
+    address  = azurerm_container_registry.phdi_registry.login_server
+    username = azurerm_container_registry.phdi_registry.admin_username
+    password = azurerm_container_registry.phdi_registry.admin_password
+  }
+}
+
+# Pull images from GitHub Container Registry and push to Azure Container Registry
+locals {
+  images = toset([
+    "fhir-converter",
+    "ingestion",
+    "tabulation",
+    "alerts",
+  ])
+}
+
+data "docker_registry_image" "ghcr_data" {
+  for_each = local.images
+  name     = "ghcr.io/cdcgov/phdi/${each.key}:main"
+}
+
+resource "docker_image" "ghcr_image" {
+  for_each      = local.images
+  name          = data.docker_registry_image.ghcr_data[each.key].name
+  pull_triggers = [data.docker_registry_image.ghcr_data[each.key].sha256_digest]
+}
+
+resource "docker_tag" "tag_for_azure" {
+  for_each     = local.images
+  source_image = data.docker_registry_image.ghcr_data[each.key].name
+  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+}
+
+resource "docker_registry_image" "acr_image" {
+  for_each = local.images
+  depends_on = [
+    docker_image.ghcr_image,
+    docker_tag.tag_for_azure,
+  ]
+  name = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+  triggers = {
+    repo_digest = docker_image.ghcr_image[each.key].repo_digest
+  }
+}
+
 ##### FHIR Server #####
 
 resource "azurerm_healthcare_service" "fhir_server" {
