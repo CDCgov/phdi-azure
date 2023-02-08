@@ -1,7 +1,6 @@
 name: Destroy environment
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       environment:
@@ -51,7 +50,6 @@ jobs:
           GHCR_USERNAME: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          exit 1
           echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
           echo location=\""$LOCATION"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
