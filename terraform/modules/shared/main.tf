@@ -201,7 +201,7 @@ resource "docker_registry_image" "acr_image" {
   keep_remotely = true
 
   triggers = {
-    repo_digest = data.docker_registry_image.ghcr_data[each.key].sha256_digest
+    sha256_digest = data.docker_registry_image.ghcr_data[each.key].sha256_digest
   }
 }
 
