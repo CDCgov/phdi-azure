@@ -237,9 +237,11 @@ jobs:
         run: |
           FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
           INGESTION_CONTAINER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)"
+          VALIDATION_CONTAINER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-validation" --query "properties.configuration.ingress.fqdn" -o tsv)"
           TABULATE_CONTAINER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-tabulation" --query "properties.configuration.ingress.fqdn" -o tsv)"
           echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
           echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
+          echo validation_container_url=\""$VALIDATION_CONTAINER_URL"\" >> terraform.tfvars
       - name: terraform
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
