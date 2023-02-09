@@ -30,3 +30,17 @@ variable "ingestion_container_url" {
 variable "client_id" {
   description = "Client ID"
 }
+
+variable "object_id" {
+  description = "Object ID"
+}
+
+variable "ghcr_username" {
+  type        = string
+  description = "GitHub Container Registry username."
+}
+
+variable "ghcr_token" {
+  type        = string
+  description = "GitHub Container Registry token."
+}

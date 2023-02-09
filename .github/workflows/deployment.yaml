@@ -24,6 +24,9 @@ jobs:
       run:
         shell: bash
         working-directory: ./terraform/implementation
+    outputs:
+      tf_env: ${{ steps.set-environment.outputs.tf_env }}
+      short_cid: ${{ steps.set-environment.outputs.short_cid }}
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
@@ -46,6 +49,9 @@ jobs:
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          OBJECT_ID: ${{ secrets.OBJECT_ID }}
+          GHCR_USERNAME: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo subscription_id=\""$SUBSCRIPTION_ID"\" >> terraform.tfvars
           echo location=\""$LOCATION"\" >> terraform.tfvars
@@ -53,6 +59,9 @@ jobs:
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
           echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
+          echo object_id=\""$OBJECT_ID"\" >> terraform.tfvars
+          echo ghcr_username=\""$GHCR_USERNAME"\" >> terraform.tfvars
+          echo ghcr_token=\""$GHCR_TOKEN"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
           echo fhir_converter_url=\"""\" >> terraform.tfvars
@@ -81,33 +90,11 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace new $TF_ENV || terraform workspace select $TF_ENV
-          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault.phdi_key_vault" -target="module.shared.random_uuid.salt" -target="module.shared.azurerm_key_vault_secret.salt" -auto-approve -lock-timeout=30m
+          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault.phdi_key_vault" -target="module.shared.random_uuid.salt" -target="module.shared.azurerm_key_vault_secret.salt" -target="module.shared.docker_image.ghcr_image" -target="module.shared.docker_tag.tag_for_azure" -target="module.shared.docker_registry_image.acr_image" -auto-approve -lock-timeout=30m
           head -n -2 terraform.tfvars >> temp.txt
           rm terraform.tfvars
           mv temp.txt terraform.tfvars
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push container images to Azure Container Registry
-        env:
-          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
-        run: |
-          REGISTRY_NAME=phdi${TF_ENV}registry${SHORT_CID}
-          az acr login --name $REGISTRY_NAME
-          IMAGES=('fhir-converter' 'ingestion' 'tabulation' 'alerts' 'validation')
-          for IMAGE in "${IMAGES[@]}"; do
-            GH_IMAGE_NAME=ghcr.io/cdcgov/phdi/$IMAGE:main
-            AZURE_IMAGE_NAME=$REGISTRY_NAME.azurecr.io/phdi/$IMAGE:latest
-            docker pull $GH_IMAGE_NAME
-            docker tag $GH_IMAGE_NAME $AZURE_IMAGE_NAME
-            docker push $AZURE_IMAGE_NAME
-          done
       - name: "Setup yq"
         uses: dcarbone/install-yq-action@v1.0.0
         with:
@@ -292,3 +279,12 @@ jobs:
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
             --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
             --endpoint-type azurefunction
+
+  end-to-end:
+    name: End-to-end tests
+    needs: deployment
+    if: ${{ needs.deployment.outputs.tf_env == 'dev' }}
+    uses: ./.github/workflows/end-to-end.yaml
+    with:
+      environment: ${{ needs.deployment.outputs.tf_env }}
+    secrets: inherit

@@ -143,6 +143,67 @@ resource "azurerm_container_registry" "phdi_registry" {
   admin_enabled       = true
 }
 
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "3.0.1"
+    }
+  }
+}
+
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
+  registry_auth {
+    address  = "ghcr.io"
+    username = var.ghcr_username
+    password = var.ghcr_token
+  }
+  registry_auth {
+    address  = azurerm_container_registry.phdi_registry.login_server
+    username = azurerm_container_registry.phdi_registry.admin_username
+    password = azurerm_container_registry.phdi_registry.admin_password
+  }
+}
+
+# Pull images from GitHub Container Registry and push to Azure Container Registry
+locals {
+  images = toset([
+    "fhir-converter",
+    "ingestion",
+    "tabulation",
+    "alerts",
+  ])
+}
+
+data "docker_registry_image" "ghcr_data" {
+  for_each = local.images
+  name     = "ghcr.io/cdcgov/phdi/${each.key}:main"
+}
+
+resource "docker_image" "ghcr_image" {
+  for_each      = local.images
+  name          = data.docker_registry_image.ghcr_data[each.key].name
+  pull_triggers = [data.docker_registry_image.ghcr_data[each.key].sha256_digest]
+}
+
+resource "docker_tag" "tag_for_azure" {
+  for_each     = local.images
+  depends_on   = [docker_image.ghcr_image]
+  source_image = data.docker_registry_image.ghcr_data[each.key].name
+  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+}
+
+resource "docker_registry_image" "acr_image" {
+  for_each   = local.images
+  depends_on = [docker_tag.tag_for_azure]
+  name       = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+
+  triggers = {
+    repo_digest = docker_image.ghcr_image[each.key].repo_digest
+  }
+}
+
 ##### FHIR Server #####
 
 resource "azurerm_healthcare_service" "fhir_server" {
@@ -153,7 +214,8 @@ resource "azurerm_healthcare_service" "fhir_server" {
   cosmosdb_throughput = 1400
 
   access_policy_object_ids = [
-    azurerm_user_assigned_identity.pipeline_runner.principal_id
+    azurerm_user_assigned_identity.pipeline_runner.principal_id,
+    var.object_id
   ]
 
   lifecycle {
@@ -164,6 +226,12 @@ resource "azurerm_healthcare_service" "fhir_server" {
     environment = terraform.workspace
     managed-by  = "terraform"
   }
+}
+
+resource "azurerm_role_assignment" "fhir_contributor" {
+  scope                = azurerm_healthcare_service.fhir_server.id
+  role_definition_name = "FHIR Data Contributor"
+  principal_id         = var.object_id
 }
 
 ##### User Assigned Identity #####

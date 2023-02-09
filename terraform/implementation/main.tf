@@ -7,6 +7,9 @@ module "shared" {
   smarty_auth_id      = var.smarty_auth_id
   smarty_auth_token   = var.smarty_auth_token
   client_id           = var.client_id
+  object_id           = var.object_id
+  ghcr_username       = var.ghcr_username
+  ghcr_token          = var.ghcr_token
 }
 
 
