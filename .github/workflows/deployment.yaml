@@ -84,7 +84,7 @@ jobs:
       - name: Cache Docker images.
         uses: ScribeMD/docker-cache@0.2.7
         with:
-          key: docker-${{ runner.os }}-${{ hashFiles(LICENSE) }}
+          key: docker-${{ runner.os }}-${{ hashFiles(./LICENSE) }}
 
       - name: Create container registry, managed identity, and PHI storage account
         env:
