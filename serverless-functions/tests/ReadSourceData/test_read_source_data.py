@@ -225,9 +225,11 @@ def test_handle_ecr_with_no_rr(
     blob.name = "source-data/ecr/12345eICR.xml"
     blob.read.return_value = b"some-blob-contents"
 
-    warning_message = "The ingestion pipeline was not triggered for this eCR, "
-    "because a reportability response was not found for filename "
-    f"{blob.name}."
+    warning_message = (
+        "The ingestion pipeline was not triggered for this eCR, "
+        "because a reportability response was not found for filename "
+        f"{blob.name}."
+    )
 
     read_source_data(event)
     patched_logging.warning.assert_called_with(warning_message)
