@@ -3,6 +3,92 @@
     "properties": {
         "activities": [
             {
+                "name": "validate_message",
+                "description": "Determine if an incoming message is valid.",
+                "type": "WebActivity",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${fhir_converter_url}/validate",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"message_type\": @{pipeline().parameters.message_type},\n    \"message\": @{pipeline().parameters.message}\n}",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "check_validation_result",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "validate_message",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(activity('validate_message').output.response.message_valid, 'true')",
+                        "type": "Expression"
+                    },
+                    "ifFalseActivities": [
+                        {
+                            "name": "log_validation_failure",
+                            "description": "Write validation failures to storage.\n",
+                            "type": "WebActivity",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "url": "https://phdi-dev-ingestion.proudsmoke-955a2e0e.centralus.azurecontainerapps.io/cloud/storage/write_blob_to_storage",
+                                "method": "POST",
+                                "body": {
+                                    "value": "{\n    \"blob\": {\n        \"validation_result\": @{activity('validate_message').output.response},\n        \"message\": @{pipeline().parameters.message}\n        },\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"invalid_messages\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "invalid_message",
+                            "description": "Raise an error when an invalid message is encountered.",
+                            "type": "Fail",
+                            "dependsOn": [
+                                {
+                                    "activity": "log_validation_failure",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "message": {
+                                    "value": "\"invalid message\"",
+                                    "type": "Expression"
+                                },
+                                "errorCode": "400"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
                 "name": "convert_to_fhir",
                 "description": "Convert message from Hl7 or CCD to FHIR.\n",
                 "type": "WebActivity",
