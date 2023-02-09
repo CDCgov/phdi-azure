@@ -1,4 +1,6 @@
 from ReadSourceData import main as read_source_data
+from ReadSourceData import get_reportability_response
+from azure.core.exceptions import ResourceNotFoundError
 from unittest import mock
 import pytest
 
@@ -125,7 +127,9 @@ def test_pipeline_trigger_success(
 @mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
+@mock.patch("ReadSourceData.logging")
 def test_publishing_failure(
+    patched_logging,
     patched_batch_converter,
     patched_os,
     patched_azure_cred_manager,
@@ -156,7 +160,76 @@ def test_publishing_failure(
 
     with pytest.raises(Exception) as e:
         read_source_data(blob)
-        assert str(e) == (
-            "The ingestion pipeline was not triggered for some messages in "
-            f"{blob.name}."
+        error_message = "The ingestion pipeline was not triggered for some messages in "
+        f"{blob.name}."
+        patched_logging.error.assert_called_with(error_message)
+        assert str(e) == (error_message)
+
+
+def test_get_reportability_response_success():
+    cloud_container_connection = mock.Mock()
+    cloud_container_connection.download_object.return_value = "rr contents"
+    container_name = "ecr"
+    filename = "source-data/ecr/12345eICR.html"
+
+    assert (
+        get_reportability_response(cloud_container_connection, container_name, filename)
+        == "rr contents"
+    )
+
+
+def test_get_reportability_response_failure():
+    cloud_container_connection = mock.Mock()
+    cloud_container_connection.download_object.side_effect = ResourceNotFoundError
+    container_name = "ecr"
+    filename = "source-data/ecr/12345eICR.html"
+
+    assert (
+        get_reportability_response(cloud_container_connection, container_name, filename)
+        == ""
+    )
+
+
+@mock.patch("ReadSourceData.os")
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.AzureCloudContainerConnection")
+@mock.patch("ReadSourceData.get_reportability_response")
+@mock.patch("ReadSourceData.logging")
+def test_handle_ecr_with_no_rr(
+    patched_logging,
+    patched_get_reportability_response,
+    patched_cloud_container_connection,
+    patched_azure_cred_manager,
+    patched_os,
+):
+    patched_os.environ = {"WAIT_TIME": 0.1, "SLEEP_TIME": 0.05}
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    patched_cloud_container_connection.return_value.download_object.return_value = (
+        "some-message"
+    )
+
+    patched_get_reportability_response.return_value = ""
+
+    event = mock.MagicMock()
+    event.get_json.return_value = {
+        "url": (
+            "https://phdidevphi87b9f133.blob.core.windows.net/"
+            "source-data/ecr/12345eICR.xml"
         )
+    }
+
+    blob = mock.MagicMock()
+    blob.name = "source-data/ecr/12345eICR.xml"
+    blob.read.return_value = b"some-blob-contents"
+
+    warning_message = (
+        "The ingestion pipeline was not triggered for this eCR, "
+        "because a reportability response was not found for filename "
+        f"{blob.name}."
+    )
+
+    read_source_data(event)
+    patched_logging.warning.assert_called_with(warning_message)
