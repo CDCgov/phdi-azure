@@ -217,6 +217,19 @@ jobs:
               --user-assigned $MANAGED_IDENTITY_ID \
               --env-vars AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" COMMUNICATION_SERVICE_NAME="$COMMUNICATION_SERVICE_NAME"
           fi
+          if [[ ! $(az containerapp show -n phdi-$TF_ENV-validation) ]]; then
+            az containerapp create \
+              --name phdi-$TF_ENV-validation \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --environment $TF_ENV \
+              --image $REGISTRY_URL/phdi/validation:latest \
+              --target-port 8080 \
+              --ingress 'external' \
+              --registry-server $REGISTRY_URL \
+              --registry-username $REGISTRY_NAME \
+              --registry-password $REGISTRY_PASSWORD \
+              --user-assigned $MANAGED_IDENTITY_ID 
+          fi
       - name: load container urls
         env:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
