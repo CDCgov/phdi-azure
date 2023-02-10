@@ -19,12 +19,16 @@ variable "smarty_auth_token" {
   description = "value of the SmartyStreets Auth Token"
 }
 
+variable "validation_service_url" {
+  description = "URL of the validation service"
+}
+
 variable "fhir_converter_url" {
   description = "URL of the FHIR converter"
 }
 
-variable "ingestion_container_url" {
-  description = "URL of the ingestion container"
+variable "ingestion_service_url" {
+  description = "URL of the service container"
 }
 
 variable "client_id" {

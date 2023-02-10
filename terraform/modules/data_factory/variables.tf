@@ -13,9 +13,14 @@ variable "fhir_converter_url" {
   description = "URL of the FHIR conversion service"
 }
 
-variable "ingestion_container_url" {
+variable "ingestion_service_url" {
   type        = string
-  description = "URL of the ingestion container"
+  description = "URL of the ingestion service"
+}
+
+variable "validation_service_url" {
+  type        = string
+  description = "URL of the validation service"
 }
 
 variable "fhir_server_url" {

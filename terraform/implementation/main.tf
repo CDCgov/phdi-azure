@@ -17,8 +17,9 @@ module "data_factory" {
   source                                  = "../modules/data_factory"
   resource_group_name                     = var.resource_group_name
   location                                = var.location
+  validation_service_url                  = var.validation_service_url
   fhir_converter_url                      = var.fhir_converter_url
-  ingestion_container_url                 = var.ingestion_container_url
+  ingestion_service_url                   = var.ingestion_service_url
   fhir_server_url                         = "https://${module.shared.fhir_server_name}.azurehealthcareapis.com/"
   phi_storage_account_endpoint_url        = module.shared.phi_storage_account_endpoint_url
   pipeline_runner_id                      = module.shared.pipeline_runner_id
