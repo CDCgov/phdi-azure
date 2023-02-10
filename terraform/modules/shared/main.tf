@@ -254,7 +254,7 @@ resource "azurerm_container_app" "container_app" {
       }
       env {
         name  = "STORAGE_ACCOUNT_URL"
-        value = azurerm_storage_account.phdi_storage.primary_blob_endpoint
+        value = azurerm_storage_account.phi.primary_blob_endpoint
       }
       env {
         name  = "SALT_STR"
