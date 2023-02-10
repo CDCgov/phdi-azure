@@ -18,6 +18,18 @@ variable "ingestion_container_url" {
   description = "URL of the ingestion container"
 }
 
+# TODO: Uncomment when tabulation is implemented
+# variable "tabulation_container_url" {
+#   type        = string
+#   description = "URL of the tabulation container"
+# }
+
+# TODO: Uncomment when alerts are implemented
+# variable "alerts_container_url" {
+#   type        = string
+#   description = "URL of the alerts container"
+# }
+
 variable "fhir_server_url" {
   type        = string
   description = "URL of the FHIR server"

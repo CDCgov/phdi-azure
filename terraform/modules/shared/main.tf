@@ -204,6 +204,95 @@ resource "docker_registry_image" "acr_image" {
   }
 }
 
+##### Container apps #####
+
+resource "azurerm_container_app_environment" "phdi" {
+  name                       = terraform.workspace
+  location                   = var.location
+  resource_group_name        = var.resource_group_name
+  log_analytics_workspace_id = var.log_analytics_workspace_id
+}
+
+resource "azurerm_container_app" "container_app" {
+  for_each                     = local.images
+  name                         = "phdi-${terraform.workspace}-${each.key}"
+  container_app_environment_id = azurerm_container_app_environment.phdi.id
+  resource_group_name          = var.resource_group_name
+  revision_mode                = "Single"
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+  }
+
+  template {
+    container {
+      name   = "phdi-${terraform.workspace}-${each.key}"
+      image  = docker_registry_image.acr_image[each.key].name
+      cpu    = 0.5
+      memory = "1.0Gi"
+
+      env {
+        name  = "AUTH_ID"
+        value = var.smarty_auth_id
+      }
+      env {
+        name  = "AUTH_TOKEN"
+        value = var.smarty_auth_token
+      }
+      env {
+        name  = "AZURE_CLIENT_ID"
+        value = azurerm_user_assigned_identity.pipeline_runner.client_id
+      }
+      env {
+        name  = "AZURE_TENANT_ID"
+        value = data.azurerm_client_config.current.tenant_id
+      }
+      env {
+        name  = "AZURE_SUBSCRIPTION_ID"
+        value = data.azurerm_client_config.current.subscription_id
+      }
+      env {
+        name  = "STORAGE_ACCOUNT_URL"
+        value = azurerm_storage_account.phdi_storage.primary_blob_endpoint
+      }
+      env {
+        name  = "SALT_STR"
+        value = random_uuid.salt.result
+      }
+      env {
+        name  = "COMMUNICATION_SERVICE_NAME"
+        value = azurerm_communication_service.communication_service.name
+      }
+    }
+  }
+
+  ingress {
+    external_enabled = false
+    target_port      = 8080
+  }
+
+  secret {
+    name  = "phdi-registry-password"
+    value = azurerm_container_registry.phdi_registry.admin_password
+  }
+
+  registry {
+    server               = azurerm_container_registry.phdi_registry.login_server
+    username             = azurerm_container_registry.phdi_registry.admin_username
+    password_secret_name = "phdi-registry-password"
+  }
+}
+
+resource "azurerm_container_app_environment_storage" "tabulation_storage" {
+  name                         = "phdi${terraform.workspace}tables"
+  container_app_environment_id = azurerm_container_app_environment.phdi.id
+  account_name                 = azurerm_storage_account.phi.name
+  share_name                   = azurerm_storage_share.tables.name
+  access_key                   = azurerm_storage_account.phi.primary_access_key
+  access_mode                  = "ReadWrite"
+}
+
 ##### FHIR Server #####
 
 resource "azurerm_healthcare_service" "fhir_server" {
