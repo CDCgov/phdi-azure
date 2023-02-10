@@ -90,6 +90,8 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
         run: |
+          terraform init -backend-config=backend.tfvars
+          terraform workspace new $TF_ENV || terraform workspace select $TF_ENV
           terraform apply -auto-approve -lock-timeout=30m
 
       - name: Setup Python Environment
