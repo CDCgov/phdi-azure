@@ -31,19 +31,19 @@ output "fhir_conversion_failures_container_name" {
 }
 
 output "fhir_converter_url" {
-  value = "https://${azurerm_container_app.container_app["fhir-converter"].latest_revision_fqdn}"
+  value = "https://phdi-${terraform.workspace}-fhir-converter.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
 output "ingestion_container_url" {
-  value = "https://${azurerm_container_app.container_app["ingestion"].latest_revision_fqdn}"
+  value = "https://phdi-${terraform.workspace}-ingestion.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
 # TODO: Uncomment when tabulation is implemented
 # output "tabulation_container_url" {
-#   value = "https://${azurerm_container_app.container_app["tabulation"].latest_revision_fqdn}"
+#   value = "https://phdi-${terraform.workspace}-tabulation.${azurerm_container_app_environment.phdi.default_domain}"
 # }
 
 # TODO: Uncomment when alerts are implemented
 # output "alerts_container_url" {
-#   value = "https://${azurerm_container_app.container_app["alerts"].latest_revision_fqdn}"
+#   value = "https://phdi-${terraform.workspace}-alerts.${azurerm_container_app_environment.phdi.default_domain}"
 # }
