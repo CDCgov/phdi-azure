@@ -22,7 +22,7 @@ module "data_factory" {
   ingestion_container_url = module.shared.ingestion_container_url
   # tabulation_container_url                = module.shared.tabulation_container_url
   # alerts_container_url                    = module.shared.alerts_container_url
-  fhir_server_url                         = "https://${module.shared.fhir_server_name}.azurehealthcareapis.com/"
+  hapi_container_url                      = module.shared.hapi_container_url
   phi_storage_account_endpoint_url        = module.shared.phi_storage_account_endpoint_url
   pipeline_runner_id                      = module.shared.pipeline_runner_id
   pipeline_runner_principal_id            = module.shared.pipeline_runner_principal_id

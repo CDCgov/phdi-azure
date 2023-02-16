@@ -193,7 +193,7 @@
                     "url": "${ingestion_container_url}/fhir/transport/http/upload_bundle_to_fhir_server",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('add_patient_hash').output.bundle},\n    \"cred_manager\": \"azure\"\n}",
+                        "value": "{\n    \"fhir_url\": \"${hapi_container_url}\",\n    \"bundle\": @{activity('add_patient_hash').output.bundle},\n    \"cred_manager\": \"azure\"\n}",
                         "type": "Expression"
                     }
                 }
