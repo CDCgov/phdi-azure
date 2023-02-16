@@ -173,12 +173,13 @@ locals {
     "ingestion",
     "tabulation",
     "alerts",
+    "hapi"
   ])
 }
 
 data "docker_registry_image" "ghcr_data" {
   for_each = local.images
-  name     = "ghcr.io/cdcgov/phdi/${each.key}:main"
+  name     = each.key == "hapi" ? "hapiproject/hapi:latest" : "ghcr.io/cdcgov/phdi/${each.key}:main"
 }
 
 resource "docker_image" "ghcr_image" {
@@ -265,6 +266,22 @@ resource "azurerm_container_app" "container_app" {
         name  = "COMMUNICATION_SERVICE_NAME"
         value = azurerm_communication_service.communication_service.name
       }
+      env {
+        name  = "SPRING_DATASOURCE_URL"
+        value = "jdbc:postgresql://${azurerm_postgresql_server.postgres.fqdn}/${azurerm_postgresql_database.hapi.name}"
+      }
+      env {
+        name  = "SPRING_DATASOURCE_USERNAME"
+        value = azurerm_postgresql_server.postgres.administrator_login
+      }
+      env {
+        name  = "SPRING_DATASOURCE_PASSWORD"
+        value = azurerm_postgresql_server.postgres.administrator_login_password
+      }
+      env {
+        name  = "SPRING_DATASOURCE_DRIVER_CLASS_NAME"
+        value = "org.postgresql.Driver"
+      }
     }
   }
 
@@ -298,34 +315,39 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
   access_mode                  = "ReadWrite"
 }
 
-##### FHIR Server #####
+##### HAPI FHIR Server Database #####
 
-resource "azurerm_healthcare_service" "fhir_server" {
-  name                = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
-  location            = "eastus"
-  resource_group_name = var.resource_group_name
-  kind                = "fhir-R4"
-  cosmosdb_throughput = 1400
-
-  access_policy_object_ids = [
-    azurerm_user_assigned_identity.pipeline_runner.principal_id,
-    var.object_id
-  ]
-
-  lifecycle {
-    ignore_changes = [name, tags]
-  }
-
-  tags = {
-    environment = terraform.workspace
-    managed-by  = "terraform"
-  }
+resource "random_password" "postgres_password" {
+  length  = 20
+  special = true
 }
 
-resource "azurerm_role_assignment" "fhir_contributor" {
-  scope                = azurerm_healthcare_service.fhir_server.id
-  role_definition_name = "FHIR Data Contributor"
-  principal_id         = var.object_id
+resource "azurerm_postgresql_server" "postgres" {
+  name                = "phdi${terraform.workspace}postgres"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  administrator_login          = "phdi"
+  administrator_login_password = random_password.postgres_password.result
+
+  sku_name   = "GP_Gen5_2"
+  version    = "11"
+  storage_mb = 102400
+
+  backup_retention_days        = 7
+  geo_redundant_backup_enabled = true
+  auto_grow_enabled            = true
+
+  public_network_access_enabled = false
+  ssl_enforcement_enabled       = true
+}
+
+resource "azurerm_postgresql_database" "hapi" {
+  name                = "hapi_dstu3"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_server.postgres.name
+  charset             = "UTF8"
+  collation           = "English_United States.1252"
 }
 
 ##### User Assigned Identity #####
