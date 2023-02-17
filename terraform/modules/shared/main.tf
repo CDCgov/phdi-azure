@@ -71,8 +71,7 @@ resource "azurerm_storage_share" "tables" {
 }
 
 resource "azurerm_storage_account_network_rules" "phi" {
-  resource_group_name        = var.resource_group_name
-  storage_account_name       = azurerm_storage_account.phi.name
+  storage_account_id         = azurerm_storage_account.phi.id
   default_action             = "Deny"
   virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
   bypass                     = ["AzureServices"]
