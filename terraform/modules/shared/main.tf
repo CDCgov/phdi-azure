@@ -70,6 +70,14 @@ resource "azurerm_storage_share" "tables" {
   enabled_protocol     = "SMB"
 }
 
+resource "azurerm_storage_account_network_rules" "phi" {
+  resource_group_name        = var.resource_group_name
+  storage_account_name       = azurerm_storage_account.phi.name
+  default_action             = "Deny"
+  virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
+  bypass                     = ["AzureServices"]
+}
+
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
@@ -111,6 +119,12 @@ resource "azurerm_key_vault" "phdi_key_vault" {
       "Get",
     ]
   }
+
+  network_acls {
+    default_action             = "Deny"
+    bypass                     = "AzureServices"
+    virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
+  }
 }
 
 resource "random_uuid" "salt" {}
@@ -136,11 +150,20 @@ resource "azurerm_key_vault_secret" "smarty_auth_token" {
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
-  name                = "phdi${terraform.workspace}registry${substr(var.client_id, 0, 8)}"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  sku                 = "Premium"
-  admin_enabled       = true
+  name                       = "phdi${terraform.workspace}registry${substr(var.client_id, 0, 8)}"
+  resource_group_name        = var.resource_group_name
+  location                   = var.location
+  sku                        = "Premium"
+  admin_enabled              = true
+  network_rule_bypass_option = "AzureServices"
+
+  network_rule_set {
+    default_action = "Deny"
+    virtual_network {
+      action    = "Allow"
+      subnet_id = azurerm_subnet.phdi.id
+    }
+  }
 }
 
 terraform {
@@ -206,13 +229,40 @@ resource "docker_registry_image" "acr_image" {
   }
 }
 
+##### Virual network #####
+
+resource "azurerm_virtual_network" "phdi" {
+  name                = "phdi-${terraform.workspace}-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = var.location
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_subnet" "phdi" {
+  name                 = "phdi-${terraform.workspace}-subnet"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.phdi.name
+  address_prefixes     = ["10.0.0.0/21"]
+
+  service_endpoints = [
+    "Microsoft.Sql",
+    "Microsoft.Storage",
+    "Microsoft.KeyVault",
+    "Microsoft.ContainerRegistry",
+    "Microsoft.EventHub",
+    "Microsoft.Web",
+  ]
+}
+
 ##### Container apps #####
 
 resource "azurerm_container_app_environment" "phdi" {
-  name                       = terraform.workspace
-  location                   = var.location
-  resource_group_name        = var.resource_group_name
-  log_analytics_workspace_id = var.log_analytics_workspace_id
+  name                           = terraform.workspace
+  location                       = var.location
+  resource_group_name            = var.resource_group_name
+  log_analytics_workspace_id     = var.log_analytics_workspace_id
+  infrastructure_subnet_id       = azurerm_subnet.phdi.id
+  internal_load_balancer_enabled = true
 }
 
 resource "azurerm_container_app" "container_app" {
@@ -272,7 +322,7 @@ resource "azurerm_container_app" "container_app" {
       }
       env {
         name  = "SPRING_DATASOURCE_USERNAME"
-        value = azurerm_postgresql_server.postgres.administrator_login
+        value = "${azurerm_postgresql_server.postgres.administrator_login}@${azurerm_postgresql_server.postgres.name}"
       }
       env {
         name  = "SPRING_DATASOURCE_PASSWORD"
@@ -286,7 +336,7 @@ resource "azurerm_container_app" "container_app" {
   }
 
   ingress {
-    external_enabled = true
+    external_enabled = false
     target_port      = 8080
     traffic_weight {
       latest_revision = true
@@ -343,11 +393,18 @@ resource "azurerm_postgresql_server" "postgres" {
 }
 
 resource "azurerm_postgresql_database" "hapi" {
-  name                = "hapi_dstu3"
+  name                = "hapi"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_postgresql_server.postgres.name
   charset             = "UTF8"
   collation           = "English_United States.1252"
+}
+
+resource "azurerm_postgresql_virtual_network_rule" "postgres_vnet_rule" {
+  name                = "phdi${terraform.workspace}postgres"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_server.postgres.name
+  subnet_id           = azurerm_subnet.phdi.id
 }
 
 ##### User Assigned Identity #####

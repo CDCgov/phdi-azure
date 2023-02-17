@@ -47,3 +47,8 @@ variable "sleep_time" {
   type        = number
   description = "The number of seconds to sleep in lookup tries for a resource."
 }
+
+variable "subnet_id" {
+  type        = string
+  description = "The ID of the subnet in which to create the resources."
+}

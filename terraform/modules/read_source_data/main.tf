@@ -41,6 +41,8 @@ resource "azurerm_linux_function_app" "read_source_data" {
   service_plan_id            = azurerm_service_plan.function_app_sp.id
   storage_account_name       = azurerm_storage_account.function_app_sa.name
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
+  virtual_network_subnet_id  = var.subnet_id
+  
   identity {
     type         = "UserAssigned"
     identity_ids = [var.pipeline_runner_id]

@@ -44,4 +44,5 @@ module "read_source_data" {
   client_id                 = var.client_id
   wait_time                 = 10
   sleep_time                = 1
+  subnet_id                 = module.shared.subnet_id
 }
