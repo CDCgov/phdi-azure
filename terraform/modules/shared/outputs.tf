@@ -29,3 +29,21 @@ output "fhir_upload_failures_container_name" {
 output "fhir_conversion_failures_container_name" {
   value = azurerm_storage_container.fhir_conversion_failures_container_name.name
 }
+
+output "fhir_converter_url" {
+  value = "https://phdi-${terraform.workspace}-fhir-converter.${azurerm_container_app_environment.phdi.default_domain}"
+}
+
+output "ingestion_container_url" {
+  value = "https://phdi-${terraform.workspace}-ingestion.${azurerm_container_app_environment.phdi.default_domain}"
+}
+
+# TODO: Uncomment when tabulation is implemented
+# output "tabulation_container_url" {
+#   value = "https://phdi-${terraform.workspace}-tabulation.${azurerm_container_app_environment.phdi.default_domain}"
+# }
+
+# TODO: Uncomment when alerts are implemented
+# output "alerts_container_url" {
+#   value = "https://phdi-${terraform.workspace}-alerts.${azurerm_container_app_environment.phdi.default_domain}"
+# }

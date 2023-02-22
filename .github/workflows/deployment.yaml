@@ -64,8 +64,7 @@ jobs:
           echo ghcr_token=\""$GHCR_TOKEN"\" >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
-          echo fhir_converter_url=\"""\" >> terraform.tfvars
-          echo ingestion_container_url=\"""\" >> terraform.tfvars
+          az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
 
       - name: Set environment
         id: set-environment
@@ -86,7 +85,7 @@ jobs:
         with:
           key: docker-${{ runner.os }}-${{ hashFiles('**/LICENSE') }}
 
-      - name: Create container registry, managed identity, and PHI storage account
+      - name: terraform
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
@@ -95,149 +94,6 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace new $TF_ENV || terraform workspace select $TF_ENV
-          terraform apply -target="module.shared.azurerm_container_registry.phdi_registry" -target="module.shared.azurerm_user_assigned_identity.pipeline_runner" -target="module.shared.azurerm_storage_account.phi" -target="module.shared.azurerm_storage_share.tables" -target="module.shared.azurerm_key_vault.phdi_key_vault" -target="module.shared.random_uuid.salt" -target="module.shared.azurerm_key_vault_secret.salt" -target="module.shared.docker_image.ghcr_image" -target="module.shared.docker_tag.tag_for_azure" -target="module.shared.docker_registry_image.acr_image" -auto-approve -lock-timeout=30m
-          head -n -2 terraform.tfvars >> temp.txt
-          rm terraform.tfvars
-          mv temp.txt terraform.tfvars
-
-      - name: "Setup yq"
-        uses: dcarbone/install-yq-action@v1.0.0
-        with:
-          version: 4.30.4
-          download-compressed: true
-          force: false
-      - name: Deploy container apps
-        env:
-          LOCATION: ${{ secrets.LOCATION }}
-          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
-          TENANT_ID: ${{ secrets.TENANT_ID }}
-          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
-        run: |
-          az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
-          az extension add --name containerapp --upgrade
-          az provider register --namespace Microsoft.App
-          az provider register --namespace Microsoft.OperationalInsights
-          REGISTRY_NAME=phdi${TF_ENV}registry${SHORT_CID}
-          REGISTRY_PASSWORD=$(az acr credential show -n $REGISTRY_NAME --query "passwords[0].value" -o tsv)
-          REGISTRY_URL=$(az acr show -n $REGISTRY_NAME --query "loginServer" -o tsv)
-          MANAGED_IDENTITY_ID="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.ManagedIdentity/userAssignedIdentities/phdi-${TF_ENV}-pipeline-runner"
-          echo $MANAGED_IDENTITY_ID
-          MANAGED_IDENTITY_CLIENT_ID=$(az identity show --ids $MANAGED_IDENTITY_ID --query "clientId" -o tsv)
-          STORAGE_ACCOUNT_NAME=$(az storage account list --query "[?contains(name,'phdi${TF_ENV}phi')] | [0].name" -o tsv)
-          STORAGE_ACCOUNT_URL=$(az storage account list --query "[?contains(name,'phdi${TF_ENV}phi')] | [0] | primaryEndpoints.blob" -o tsv)
-          STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
-          STORAGE_SHARE_NAME=phdi${TF_ENV}tables
-          HASH_SALT=$(az keyvault secret show --vault-name ${TF_ENV}vault${SHORT_CID} -n patient-hash-salt --query "value" -o tsv)
-          COMMUNICATION_SERVICE_NAME="${TF_ENV}communication${SHORT_CID}"
-          if [[ ! $(az containerapp env show -n $TF_ENV) ]]; then
-            az containerapp env create \
-              --name $TF_ENV \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --location $LOCATION
-            ENV_PROVISIONED=$(az containerapp env show -n $TF_ENV --query "properties.provisioningState" -o tsv)
-            CHECK_COUNT=0
-            while [ $ENV_PROVISIONED != "Succeeded" ]; do
-                if [ $CHECK_COUNT -gt 60 ]; then
-                    echo "Environment failed to provision."
-                    exit 1
-                fi
-                echo "Environment not yet provisioned. Checking again in 10 seconds..."
-                sleep 10
-                CHECK_COUNT=$((CHECK_COUNT+1))
-                ENV_PROVISIONED=$(az containerapp env show -n $TF_ENV --query "properties.provisioningState" -o tsv)
-            done
-          fi
-          if [[ ! $(az containerapp show -n phdi-$TF_ENV-fhir-converter) ]]; then
-            az containerapp create \
-              --name phdi-$TF_ENV-fhir-converter \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --environment $TF_ENV \
-              --image $REGISTRY_URL/phdi/fhir-converter:latest \
-              --target-port 8080 \
-              --ingress 'external' \
-              --registry-server $REGISTRY_URL \
-              --registry-username $REGISTRY_NAME \
-              --registry-password $REGISTRY_PASSWORD \
-              --user-assigned $MANAGED_IDENTITY_ID 
-          fi
-          if [[ ! $(az containerapp show -n phdi-$TF_ENV-ingestion) ]]; then
-            az containerapp create \
-              --name phdi-$TF_ENV-ingestion \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --environment $TF_ENV \
-              --image $REGISTRY_URL/phdi/ingestion:latest \
-              --target-port 8080 \
-              --ingress 'external' \
-              --registry-server $REGISTRY_URL \
-              --registry-username $REGISTRY_NAME \
-              --registry-password $REGISTRY_PASSWORD \
-              --user-assigned $MANAGED_IDENTITY_ID \
-              --env-vars AUTH_ID="${{ secrets.SMARTY_AUTH_ID }}" AUTH_TOKEN="${{ secrets.SMARTY_AUTH_TOKEN }}" AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL" SALT_STR="$HASH_SALT"
-          fi
-          if [[ ! $(az containerapp show -n phdi-$TF_ENV-tabulation) ]]; then
-            az containerapp create \
-              --name phdi-$TF_ENV-tabulation \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --environment $TF_ENV \
-              --image $REGISTRY_URL/phdi/tabulation:latest \
-              --target-port 8080 \
-              --ingress 'external' \
-              --registry-server $REGISTRY_URL \
-              --registry-username $REGISTRY_NAME \
-              --registry-password $REGISTRY_PASSWORD \
-              --user-assigned $MANAGED_IDENTITY_ID \
-              --env-vars AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" STORAGE_ACCOUNT_URL="$STORAGE_ACCOUNT_URL"
-            az containerapp show \
-              --name phdi-$TF_ENV-tabulation \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --output yaml > tabulation.yaml
-            yq -i ".properties.template += {\"volumes\": [{\"name\":\"phdi${TF_ENV}tables\",\"storageName\":\"phdi${TF_ENV}tables\",\"storageType\":\"AzureFile\"}]}" tabulation.yaml
-            yq -i ".properties.template.containers[0] += {\"volumeMounts\": [{\"volumeName\":\"phdi${TF_ENV}tables\", \"mountPath\":\"/tables\"}]}" tabulation.yaml
-            az containerapp env storage set \
-              --access-mode ReadWrite \
-              --azure-file-account-name $STORAGE_ACCOUNT_NAME \
-              --azure-file-account-key $STORAGE_ACCOUNT_KEY \
-              --azure-file-share-name $STORAGE_SHARE_NAME \
-              --storage-name $STORAGE_SHARE_NAME \
-              --name $TF_ENV \
-              --resource-group $RESOURCE_GROUP_NAME
-            az containerapp update \
-              --name phdi-$TF_ENV-tabulation \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --yaml tabulation.yaml
-          fi
-          if [[ ! $(az containerapp show -n phdi-$TF_ENV-alerts) ]]; then
-            az containerapp create \
-              --name phdi-$TF_ENV-alerts \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --environment $TF_ENV \
-              --image $REGISTRY_URL/phdi/alerts:latest \
-              --target-port 8080 \
-              --ingress 'external' \
-              --registry-server $REGISTRY_URL \
-              --registry-username $REGISTRY_NAME \
-              --registry-password $REGISTRY_PASSWORD \
-              --user-assigned $MANAGED_IDENTITY_ID \
-              --env-vars AZURE_CLIENT_ID="$MANAGED_IDENTITY_CLIENT_ID" AZURE_TENANT_ID="$TENANT_ID" AZURE_SUBSCRIPTION_ID="$SUBSCRIPTION_ID" COMMUNICATION_SERVICE_NAME="$COMMUNICATION_SERVICE_NAME"
-          fi
-      - name: load container urls
-        env:
-          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
-        run: |
-          FHIR_CONVERTER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-fhir-converter" --query "properties.configuration.ingress.fqdn" -o tsv)"
-          INGESTION_CONTAINER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-ingestion" --query "properties.configuration.ingress.fqdn" -o tsv)"
-          TABULATE_CONTAINER_URL="https://$(az containerapp show --name "phdi-$TF_ENV-tabulation" --query "properties.configuration.ingress.fqdn" -o tsv)"
-          echo fhir_converter_url=\""$FHIR_CONVERTER_URL"\" >> terraform.tfvars
-          echo ingestion_container_url=\""$INGESTION_CONTAINER_URL"\" >> terraform.tfvars
-      - name: terraform
-        env:
-          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
-        run: |
           terraform apply -auto-approve -lock-timeout=30m
 
       - name: Setup Python Environment

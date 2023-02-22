@@ -1,24 +1,27 @@
 // Load modules here
 
 module "shared" {
-  source              = "../modules/shared"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  smarty_auth_id      = var.smarty_auth_id
-  smarty_auth_token   = var.smarty_auth_token
-  client_id           = var.client_id
-  object_id           = var.object_id
-  ghcr_username       = var.ghcr_username
-  ghcr_token          = var.ghcr_token
+  source                     = "../modules/shared"
+  resource_group_name        = var.resource_group_name
+  location                   = var.location
+  smarty_auth_id             = var.smarty_auth_id
+  smarty_auth_token          = var.smarty_auth_token
+  client_id                  = var.client_id
+  object_id                  = var.object_id
+  ghcr_username              = var.ghcr_username
+  ghcr_token                 = var.ghcr_token
+  log_analytics_workspace_id = module.read_source_data.log_analytics_workspace_id
 }
 
 
 module "data_factory" {
-  source                                  = "../modules/data_factory"
-  resource_group_name                     = var.resource_group_name
-  location                                = var.location
-  fhir_converter_url                      = var.fhir_converter_url
-  ingestion_container_url                 = var.ingestion_container_url
+  source                  = "../modules/data_factory"
+  resource_group_name     = var.resource_group_name
+  location                = var.location
+  fhir_converter_url      = module.shared.fhir_converter_url
+  ingestion_container_url = module.shared.ingestion_container_url
+  # tabulation_container_url                = module.shared.tabulation_container_url
+  # alerts_container_url                    = module.shared.alerts_container_url
   fhir_server_url                         = "https://${module.shared.fhir_server_name}.azurehealthcareapis.com/"
   phi_storage_account_endpoint_url        = module.shared.phi_storage_account_endpoint_url
   pipeline_runner_id                      = module.shared.pipeline_runner_id

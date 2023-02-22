@@ -37,3 +37,8 @@ variable "ghcr_token" {
   type        = string
   description = "GitHub Container Registry token."
 }
+
+variable "log_analytics_workspace_id" {
+  type        = string
+  description = "Log Analytics Workspace ID."
+}
