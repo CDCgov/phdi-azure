@@ -265,6 +265,24 @@ resource "azurerm_subnet" "phdi" {
       actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
     }
   }
+
+  delegation {
+    name = "containerapp"
+
+    service_delegation {
+      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
+
+  delegation {
+    name = "postgresql"
+
+    service_delegation {
+      name    = "Microsoft.DBforPostgreSQL/singleServers"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
 }
 
 resource "azurerm_private_dns_zone" "postgres" {
