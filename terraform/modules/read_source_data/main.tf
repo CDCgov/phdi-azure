@@ -9,6 +9,7 @@ resource "azurerm_storage_account" "function_app_sa" {
     default_action             = "Deny"
     bypass                     = ["None"]
     virtual_network_subnet_ids = [var.subnet_id]
+    ip_rules                   = [data.http.runner_ip.response_body]
   }
 }
 

@@ -256,6 +256,27 @@ resource "azurerm_subnet" "phdi" {
     "Microsoft.EventHub",
     "Microsoft.Web",
   ]
+
+  delegation {
+    name = "functionapp"
+
+    service_delegation {
+      name    = "Microsoft.Web/serverFarms"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
+}
+
+resource "azurerm_private_dns_zone" "postgres" {
+  name                = "postgres.database.azure.com"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "postgres" {
+  name                  = "phdi-${terraform.workspace}-postgres-link"
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = azurerm_private_dns_zone.postgres.name
+  virtual_network_id    = azurerm_virtual_network.phdi.id
 }
 
 ##### Container apps #####
@@ -404,11 +425,27 @@ resource "azurerm_postgresql_database" "hapi" {
   collation           = "English_United States.1252"
 }
 
-resource "azurerm_postgresql_virtual_network_rule" "postgres_vnet_rule" {
+resource "azurerm_private_endpoint" "postgres" {
   name                = "phdi${terraform.workspace}postgres"
+  location            = var.location
   resource_group_name = var.resource_group_name
-  server_name         = azurerm_postgresql_server.postgres.name
   subnet_id           = azurerm_subnet.phdi.id
+
+  private_service_connection {
+    name                           = "phdi${terraform.workspace}postgres-psc"
+    private_connection_resource_id = azurerm_postgresql_server.postgres.id
+    subresource_names              = ["postgresqlServer"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name = "phdi${terraform.workspace}postgres-pdzg"
+
+    private_dns_zone_configs {
+      name                = "postgres"
+      private_dns_zone_id = azurerm_private_dns_zone.postgres.id
+    }
+  }
 }
 
 ##### User Assigned Identity #####
