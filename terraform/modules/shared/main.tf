@@ -16,6 +16,12 @@ resource "azurerm_storage_account" "phi" {
   lifecycle {
     prevent_destroy = false
   }
+
+  network_rules {
+    default_action             = "Deny"
+    bypass                     = ["None"]
+    virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
+  }
 }
 
 resource "azurerm_storage_container" "source_data" {
@@ -70,13 +76,6 @@ resource "azurerm_storage_share" "tables" {
   enabled_protocol     = "SMB"
 }
 
-resource "azurerm_storage_account_network_rules" "phi" {
-  storage_account_id         = azurerm_storage_account.phi.id
-  default_action             = "Deny"
-  virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
-  bypass                     = ["AzureServices"]
-}
-
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
@@ -121,7 +120,7 @@ resource "azurerm_key_vault" "phdi_key_vault" {
 
   network_acls {
     default_action             = "Deny"
-    bypass                     = "AzureServices"
+    bypass                     = "None"
     virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
   }
 }
@@ -154,7 +153,7 @@ resource "azurerm_container_registry" "phdi_registry" {
   location                   = var.location
   sku                        = "Premium"
   admin_enabled              = true
-  network_rule_bypass_option = "AzureServices"
+  network_rule_bypass_option = "None"
 
   network_rule_set {
     default_action = "Deny"

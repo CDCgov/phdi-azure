@@ -4,6 +4,12 @@ resource "azurerm_storage_account" "function_app_sa" {
   location                 = var.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+
+  network_rules {
+    default_action             = "Deny"
+    bypass                     = ["None"]
+    virtual_network_subnet_ids = [var.subnet_id]
+  }
 }
 
 resource "azurerm_storage_container" "read_source_data" {
@@ -42,7 +48,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
   storage_account_name       = azurerm_storage_account.function_app_sa.name
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
   virtual_network_subnet_id  = var.subnet_id
-  
+
   identity {
     type         = "UserAssigned"
     identity_ids = [var.pipeline_runner_id]

@@ -91,5 +91,5 @@ jobs:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
         run: |
           terraform init -backend-config=backend.tfvars
-          terraform workspace new $TF_ENV || terraform workspace select $TF_ENV
+          terraform workspace select $TF_ENV || terraform workspace new $TF_ENV
           terraform destroy -auto-approve -lock-timeout=30m

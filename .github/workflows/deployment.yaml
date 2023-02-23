@@ -79,6 +79,33 @@ jobs:
           fi
           )" >> $GITHUB_OUTPUT
           echo "short_cid=${CLIENT_ID:0:8}" >> $GITHUB_OUTPUT
+          echo "runner_ip=$(curl -s https://api.ipify.org/)" >> $GITHUB_OUTPUT
+
+      - name: Whitelist runner IP
+        env:
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          RUNNER_IP: ${{ steps.set-environment.outputs.runner_ip }}
+        run: |
+          if [[ "$(az storage account check-name -n phdi${TF_ENV}phi${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az storage account network-rule add \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --account-name phdi${TF_ENV}phi${SHORT_CID} \
+              --ip-address $RUNNER_IP
+          fi
+          if [[ "$(az keyvault check-name -n ${TF_ENV}vault${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az keyvault network-rule add \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --name ${TF_ENV}vault${SHORT_CID} \
+              --ip-address $RUNNER_IP
+          fi
+          if [[ "$(az acr check-name -n phdi${TF_ENV}registry${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az acr network-rule add \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --name phdi${TF_ENV}registry${SHORT_CID} \
+              --ip-address $RUNNER_IP
+          fi
 
       - name: Cache Docker images
         uses: ScribeMD/docker-cache@0.2.7
@@ -93,7 +120,7 @@ jobs:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
         run: |
           terraform init -backend-config=backend.tfvars
-          terraform workspace new $TF_ENV || terraform workspace select $TF_ENV
+          terraform workspace select $TF_ENV || terraform workspace new $TF_ENV
           terraform apply -auto-approve -lock-timeout=30m
 
       - name: Setup Python Environment
