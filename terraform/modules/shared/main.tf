@@ -439,12 +439,8 @@ resource "azurerm_private_endpoint" "postgres" {
   }
 
   private_dns_zone_group {
-    name = "phdi${terraform.workspace}postgres-pdzg"
-
-    private_dns_zone_configs {
-      name                = "postgres"
-      private_dns_zone_id = azurerm_private_dns_zone.postgres.id
-    }
+    name                 = "phdi${terraform.workspace}postgres-pdzg"
+    private_dns_zone_ids = [azurerm_private_dns_zone.postgres.id]
   }
 }
 
