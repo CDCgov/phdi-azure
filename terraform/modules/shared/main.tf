@@ -259,10 +259,10 @@ resource "azurerm_subnet" "phdi" {
 }
 
 resource "azurerm_subnet" "functionapp" {
-  name                = "phdi-${terraform.workspace}-functionapp-subnet"
-  resource_group_name = var.resource_group_name
-  virtual_network_id  = azurerm_virtual_network.phdi.id
-  address_prefixes    = ["10.0.8.0/21"]
+  name                 = "phdi-${terraform.workspace}-functionapp-subnet"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.phdi.name
+  address_prefixes     = ["10.0.8.0/21"]
 
   delegation {
     name = "functionapp"
