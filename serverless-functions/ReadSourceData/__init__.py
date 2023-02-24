@@ -100,6 +100,38 @@ def main(event: func.EventGridEvent) -> None:
         # TODO Determine how to incorporate RR directly in eICR when creating the
         # message. We want to import from phdi python package function to takes things
         # from RR and adds them into the eICR where appropriate.
+        # Pseudocode
+        # In the reportability_response
+        #   get the following root level fields and save them
+        #       templateId
+        #       id with root
+        #       code
+        #       title
+        #       effectiveTime
+        #       confidentialityCode
+        #
+        #   for all <entry typeCode="DRIV"> fields in the reportability_response:
+        #       if <organizer classCode="CLUSTER" moodCode="EVN">
+        #           grab that whole <entry> and save it
+        #
+        # in the ecr:
+        #   check to see if the first line contains xmlns:xsi like this:
+        #       <ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        #   if it doesn't have the xmlns:xsi field, add it to the <Clinical Document line
+        #
+        #   create a new <section></section> at the root level of the document (at the end/bottom)
+        #   
+        #   put these fields retrieved and saved above in the <section>
+        #       templateId
+        #       id with root
+        #       code
+        #       title
+        #       effectiveTime
+        #       confidentialityCode
+        #       <entry>
+        #
+        # DONE!
+
         messages = [ecr]
 
     # Handle batch Hl7v2 messages.
