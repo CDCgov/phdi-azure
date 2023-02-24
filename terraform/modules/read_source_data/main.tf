@@ -8,7 +8,7 @@ resource "azurerm_storage_account" "function_app_sa" {
   network_rules {
     default_action             = "Deny"
     bypass                     = ["None"]
-    virtual_network_subnet_ids = [var.subnet_id]
+    virtual_network_subnet_ids = [var.subnet_id, var.functionapp_subnet_id]
     ip_rules                   = [data.http.runner_ip.response_body]
   }
 }
@@ -48,7 +48,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
   service_plan_id            = azurerm_service_plan.function_app_sp.id
   storage_account_name       = azurerm_storage_account.function_app_sa.name
   storage_account_access_key = azurerm_storage_account.function_app_sa.primary_access_key
-  virtual_network_subnet_id  = var.subnet_id
+  virtual_network_subnet_id  = var.functionapp_subnet_id
 
   identity {
     type         = "UserAssigned"

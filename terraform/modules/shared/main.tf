@@ -256,6 +256,13 @@ resource "azurerm_subnet" "phdi" {
     "Microsoft.EventHub",
     "Microsoft.Web",
   ]
+}
+
+resource "azurerm_subnet" "functionapp" {
+  name                = "phdi-${terraform.workspace}-functionapp-subnet"
+  resource_group_name = var.resource_group_name
+  virtual_network_id  = azurerm_virtual_network.phdi.id
+  address_prefixes    = ["10.0.8.0/21"]
 
   delegation {
     name = "functionapp"
@@ -266,27 +273,10 @@ resource "azurerm_subnet" "phdi" {
     }
   }
 
-  delegation {
-    name = "containerapp"
-
-    service_delegation {
-      name    = "Microsoft.ContainerInstance/containerGroups"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
-    }
-  }
-
-  delegation {
-    name = "postgresql"
-
-    service_delegation {
-      name    = "Microsoft.DBforPostgreSQL/singleServers"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
-    }
-  }
 }
 
 resource "azurerm_private_dns_zone" "postgres" {
-  name                = "postgres.database.azure.com"
+  name                = "phdi${terraform.workspace}postgres.postgres.database.azure.com"
   resource_group_name = var.resource_group_name
 }
 

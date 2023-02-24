@@ -51,3 +51,7 @@ output "hapi_container_url" {
 output "subnet_id" {
   value = azurerm_subnet.phdi.id
 }
+
+output "functionapp_subnet_id" {
+  value = azurerm_subnet.functionapp.id
+}

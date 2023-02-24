@@ -52,3 +52,8 @@ variable "subnet_id" {
   type        = string
   description = "The ID of the subnet in which to create the resources."
 }
+
+variable "functionapp_subnet_id" {
+  type        = string
+  description = "The ID of the subnet in which to create the function app."
+}
