@@ -4,18 +4,24 @@ resource "azurerm_storage_account" "function_app_sa" {
   location                 = var.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-
-  network_rules {
-    default_action             = "Deny"
-    bypass                     = ["None"]
-    virtual_network_subnet_ids = [var.subnet_id, var.functionapp_subnet_id]
-    ip_rules                   = [data.http.runner_ip.response_body]
-  }
 }
 
 resource "azurerm_storage_container" "read_source_data" {
   name                 = "read-source-data"
   storage_account_name = azurerm_storage_account.function_app_sa.name
+}
+
+resource "azurerm_storage_account_network_rules" "function_app_sa_network_rules" {
+  storage_account_id = azurerm_storage_account.function_app_sa.id
+
+  default_action             = "Deny"
+  bypass                     = ["None"]
+  virtual_network_subnet_ids = [var.subnet_id, var.functionapp_subnet_id]
+  ip_rules                   = [data.http.runner_ip.response_body]
+
+  depends_on = [
+    azurerm_storage_container.read_source_data,
+  ]
 }
 
 resource "azurerm_service_plan" "function_app_sp" {

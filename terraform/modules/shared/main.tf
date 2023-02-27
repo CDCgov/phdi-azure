@@ -16,13 +16,6 @@ resource "azurerm_storage_account" "phi" {
   lifecycle {
     prevent_destroy = false
   }
-
-  network_rules {
-    default_action             = "Deny"
-    bypass                     = ["None"]
-    virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
-    ip_rules                   = [data.http.runner_ip.response_body]
-  }
 }
 
 resource "azurerm_storage_container" "source_data" {
@@ -75,6 +68,22 @@ resource "azurerm_storage_share" "tables" {
   storage_account_name = azurerm_storage_account.phi.name
   quota                = 50
   enabled_protocol     = "SMB"
+}
+
+resource "azurerm_storage_account_network_rules" "phi" {
+  storage_account_id = azurerm_storage_account.phi.id
+
+  default_action             = "Deny"
+  bypass                     = ["None"]
+  virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
+  ip_rules                   = [data.http.runner_ip.response_body]
+
+  depends_on = [
+    azurerm_storage_container.source_data,
+    azurerm_storage_container.fhir_conversion_failures_container_name,
+    azurerm_storage_container.fhir_upload_failures_container_name,
+    azurerm_storage_share.tables,
+  ]
 }
 
 ##### Key Vault #####
@@ -263,6 +272,10 @@ resource "azurerm_subnet" "functionapp" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.phdi.name
   address_prefixes     = ["10.0.8.0/21"]
+
+  service_endpoints = [
+    "Microsoft.Storage",
+  ]
 
   delegation {
     name = "functionapp"
