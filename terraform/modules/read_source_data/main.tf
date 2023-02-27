@@ -29,7 +29,7 @@ resource "azurerm_service_plan" "function_app_sp" {
   location            = var.location
   resource_group_name = var.resource_group_name
   os_type             = "Linux"
-  sku_name            = "Y1"
+  sku_name            = "P1v2"
 }
 
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
