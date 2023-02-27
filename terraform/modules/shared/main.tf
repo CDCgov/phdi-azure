@@ -177,6 +177,10 @@ resource "azurerm_container_registry" "phdi_registry" {
       ip_range = "${data.http.runner_ip.response_body}/32"
     }
   }
+
+  depends_on = [
+    azurerm_subnet.phdi
+  ]
 }
 
 terraform {
