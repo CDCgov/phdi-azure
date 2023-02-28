@@ -89,29 +89,16 @@ jobs:
           RUNNER_IP: ${{ steps.set-environment.outputs.runner_ip }}
         run: |
           if [[ "$(az storage account check-name -n phdi${TF_ENV}phi${SHORT_CID} --query nameAvailable)" == "false" ]]; then
-            az storage account network-rule add \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --account-name phdi${TF_ENV}phi${SHORT_CID} \
-              --ip-address $RUNNER_IP
+            az storage account network-rule add --account-name phdi${TF_ENV}phi${SHORT_CID} --ip-address $RUNNER_IP
           fi
           if [[ "$(az storage account check-name -n phdi${TF_ENV}funcs${SHORT_CID} --query nameAvailable)" == "false" ]]; then
-            az storage account network-rule add \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --account-name phdi${TF_ENV}funcs${SHORT_CID} \
-              --ip-address $RUNNER_IP
+            az storage account network-rule add --account-name phdi${TF_ENV}funcs${SHORT_CID} --ip-address $RUNNER_IP
           fi
           if [[ "$(az keyvault check-name -n ${TF_ENV}vault${SHORT_CID} --query nameAvailable)" == "false" ]]; then
-            az keyvault network-rule add \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --name ${TF_ENV}vault${SHORT_CID} \
-              --ip-address $RUNNER_IP
+            az keyvault network-rule add --name ${TF_ENV}vault${SHORT_CID} --ip-address $RUNNER_IP
           fi
           if [[ "$(az acr check-name -n phdi${TF_ENV}registry${SHORT_CID} --query nameAvailable)" == "false" ]]; then
-            az acr network-rule add \
-              --resource-group $RESOURCE_GROUP_NAME \
-              --name phdi${TF_ENV}registry${SHORT_CID} \
-              --ip-address $RUNNER_IP
-            
+            az acr network-rule add --name phdi${TF_ENV}registry${SHORT_CID} --ip-address $RUNNER_IP
             sleep 30
           fi
 
@@ -175,6 +162,27 @@ jobs:
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
             --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
             --endpoint-type azurefunction
+
+      - name: Remove IP Whitelist
+        if: always()
+        env:
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          RUNNER_IP: ${{ steps.set-environment.outputs.runner_ip }}
+        run: |
+          if [[ "$(az storage account check-name -n phdi${TF_ENV}phi${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az storage account network-rule remove --account-name phdi${TF_ENV}phi${SHORT_CID} --ip-address $RUNNER_IP
+          fi
+          if [[ "$(az storage account check-name -n phdi${TF_ENV}funcs${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az storage account network-rule remove --account-name phdi${TF_ENV}funcs${SHORT_CID} --ip-address $RUNNER_IP
+          fi
+          if [[ "$(az keyvault check-name -n ${TF_ENV}vault${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az keyvault network-rule remove --name ${TF_ENV}vault${SHORT_CID} --ip-address $RUNNER_IP
+          fi
+          if [[ "$(az acr check-name -n phdi${TF_ENV}registry${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az acr network-rule remove --name phdi${TF_ENV}registry${SHORT_CID} --ip-address $RUNNER_IP
+          fi
 
   end-to-end:
     name: End-to-end tests
