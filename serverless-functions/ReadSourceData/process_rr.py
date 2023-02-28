@@ -33,19 +33,23 @@ json_data_ecr = json.dumps(data_dict_ecr)
 
 # Write the json data to output
 # json file
-jsonified_ecr_file_name = "jsonified_CDA_eICR.xml"
 jsonified_rr_file_name = "jsonified_CDA_RR.xml"
+jsonified_ecr_file_name = "jsonified_CDA_eICR.xml"
 with open(jsonified_rr_file_name, "w") as json_file:
     json_file.write(json_data_rr)
 with open(jsonified_ecr_file_name, "w") as json_file:
     json_file.write(json_data_ecr)
 
 # Everything works from here, given we jsonified the xml files correctly
-# (currently not jsonified correctly so it fails on lines 47-48)
+# (currently not jsonified correctly so it fails on lines 48-49)
+# Read and parse the file
 
-# Read and parse the files
-ecr = json.loads(Path(jsonified_ecr_file_name).read_text())
+# this does not work
 rr = json.loads(Path(jsonified_rr_file_name).read_text())
+ecr = json.loads(Path(jsonified_ecr_file_name).read_text())
+# this works
+# rr = json.loads(Path("sample_jsonified_CDA_RR.xml").read_text())
+# ecr = json.loads(Path("sample_jsonified_CDA_eICR.xml").read_text())
 
 ecr = etree.fromstring(ecr)
 rr = etree.fromstring(rr)
