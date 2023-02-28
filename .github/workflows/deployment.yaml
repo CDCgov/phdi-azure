@@ -90,16 +90,10 @@ jobs:
         run: |
           if [[ "$(az storage account check-name -n phdi${TF_ENV}phi${SHORT_CID} --query nameAvailable)" == "false" ]]; then
             az storage account network-rule add --account-name phdi${TF_ENV}phi${SHORT_CID} --ip-address $RUNNER_IP
-          fi
-          if [[ "$(az storage account check-name -n phdi${TF_ENV}funcs${SHORT_CID} --query nameAvailable)" == "false" ]]; then
             az storage account network-rule add --account-name phdi${TF_ENV}funcs${SHORT_CID} --ip-address $RUNNER_IP
-          fi
-          if [[ "$(az keyvault check-name -n ${TF_ENV}vault${SHORT_CID} --query nameAvailable)" == "false" ]]; then
             az keyvault network-rule add --name ${TF_ENV}vault${SHORT_CID} --ip-address $RUNNER_IP
-          fi
-          if [[ "$(az acr check-name -n phdi${TF_ENV}registry${SHORT_CID} --query nameAvailable)" == "false" ]]; then
             az acr network-rule add --name phdi${TF_ENV}registry${SHORT_CID} --ip-address $RUNNER_IP
-            sleep 600
+            sleep 60
           fi
 
       - name: Cache Docker images
