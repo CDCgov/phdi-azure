@@ -99,7 +99,7 @@ jobs:
           fi
           if [[ "$(az acr check-name -n phdi${TF_ENV}registry${SHORT_CID} --query nameAvailable)" == "false" ]]; then
             az acr network-rule add --name phdi${TF_ENV}registry${SHORT_CID} --ip-address $RUNNER_IP
-            sleep 300
+            sleep 600
           fi
 
       - name: Cache Docker images

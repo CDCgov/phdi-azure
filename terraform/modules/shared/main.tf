@@ -74,7 +74,7 @@ resource "azurerm_storage_account_network_rules" "phi" {
   storage_account_id = azurerm_storage_account.phi.id
 
   default_action             = "Deny"
-  bypass                     = ["None"]
+  bypass                     = ["AzureServices", "Logging", "Metrics"]
   virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
   ip_rules                   = [chomp(data.http.runner_ip.response_body)]
 
@@ -130,7 +130,7 @@ resource "azurerm_key_vault" "phdi_key_vault" {
 
   network_acls {
     default_action             = "Deny"
-    bypass                     = "None"
+    bypass                     = "AzureServices"
     virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
     ip_rules                   = [chomp(data.http.runner_ip.response_body)]
   }
@@ -164,7 +164,7 @@ resource "azurerm_container_registry" "phdi_registry" {
   location                   = var.location
   sku                        = "Premium"
   admin_enabled              = true
-  network_rule_bypass_option = "None"
+  network_rule_bypass_option = "AzureServices"
 
   network_rule_set {
     default_action = "Deny"

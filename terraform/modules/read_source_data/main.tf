@@ -15,7 +15,7 @@ resource "azurerm_storage_account_network_rules" "function_app_sa_network_rules"
   storage_account_id = azurerm_storage_account.function_app_sa.id
 
   default_action             = "Deny"
-  bypass                     = ["None"]
+  bypass                     = ["AzureServices", "Logging", "Metrics"]
   virtual_network_subnet_ids = [var.subnet_id, var.functionapp_subnet_id]
   ip_rules                   = [chomp(data.http.runner_ip.response_body)]
 
