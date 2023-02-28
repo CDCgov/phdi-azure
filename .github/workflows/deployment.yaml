@@ -93,6 +93,7 @@ jobs:
             az storage account network-rule add --account-name phdi${TF_ENV}funcs${SHORT_CID} --ip-address $RUNNER_IP
             az keyvault network-rule add --name ${TF_ENV}vault${SHORT_CID} --ip-address $RUNNER_IP
             az acr network-rule add --name phdi${TF_ENV}registry${SHORT_CID} --ip-address $RUNNER_IP
+            sleep 30
           fi
 
       - name: Cache Docker images
