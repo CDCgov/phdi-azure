@@ -1,19 +1,51 @@
 from lxml import etree
 import json
 from pathlib import Path
+import xmltodict
 
-# TODO function-ify the code to take rr + ecr file inputs
-# return a single ecr file
-# will need to take the raw xml, jsonify it,
-# and convert back to xml to return
+# TODO Convert the code to the body of a function
+# called `process_rr` that takes the rr and ecr read
+# from blob storage. process_rr will get called in the
+# ReadSourceData main function and process_rr will send
+# back an xml file
+# (this is way too much code to put directly in the file)
+# def process_rr(rr, ecr) -> __file__:
+
+# TODO Get jsonifying files to work properly so the
+# processing works. Need to convert the xml pulled
+# directly from blob storage, currently using the two
+# files below for testing
 
 # Get the RR and eICR files
-ecr_file_name = "jsonified_CDA_eICR.xml"
-rr_file_name = "jsonified_CDA_RR.xml"
+# (eventually want to just use the parameters passed in
+# instead of these hard coded testing files)
+ecr_file_name = 'CDA_eICR.xml'
+rr_file_name = 'CDA_RR.xml'
+with open(rr_file_name, 'r') as rr_file:
+    data_dict_rr = xmltodict.parse(rr_file.read())
+with open(ecr_file_name, 'r') as ecr_file:
+    data_dict_ecr = xmltodict.parse(ecr_file.read())
+
+# generate the object using json.dumps()
+# corresponding to json data
+json_data_rr = json.dumps(data_dict_rr)
+json_data_ecr = json.dumps(data_dict_ecr)
+
+# Write the json data to output
+# json file
+jsonified_ecr_file_name = "jsonified_CDA_eICR.xml"
+jsonified_rr_file_name = "jsonified_CDA_RR.xml"
+with open(jsonified_rr_file_name, "w") as json_file:
+    json_file.write(json_data_rr)
+with open(jsonified_ecr_file_name, "w") as json_file:
+    json_file.write(json_data_ecr)
+
+# Everything works from here, given we jsonified the xml files correctly
+# (currently not jsonified correctly so it fails on lines 47-48)
 
 # Read and parse the files
-ecr = json.loads(Path(ecr_file_name).read_text())
-rr = json.loads(Path(rr_file_name).read_text())
+ecr = json.loads(Path(jsonified_ecr_file_name).read_text())
+rr = json.loads(Path(jsonified_rr_file_name).read_text())
 
 ecr = etree.fromstring(ecr)
 rr = etree.fromstring(rr)
@@ -77,6 +109,10 @@ print(all_sections[0][3].tag)
 print(all_sections[0][4].tag)
 print(all_sections[0][5].tag)
 print(all_sections[0][6].tag)
+
+# TODO Need to convert the jsonified ecr back to xml
+# because that's what ReadSourceData expects
+# return ecr
 
 # Garbage -->
 
