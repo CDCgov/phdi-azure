@@ -76,7 +76,7 @@ resource "azurerm_storage_account_network_rules" "phi" {
   default_action             = "Deny"
   bypass                     = ["None"]
   virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
-  ip_rules                   = [data.http.runner_ip.response_body]
+  ip_rules                   = [chomp(data.http.runner_ip.response_body)]
 
   depends_on = [
     azurerm_storage_container.source_data,
@@ -132,7 +132,7 @@ resource "azurerm_key_vault" "phdi_key_vault" {
     default_action             = "Deny"
     bypass                     = "None"
     virtual_network_subnet_ids = [azurerm_subnet.phdi.id]
-    ip_rules                   = [data.http.runner_ip.response_body]
+    ip_rules                   = [chomp(data.http.runner_ip.response_body)]
   }
 }
 
@@ -174,7 +174,7 @@ resource "azurerm_container_registry" "phdi_registry" {
     }
     ip_rule {
       action   = "Allow"
-      ip_range = "${data.http.runner_ip.response_body}/32"
+      ip_range = "${chomp(data.http.runner_ip.response_body)}/32"
     }
   }
 

@@ -17,7 +17,7 @@ resource "azurerm_storage_account_network_rules" "function_app_sa_network_rules"
   default_action             = "Deny"
   bypass                     = ["None"]
   virtual_network_subnet_ids = [var.subnet_id, var.functionapp_subnet_id]
-  ip_rules                   = [data.http.runner_ip.response_body]
+  ip_rules                   = [chomp(data.http.runner_ip.response_body)]
 
   depends_on = [
     azurerm_storage_container.read_source_data,
