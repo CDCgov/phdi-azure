@@ -44,6 +44,18 @@ jobs:
           fi
           )" >> $GITHUB_OUTPUT
           echo "short_cid=${CLIENT_ID:0:8}" >> $GITHUB_OUTPUT
+          echo "runner_ip=$(curl -s https://api.ipify.org/)" >> $GITHUB_OUTPUT
+      - name: Whitelist runner IP
+        env:
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          RUNNER_IP: ${{ steps.set-environment.outputs.runner_ip }}
+        run: |
+          if [[ "$(az storage account check-name -n phdi${TF_ENV}phi${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az storage account network-rule add --account-name phdi${TF_ENV}phi${SHORT_CID} --ip-address $RUNNER_IP
+            sleep 30
+          fi
       - name: Upload sample data
         id: upload-sample-data
         env:
@@ -102,3 +114,15 @@ jobs:
           echo "FHIR server query succeeded! Deleting sample data..."
           az storage blob delete --account-name phdi${TF_ENV}phi${SHORT_CID} --container-name source-data --name vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7
           curl -X DELETE --header "Authorization: Bearer $TOKEN" "https://${TF_ENV}fhir${SHORT_CID}.azurehealthcareapis.com/Patient?identifier=${PATIENT_ID}&hardDelete=true"
+
+      - name: Remove IP Whitelist
+        if: always()
+        env:
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          RUNNER_IP: ${{ steps.set-environment.outputs.runner_ip }}
+        run: |
+          if [[ "$(az storage account check-name -n phdi${TF_ENV}phi${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az storage account network-rule remove --account-name phdi${TF_ENV}phi${SHORT_CID} --ip-address $RUNNER_IP
+          fi

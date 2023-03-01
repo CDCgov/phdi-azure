@@ -82,6 +82,22 @@ jobs:
           fi
           )" >> $GITHUB_OUTPUT
           echo "short_cid=${CLIENT_ID:0:8}" >> $GITHUB_OUTPUT
+          echo "runner_ip=$(curl -s https://api.ipify.org/)" >> $GITHUB_OUTPUT
+
+      - name: Whitelist runner IP
+        env:
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          RUNNER_IP: ${{ steps.set-environment.outputs.runner_ip }}
+        run: |
+          if [[ "$(az storage account check-name -n phdi${TF_ENV}phi${SHORT_CID} --query nameAvailable)" == "false" ]]; then
+            az storage account network-rule add --account-name phdi${TF_ENV}phi${SHORT_CID} --ip-address $RUNNER_IP
+            az storage account network-rule add --account-name phdi${TF_ENV}funcs${SHORT_CID} --ip-address $RUNNER_IP
+            az keyvault network-rule add --name ${TF_ENV}vault${SHORT_CID} --ip-address $RUNNER_IP
+            az acr network-rule add --name phdi${TF_ENV}registry${SHORT_CID} --ip-address $RUNNER_IP
+            sleep 30
+          fi
 
       - name: Destroy environment
         env:
