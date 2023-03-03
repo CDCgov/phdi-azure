@@ -594,10 +594,10 @@ resource "azurerm_private_dns_zone" "evhns_private_link" {
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "evhns_private_link" {
-  name                  = "phdi-${terraform.workspace}-servicebus_privatelink"
+  name                  = "phdi-${terraform.workspace}-servicebus-privatelink"
   resource_group_name   = var.resource_group_name
   private_dns_zone_name = azurerm_private_dns_zone.evhns_private_link.name
-  virtual_network_id    = azurerm_subnet.phdi.id
+  virtual_network_id    = azurerm_virtual_network.phdi.id
 }
 
 resource "azurerm_private_endpoint" "evhns_private_endpoint" {
