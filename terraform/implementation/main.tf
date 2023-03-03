@@ -46,4 +46,5 @@ module "read_source_data" {
   sleep_time                = 1
   subnet_id                 = module.shared.subnet_id
   functionapp_subnet_id     = module.shared.functionapp_subnet_id
+  eventhub_name             = module.shared.eventhub_name
 }

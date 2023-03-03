@@ -12,7 +12,7 @@ from phdi.harmonization.hl7 import (
 )
 
 
-def main(event: func.EventGridEvent) -> None:
+def main(event: func.EventHubEvent) -> None:
     """
     When this function is triggered with a blob payload, read the new file if its
     name begins with 'source-data/', identify each individual messsage
@@ -25,6 +25,17 @@ def main(event: func.EventGridEvent) -> None:
     :param blob: An input stream of the blob that was uploaded to the blob storage
     :return: None
     """
+
+    logging.info(
+        f"Function triggered to process a message: {event.get_body().decode()}"
+    )
+    logging.info(f"  EnqueuedTimeUtc = {event.enqueued_time}")
+    logging.info(f"  SequenceNumber = {event.sequence_number}")
+    logging.info(f"  Offset = {event.offset}")
+
+    # Metadata
+    for key in event.metadata:
+        logging.info(f"Metadata: {key} = {event.metadata[key]}")
 
     # Get blob info
     container_name = "source-data"

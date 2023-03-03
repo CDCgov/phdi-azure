@@ -86,6 +86,51 @@ resource "azurerm_storage_account_network_rules" "phi" {
   ]
 }
 
+locals {
+  storage_types = toset([
+    "blob",
+    "file",
+    "queue",
+    "table",
+  ])
+}
+
+resource "azurerm_private_dns_zone" "storage" {
+  for_each            = local.storage_types
+  name                = "privatelink.${each.key}.core.windows.net"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "storage" {
+  for_each              = local.storage_types
+  name                  = "${each.key}_privatelink"
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = azurerm_private_dns_zone.storage[each.key].name
+  virtual_network_id    = azurerm_virtual_network.phdi.id
+}
+
+resource "azurerm_private_endpoint" "storage" {
+  for_each            = local.storage_types
+  name                = "phdi${terraform.workspace}storage${each.key}${substr(var.client_id, 0, 8)}"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  subnet_id           = azurerm_subnet.phdi.id
+
+  private_service_connection {
+    name                           = "phdi-${terraform.workspace}-${each.key}-private-service-connection"
+    private_connection_resource_id = azurerm_storage_account.phi.id
+    is_manual_connection           = false
+    subresource_names = [
+      "${each.key}"
+    ]
+  }
+
+  private_dns_zone_group {
+    name                 = "phdi-${terraform.workspace}-storage-${each.key}-private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.storage[each.key].id]
+  }
+}
+
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
@@ -154,6 +199,37 @@ resource "azurerm_key_vault_secret" "smarty_auth_token" {
   name         = "smarty-auth-token"
   value        = var.smarty_auth_token
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_private_dns_zone" "kv_private_link" {
+  name                = "privatelink.vaultcore.azure.net"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "kv_private_link" {
+  name                  = "phdi-${terraform.workspace}-keyvault-privatelink"
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = azurerm_private_dns_zone.kv_private_link.name
+  virtual_network_id    = azurerm_virtual_network.phdi.id
+}
+
+resource "azurerm_private_endpoint" "kv_private_endpoint" {
+  name                = "phdi-${terraform.workspace}-keyvault-private-endpoint"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  subnet_id           = azurerm_subnet.phdi.id
+
+  private_service_connection {
+    name                           = "phdi-${terraform.workspace}-keyvault-private-service-connection"
+    private_connection_resource_id = azurerm_key_vault.phdi_key_vault.id
+    subresource_names              = ["vault"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "phdi-${terraform.workspace}-keyvault-private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.kv_private_link.id]
+  }
 }
 
 ##### Container registry #####
@@ -293,7 +369,7 @@ resource "azurerm_subnet" "functionapp" {
 }
 
 resource "azurerm_private_dns_zone" "postgres" {
-  name                = "phdi${terraform.workspace}postgres.postgres.database.azure.com"
+  name                = "postgres.database.azure.com"
   resource_group_name = var.resource_group_name
 }
 
@@ -483,4 +559,62 @@ resource "azurerm_communication_service" "communication_service" {
   name                = "${terraform.workspace}communication${substr(var.client_id, 0, 8)}"
   resource_group_name = var.resource_group_name
   data_location       = "United States"
+}
+
+##### Event Hub #####
+
+resource "azurerm_eventhub_namespace" "evhns" {
+  name                = "phdi-${terraform.workspace}-evhns"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  sku                 = "Standard"
+
+  network_rulesets {
+    default_action                 = "Deny"
+    trusted_service_access_enabled = false
+
+    virtual_network_rule {
+      ignore_missing_virtual_network_service_endpoint = false
+      subnet_id                                       = azurerm_subnet.phdi.id
+    }
+  }
+}
+
+resource "azurerm_eventhub" "evh" {
+  name                = "phdi-${terraform.workspace}-evh"
+  resource_group_name = var.resource_group_name
+  namespace_name      = azurerm_eventhub_namespace.evhns.name
+  partition_count     = 32
+  message_retention   = 1
+}
+
+resource "azurerm_private_dns_zone" "evhns_private_link" {
+  name                = "privatelink.servicebus.windows.net"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "evhns_private_link" {
+  name                  = "phdi-${terraform.workspace}-servicebus_privatelink"
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = azurerm_private_dns_zone.evhns_private_link.name
+  virtual_network_id    = azurerm_subnet.phdi.id
+}
+
+resource "azurerm_private_endpoint" "evhns_private_endpoint" {
+  name                = "phdi-${terraform.workspace}-evhns-private-endpoint"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  subnet_id           = azurerm_subnet.phdi.id
+
+  private_service_connection {
+    name                           = "phdi-${terraform.workspace}-evhns-private-endpoint-psc"
+    private_connection_resource_id = azurerm_eventhub_namespace.evhns.id
+    subresource_names              = ["namespace"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "phdi-${terraform.workspace}-event-hub-private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.evhns_private_link.id]
+  }
 }

@@ -55,3 +55,11 @@ output "subnet_id" {
 output "functionapp_subnet_id" {
   value = azurerm_subnet.functionapp.id
 }
+
+output "eventhub_name" {
+  value = azurerm_eventhub.evh.name
+}
+
+output "eventhub_connection_string" {
+  value = azurerm_eventhub_namespace.evhns.default_primary_connection_string
+}

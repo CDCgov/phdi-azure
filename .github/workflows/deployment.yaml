@@ -106,10 +106,20 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select $TF_ENV || terraform workspace new $TF_ENV
+
+          STORAGE_TYPES=('blob' 'file' 'queue' 'table')
+          for STORAGE_TYPE in "${STORAGE_TYPES[@]}"; do
+            terraform import module.shared.azurerm_private_dns_zone.storage["$STORAGE_TYPE"] /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.$STORAGE_TYPE.core.windows.net || true
+          done
+          terraform import module.shared.azurerm_private_dns_zone.kv_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net || true
+          terraform import module.shared.azurerm_private_dns_zone.postgres /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/postgres.database.azure.com || true
+          terraform import module.shared.azurerm_private_dns_zone.evhns_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.servicebus.windows.net || true
+
           terraform apply -auto-approve -lock-timeout=30m
 
       - name: Setup Python Environment
@@ -157,8 +167,9 @@ jobs:
               --source-resource-id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageaccounts/phdi${TF_ENV}phi${SHORT_CID}" \
               --included-event-types Microsoft.Storage.BlobCreated \
               --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
-              --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
-              --endpoint-type azurefunction
+              --delivery-identity systemassigned \
+              --delivery-identity-endpoint-type eventhub \
+              --delivery-identity-endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.EventHub/namespaces/phdi-${TF_ENV}-evhns/eventhubs/phdi-${TF_ENV}-evh"
           fi
 
       - name: Remove IP Whitelist
