@@ -111,6 +111,7 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select $TF_ENV || terraform workspace new $TF_ENV
+          terraform apply -target module.shared.azurerm_container_registry.phdi_registry -auto-approve -lock-timeout=30m
 
           STORAGE_TYPES=('blob' 'file' 'queue' 'table')
           for STORAGE_TYPE in "${STORAGE_TYPES[@]}"; do
