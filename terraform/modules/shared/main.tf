@@ -635,12 +635,13 @@ resource "azurerm_eventgrid_system_topic" "phi" {
 
 resource "azurerm_eventgrid_system_topic_event_subscription" "phi" {
   name                 = "phdi${terraform.workspace}phisubscription"
-  scope                = azurerm_eventgrid_system_topic.phi.id
+  system_topic         = azurerm_eventgrid_system_topic.phi.id
+  resource_group_name  = var.resource_group_name
   eventhub_endpoint_id = azurerm_eventhub.evh.id
   included_event_types = ["Microsoft.Storage.BlobCreated"]
   delivery_identity {
-    type                        = "UserAssigned"
-    user_user_assigned_identity = azurerm_user_assigned_identity.pipeline_runner.id
+    type                   = "UserAssigned"
+    user_assigned_identity = azurerm_user_assigned_identity.pipeline_runner.id
   }
   subject_filter {
     subject_begins_with = "/blobServices/default/containers/source-data/blobs"
