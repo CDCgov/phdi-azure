@@ -618,3 +618,31 @@ resource "azurerm_private_endpoint" "evhns_private_endpoint" {
     private_dns_zone_ids = [azurerm_private_dns_zone.evhns_private_link.id]
   }
 }
+
+##### Event Grid #####
+
+resource "azurerm_eventgrid_system_topic" "phi" {
+  name                   = "phdi${terraform.workspace}phitopic"
+  resource_group_name    = var.resource_group_name
+  location               = var.location
+  source_arm_resource_id = azurerm_storage_account.phi.id
+  topic_type             = "Microsoft.Storage.StorageAccounts"
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+  }
+}
+
+resource "azurerm_eventgrid_system_topic_event_subscription" "phi" {
+  name                 = "phdi${terraform.workspace}phisubscription"
+  scope                = azurerm_eventgrid_system_topic.phi.id
+  eventhub_endpoint_id = azurerm_eventhub.evh.id
+  included_event_types = ["Microsoft.Storage.BlobCreated"]
+  delivery_identity {
+    type                        = "UserAssigned"
+    user_user_assigned_identity = azurerm_user_assigned_identity.pipeline_runner.id
+  }
+  subject_filter {
+    subject_begins_with = "/blobServices/default/containers/source-data/blobs"
+  }
+}
