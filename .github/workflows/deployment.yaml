@@ -101,7 +101,7 @@ jobs:
         with:
           key: docker-${{ runner.os }}-${{ hashFiles('**/LICENSE') }}
 
-      - name: terraform
+      - name: terraform setup
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
@@ -114,13 +114,18 @@ jobs:
 
           STORAGE_TYPES=('blob' 'file' 'queue' 'table')
           for STORAGE_TYPE in "${STORAGE_TYPES[@]}"; do
-            terraform import module.shared.azurerm_private_dns_zone.storage["$STORAGE_TYPE"] /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.$STORAGE_TYPE.core.windows.net || true
+            terraform import module.shared.azurerm_private_dns_zone.storage[\"${STORAGE_TYPE}\"] /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.$STORAGE_TYPE.core.windows.net || true
           done
           terraform import module.shared.azurerm_private_dns_zone.kv_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net || true
           terraform import module.shared.azurerm_private_dns_zone.postgres /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/postgres.database.azure.com || true
           terraform import module.shared.azurerm_private_dns_zone.evhns_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.servicebus.windows.net || true
 
-          terraform apply -auto-approve -lock-timeout=30m
+      - name: terraform apply
+        env:
+          ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        run: terraform apply -auto-approve -lock-timeout=30m
 
       - name: Setup Python Environment
         uses: actions/setup-python@v1
