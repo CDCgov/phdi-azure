@@ -10,10 +10,7 @@ from phdi.cloud.azure import AzureCredentialManager, AzureCloudContainerConnecti
 from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
-from lxml import etree
-import json
-from pathlib import Path
-import xmltodict
+from process_rr import rr_to_ecr
 
 
 def main(event: func.EventGridEvent) -> None:
@@ -101,7 +98,7 @@ def main(event: func.EventGridEvent) -> None:
             return
 
         # Extract RR fields and put them in the ecr
-        ecr = process_rr(reportability_response, ecr)
+        ecr = rr_to_ecr(reportability_response, ecr)
 
         messages = [ecr]
 
