@@ -5,8 +5,8 @@
       "type": "eventHubTrigger",
       "name": "event",
       "direction": "in",
-      "eventHubName": "%EVENT_HUB_NAME%",
-      "connection": "EVENT_HUB_CONN_STR"
+      "eventHubName": "%eventHubName%",
+      "connection": "eventHubConnectionString"
     }
   ]
 }

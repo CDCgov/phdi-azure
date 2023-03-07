@@ -62,3 +62,8 @@ variable "eventhub_name" {
   type        = string
   description = "The name of the event hub."
 }
+
+variable "eventhub_connection_string" {
+  type        = string
+  description = "The connection string for the event hub."
+}

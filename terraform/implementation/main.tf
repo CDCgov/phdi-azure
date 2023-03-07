@@ -47,4 +47,5 @@ module "read_source_data" {
   subnet_id                 = module.shared.subnet_id
   functionapp_subnet_id     = module.shared.functionapp_subnet_id
   eventhub_name             = module.shared.eventhub_name
+  eventhub_connection_string = module.shared.eventhub_connection_string
 }

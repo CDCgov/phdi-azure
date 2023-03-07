@@ -73,8 +73,8 @@ resource "azurerm_linux_function_app" "read_source_data" {
     AZURE_SUBSCRIPTION_ID           = var.subscription_id
     WAIT_TIME                       = var.wait_time
     SLEEP_TIME                      = var.sleep_time
-    EVENT_HUB_NAME                  = var.eventhub_name
-    EVENT_HUB_CONN_STRING           = "privatelink.servicebus.windows.net"
+    eventHubName                    = var.eventhub_name
+    eventHubConnectionString        = var.eventhub_connection_string
   }
 
   lifecycle {
