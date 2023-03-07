@@ -571,7 +571,7 @@ resource "azurerm_eventhub_namespace" "evhns" {
 
   network_rulesets {
     default_action                 = "Deny"
-    trusted_service_access_enabled = false
+    trusted_service_access_enabled = true
 
     virtual_network_rule {
       ignore_missing_virtual_network_service_endpoint = false
@@ -619,12 +619,6 @@ resource "azurerm_private_endpoint" "evhns_private_endpoint" {
   }
 }
 
-resource "azurerm_role_assignment" "event_hub_owner" {
-  scope                = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
-  role_definition_name = "Azure Event Hubs Data Owner"
-  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
-}
-
 ##### Event Grid #####
 
 resource "azurerm_eventgrid_system_topic" "phi" {
@@ -634,9 +628,14 @@ resource "azurerm_eventgrid_system_topic" "phi" {
   source_arm_resource_id = azurerm_storage_account.phi.id
   topic_type             = "Microsoft.Storage.StorageAccounts"
   identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+    type = "SystemAssigned"
   }
+}
+
+resource "azurerm_role_assignment" "event_hub_data_sender" {
+  scope                = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  role_definition_name = "Azure Event Hubs Data Sender"
+  principal_id         = azurerm_eventgrid_system_topic.phi.identity[0].principal_id
 }
 
 resource "azurerm_eventgrid_system_topic_event_subscription" "phi" {
@@ -646,8 +645,7 @@ resource "azurerm_eventgrid_system_topic_event_subscription" "phi" {
   eventhub_endpoint_id = azurerm_eventhub.evh.id
   included_event_types = ["Microsoft.Storage.BlobCreated"]
   delivery_identity {
-    type                   = "UserAssigned"
-    user_assigned_identity = azurerm_user_assigned_identity.pipeline_runner.id
+    type = "SystemAssigned"
   }
   subject_filter {
     subject_begins_with = "/blobServices/default/containers/source-data/blobs"
