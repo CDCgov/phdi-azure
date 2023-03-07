@@ -620,7 +620,7 @@ resource "azurerm_private_endpoint" "evhns_private_endpoint" {
 }
 
 resource "azurerm_role_assignment" "event_hub_owner" {
-  scope                = "/subscriptions/${var.subscription_id}/resourceGroups/${var.resource_group_name}"
+  scope                = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
   role_definition_name = "Azure Event Hubs Data Owner"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
