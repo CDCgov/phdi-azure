@@ -3,3 +3,4 @@ azure-identity
 azure-mgmt-datafactory
 azure-storage-blob
 phdi
+lxml
