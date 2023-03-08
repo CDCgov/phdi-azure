@@ -174,7 +174,7 @@ def rr_to_ecr(rr, ecr):
 
     rr = etree.fromstring(rr)
     ecr = etree.fromstring(ecr)
-    
+
     # Create the tags for elements we'll be looking for
     rr_tags = [
         "templateId",
