@@ -171,6 +171,21 @@ def get_reportability_response(
 
 
 def rr_to_ecr(rr, ecr):
+    # storage_account_url = "https://phdidevphi9d194c64.blob.core.windows.net"
+    # container_name = "source-data"
+    # filename1 = "ecr/CDA_RR.xml"
+    # filename2 = "ecr/CDA_eICR.xml"
+
+    # cred_manager = AzureCredentialManager(resource_location=storage_account_url)
+    # cloud_container_connection = AzureCloudContainerConnection(
+    #     storage_account_url=storage_account_url, cred_manager=cred_manager
+    # )
+    # rr = cloud_container_connection.download_object(
+    #     container_name=container_name, filename=filename1
+    # )
+    # ecr = cloud_container_connection.download_object(
+    #     container_name=container_name, filename=filename2
+    # )
 
     rr = etree.fromstring(rr)
     ecr = etree.fromstring(ecr)
@@ -242,5 +257,7 @@ def rr_to_ecr(rr, ecr):
     # print(all_sections[0][4].tag)
     # print(all_sections[0][5].tag)
     # print(all_sections[0][6].tag)
+
+    ecr = etree.tostring(ecr, encoding='unicode', method='xml')
 
     return ecr
