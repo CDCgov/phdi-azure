@@ -3,6 +3,7 @@ from ReadSourceData import get_reportability_response
 from azure.core.exceptions import ResourceNotFoundError
 from unittest import mock
 import pytest
+import json
 
 
 @mock.patch("ReadSourceData.DataFactoryManagementClient")
@@ -40,12 +41,16 @@ def test_handle_batch_hl7(
     patched_adf_management_client.return_value = adf_client
 
     event = mock.MagicMock()
-    event.get_json.return_value = {
-        "url": (
-            "https://phdidevphi87b9f133.blob.core.windows.net/"
-            "source-data/elr/some-filename.hl7"
-        )
-    }
+    event.get_body.return_value.decode.return_value = json.dumps(
+        [
+            {
+                "url": (
+                    "https://phdidevphi87b9f133.blob.core.windows.net/"
+                    "source-data/elr/some-filename.hl7"
+                )
+            }
+        ]
+    )
 
     patched_batch_converter.return_value = ["some-message"]
 
@@ -99,12 +104,16 @@ def test_pipeline_trigger_success(
             root_template = "CCD"
 
         event = mock.MagicMock()
-        event.get_json.return_value = {
-            "url": (
-                "https://phdidevphi87b9f133.blob.core.windows.net/"
-                f"source-data/{source_data_subdirectory}/some-filename.hl7"
-            )
-        }
+        event.get_body.return_value.decode.return_value = json.dumps(
+            [
+                {
+                    "url": (
+                        "https://phdidevphi87b9f133.blob.core.windows.net/"
+                        f"source-data/{source_data_subdirectory}/some-filename.hl7"
+                    )
+                }
+            ]
+        )
         patched_batch_converter.return_value = ["some-message"]
 
         parameters = {
@@ -214,12 +223,16 @@ def test_handle_ecr_with_no_rr(
     patched_get_reportability_response.return_value = ""
 
     event = mock.MagicMock()
-    event.get_json.return_value = {
-        "url": (
-            "https://phdidevphi87b9f133.blob.core.windows.net/"
-            "source-data/ecr/12345eICR.xml"
-        )
-    }
+    event.get_body.return_value.decode.return_value = json.dumps(
+        [
+            {
+                "url": (
+                    "https://phdidevphi87b9f133.blob.core.windows.net/"
+                    "source-data/ecr/12345eICR.xml"
+                )
+            }
+        ]
+    )
 
     blob = mock.MagicMock()
     blob.name = "source-data/ecr/12345eICR.xml"
