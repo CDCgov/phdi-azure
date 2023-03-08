@@ -115,11 +115,27 @@ jobs:
 
           STORAGE_TYPES=('blob' 'file' 'queue' 'table')
           for STORAGE_TYPE in "${STORAGE_TYPES[@]}"; do
-            terraform import module.shared.azurerm_private_dns_zone.storage[\"${STORAGE_TYPE}\"] /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.$STORAGE_TYPE.core.windows.net || true
+            if terraform state list module.shared.azurerm_private_dns_zone.storage[\"${STORAGE_TYPE}\"]; then
+              echo "${STORAGE_TYPE} private DNS zone already imported"
+            else
+              terraform import module.shared.azurerm_private_dns_zone.storage[\"${STORAGE_TYPE}\"] /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.$STORAGE_TYPE.core.windows.net || true
+            fi
           done
-          terraform import module.shared.azurerm_private_dns_zone.kv_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net || true
-          terraform import module.shared.azurerm_private_dns_zone.postgres /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/postgres.database.azure.com || true
-          terraform import module.shared.azurerm_private_dns_zone.evhns_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.servicebus.windows.net || true
+          if terraform state list module.shared.azurerm_private_dns_zone.kv_private_link; then
+            echo "Key Vault private DNS zone already imported"
+          else
+            terraform import module.shared.azurerm_private_dns_zone.kv_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net || true
+          fi
+          if terraform state list module.shared.azurerm_private_dns_zone.postgres; then
+            echo "Postgres private DNS zone already imported"
+          else
+            terraform import module.shared.azurerm_private_dns_zone.postgres /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/postgres.database.azure.com || true
+          fi
+          if terraform state list module.shared.azurerm_private_dns_zone.evhns_private_link; then
+            echo "Event Hubs private DNS zone already imported"
+          else
+            terraform import module.shared.azurerm_private_dns_zone.evhns_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.servicebus.windows.net || true
+          fi
 
       - name: terraform apply
         env:
