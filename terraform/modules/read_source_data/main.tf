@@ -77,6 +77,8 @@ resource "azurerm_linux_function_app" "read_source_data" {
     EventHubConnection__clientId                = var.pipeline_runner_client_id
     EventHubConnection__credential              = "managedidentity"
     EventHubConnection__fullyQualifiedNamespace = "${var.eventhub_namespace_name}.servicebus.windows.net"
+    PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION      = "python"
+    PYTHON_ISOLATE_WORKER_DEPENDENCIES          = 1
   }
 
   lifecycle {

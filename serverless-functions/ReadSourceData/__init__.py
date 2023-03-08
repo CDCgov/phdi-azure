@@ -26,20 +26,14 @@ def main(event: func.EventHubEvent) -> None:
     :return: None
     """
 
-    logging.info(
-        f"Function triggered to process a message: {event.get_body().decode()}"
-    )
-    logging.info(f"  EnqueuedTimeUtc = {event.enqueued_time}")
-    logging.info(f"  SequenceNumber = {event.sequence_number}")
-    logging.info(f"  Offset = {event.offset}")
-
-    # Metadata
-    for key in event.metadata:
-        logging.info(f"Metadata: {key} = {event.metadata[key]}")
+    event_body = event.get_body().decode("utf-8")
+    logging.info(f"Function triggered to process a message: {event_body}")
 
     # Get blob info
+    event_json = json.loads(event_body)
+    blob_url = event_json["url"]
+    logging.info(f"Blob URL: {blob_url}")
     container_name = "source-data"
-    blob_url = event.get_json()["url"]
     storage_account_url, filename = blob_url.split(f"/{container_name}/")
 
     # Determine data type and root template.
