@@ -619,6 +619,18 @@ resource "azurerm_private_endpoint" "evhns_private_endpoint" {
   }
 }
 
+resource "azurerm_role_assignment" "evhns_data_receiver" {
+  scope                = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  role_definition_name = "Azure Event Hubs Data Receiver"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+resource "azurerm_role_assignment" "evhns_data_owner" {
+  scope                = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  role_definition_name = "Azure Event Hubs Data Owner"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
 ##### Event Grid #####
 
 resource "azurerm_eventgrid_system_topic" "phi" {

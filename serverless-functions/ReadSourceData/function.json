@@ -6,7 +6,7 @@
       "name": "event",
       "direction": "in",
       "eventHubName": "%eventHubName%",
-      "connection": "eventHubConnectionString"
+      "connection": "EventHubConnection"
     }
   ]
 }
