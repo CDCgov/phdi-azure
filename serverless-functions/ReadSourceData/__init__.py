@@ -31,7 +31,7 @@ def main(event: func.EventHubEvent) -> None:
 
     # Get blob info
     event_json = json.loads(event_body)
-    blob_url = event_json[0]["url"]
+    blob_url = event_json[0]["data"]["url"]
     logging.info(f"Blob URL: {blob_url}")
     container_name = "source-data"
     storage_account_url, filename = blob_url.split(f"/{container_name}/")

@@ -44,10 +44,12 @@ def test_handle_batch_hl7(
     event.get_body.return_value.decode.return_value = json.dumps(
         [
             {
-                "url": (
-                    "https://phdidevphi87b9f133.blob.core.windows.net/"
-                    "source-data/elr/some-filename.hl7"
-                )
+                "data": {
+                    "url": (
+                        "https://phdidevphi87b9f133.blob.core.windows.net/"
+                        "source-data/elr/some-filename.hl7"
+                    )
+                }
             }
         ]
     )
@@ -107,10 +109,12 @@ def test_pipeline_trigger_success(
         event.get_body.return_value.decode.return_value = json.dumps(
             [
                 {
-                    "url": (
-                        "https://phdidevphi87b9f133.blob.core.windows.net/"
-                        f"source-data/{source_data_subdirectory}/some-filename.hl7"
-                    )
+                    "data": {
+                        "url": (
+                            "https://phdidevphi87b9f133.blob.core.windows.net/"
+                            f"source-data/{source_data_subdirectory}/some-filename.hl7"
+                        )
+                    }
                 }
             ]
         )
@@ -226,10 +230,12 @@ def test_handle_ecr_with_no_rr(
     event.get_body.return_value.decode.return_value = json.dumps(
         [
             {
-                "url": (
-                    "https://phdidevphi87b9f133.blob.core.windows.net/"
-                    "source-data/ecr/12345eICR.xml"
-                )
+                "data": {
+                    "url": (
+                        "https://phdidevphi87b9f133.blob.core.windows.net/"
+                        "source-data/ecr/12345eICR.xml"
+                    )
+                }
             }
         ]
     )
