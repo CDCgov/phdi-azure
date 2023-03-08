@@ -136,6 +136,16 @@ jobs:
           else
             terraform import module.shared.azurerm_private_dns_zone.evhns_private_link /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.servicebus.windows.net || true
           fi
+          if terraform state list module.shared.azurerm_private_dns_zone.container_app; then
+            echo "Container App private DNS zone already imported"
+          else
+            terraform import module.shared.azurerm_private_dns_zone.container_app /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io || true
+          fi
+          if terraform state list module.data_factory.azurerm_private_dns_zone.data_factory; then
+            echo "Data Factory private DNS zone already imported"
+          else
+            terraform import module.data_factory.azurerm_private_dns_zone.data_factory /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Network/privateDnsZones/privatelink.datafactory.azure.net || true
+          fi
 
       - name: terraform apply
         env:
