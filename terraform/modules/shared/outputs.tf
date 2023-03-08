@@ -48,6 +48,10 @@ output "hapi_container_url" {
 #   value = "https://phdi-${terraform.workspace}-alerts.${azurerm_container_app_environment.phdi.default_domain}"
 # }
 
+output "vnet_id" {
+  value = azurerm_virtual_network.phdi.id
+}
+
 output "subnet_id" {
   value = azurerm_subnet.phdi.id
 }

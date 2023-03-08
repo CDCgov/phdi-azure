@@ -491,6 +491,26 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
   access_mode                  = "ReadWrite"
 }
 
+resource "azurerm_private_dns_zone" "container_app" {
+  name                = azurerm_container_app_environment.phdi.default_domain
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "container_app" {
+  name                  = "phdi-${terraform.workspace}-container-app-link"
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = azurerm_private_dns_zone.container_app.name
+  virtual_network_id    = azurerm_virtual_network.phdi.id
+}
+
+resource "azurerm_private_dns_a_record" "container_app" {
+  name                = "*"
+  resource_group_name = var.resource_group_name
+  zone_name           = azurerm_private_dns_zone.container_app.name
+  ttl                 = 300
+  records             = [azurerm_container_app_environment.phdi.static_ip_address]
+}
+
 ##### HAPI FHIR Server Database #####
 
 resource "random_password" "postgres_password" {

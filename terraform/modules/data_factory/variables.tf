@@ -76,3 +76,13 @@ variable "client_id" {
   type        = string
   description = "Client ID"
 }
+
+variable "vnet_id" {
+  type        = string
+  description = "ID of the virtual network"
+}
+
+variable "subnet_id" {
+  type        = string
+  description = "ID of the subnet"
+}

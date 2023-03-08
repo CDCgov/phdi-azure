@@ -51,3 +51,34 @@ resource "azurerm_role_assignment" "data_factory_contributor" {
   role_definition_name = "Contributor"
   principal_id         = var.pipeline_runner_principal_id
 }
+
+resource "azurerm_private_dns_zone" "data_factory" {
+  name                = "privatelink.datafactory.azure.net"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "data_factory" {
+  name                  = "phdi-${terraform.workspace}-datafactory-privatelink"
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = azurerm_private_dns_zone.data_factory.name
+  virtual_network_id    = var.vnet_id
+}
+
+resource "azurerm_private_endpoint" "data_factory" {
+  name                = "phdi-${terraform.workspace}-datafactory-private-endpoint"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  subnet_id           = var.subnet_id
+
+  private_service_connection {
+    name                           = "phdi-${terraform.workspace}-datafactory-private-endpoint-psc"
+    private_connection_resource_id = azurerm_data_factory.phdi_data_factory.id
+    subresource_names              = ["dataFactory"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "phdi-${terraform.workspace}-datafactory-private-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.data_factory.id]
+  }
+}
