@@ -127,6 +127,8 @@ def main(event: func.EventGridEvent) -> None:
 
     failed_pipeline_executions = {}
     for idx, message in enumerate(messages):
+        print("message")
+        print(message)
         pipeline_parameters = {
             "message": json.dumps(message),
             "message_type": message_type,
@@ -183,6 +185,10 @@ def rr_to_ecr(rr, ecr):
         )
         ecr = "\n".join(lines)
 
+    # print(ecr)
+    print(type(ecr))
+    print(ecr)
+
     rr = etree.fromstring(rr)
     ecr = etree.fromstring(ecr)
 
@@ -209,6 +215,7 @@ def rr_to_ecr(rr, ecr):
     organizer_tag = "{urn:hl7-org:v3}" + "organizer"
 
     # For now we assume there is only one matching entry
+    rr_entry = None
     for entry in rr_nestedEntries:
         if entry.attrib and "DRIV" in entry.attrib["typeCode"]:
             organizer = entry.find(f"./{organizer_tag}", namespaces=entry.nsmap)
@@ -222,14 +229,15 @@ def rr_to_ecr(rr, ecr):
 
     # Create the section element with root-level elements
     # and entry to insert in the eICR
+    ecr_section = None
     if rr_entry is not None:
         ecr_section_tag = "{urn:hl7-org:v3}" + "section"
         ecr_section = etree.Element(ecr_section_tag)
         ecr_section.extend(rr_elements)
         ecr_section.append(rr_entry)
-
-    # Append the ecr section into the eCR - puts it at the end
-    ecr.append(ecr_section)
+        
+        # Append the ecr section into the eCR - puts it at the end
+        ecr.append(ecr_section)
 
     ecr = etree.tostring(ecr, encoding="unicode", method="xml")
 
