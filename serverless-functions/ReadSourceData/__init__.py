@@ -178,7 +178,9 @@ def rr_to_ecr(rr, ecr):
     if xsi_tag not in lines[0]:
         lines[0] = lines[0].replace(
             'xmlns="urn:hl7-org:v3"',
-            'xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+            'xmlns="urn:hl7-org:v3" '
+            'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+        )
         ecr = "\n".join(lines)
 
     rr = etree.fromstring(rr)
@@ -229,6 +231,6 @@ def rr_to_ecr(rr, ecr):
     # Append the ecr section into the eCR - puts it at the end
     ecr.append(ecr_section)
 
-    ecr = etree.tostring(ecr, encoding='unicode', method='xml')
+    ecr = etree.tostring(ecr, encoding="unicode", method="xml")
 
     return ecr
