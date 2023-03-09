@@ -235,7 +235,7 @@ def rr_to_ecr(rr, ecr):
         ecr_section = etree.Element(ecr_section_tag)
         ecr_section.extend(rr_elements)
         ecr_section.append(rr_entry)
-        
+
         # Append the ecr section into the eCR - puts it at the end
         ecr.append(ecr_section)
 
