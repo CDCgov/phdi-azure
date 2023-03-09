@@ -1,7 +1,9 @@
 from ReadSourceData import main as read_source_data
 from ReadSourceData import get_reportability_response
+from ReadSourceData import rr_to_ecr as rr_to_ecr
 from azure.core.exceptions import ResourceNotFoundError
 from unittest import mock
+from lxml import etree
 import pytest
 
 
@@ -233,3 +235,40 @@ def test_handle_ecr_with_no_rr(
 
     read_source_data(event)
     patched_logging.warning.assert_called_with(warning_message)
+
+
+def test_add_rr_to_ecr():
+    with open("./tests/ReadSourceData/CDA_RR.xml", "r") as f:
+        rr = f.read()
+
+    with open("./tests/ReadSourceData/CDA_eICR.xml", "r") as f:
+        ecr = f.read()
+
+    # extract rr fields, insert to ecr
+    ecr = rr_to_ecr(rr, ecr)
+
+    # confirm root tag added
+    ecr_root = ecr.splitlines()[0]
+    xsi_tag = "xmlns:xsi"
+    assert xsi_tag in ecr_root
+
+    # confirm new section added
+    ecr = etree.fromstring(ecr)
+    tag = "{urn:hl7-org:v3}" + "section"
+    section = ecr.find(f"./{tag}", namespaces=ecr.nsmap)
+    assert section is not None
+
+    # confirm required elements added
+    rr_tags = [
+        "templateId",
+        "id",
+        "code",
+        "title",
+        "effectiveTime",
+        "confidentialityCode",
+        "entry",
+    ]
+    rr_tags = ["{urn:hl7-org:v3}" + tag for tag in rr_tags]
+    for tag in rr_tags:
+        element = section.find(f"./{tag}", namespaces=section.nsmap)
+        assert element is not None

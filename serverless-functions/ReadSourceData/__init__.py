@@ -127,8 +127,6 @@ def main(event: func.EventGridEvent) -> None:
 
     failed_pipeline_executions = {}
     for idx, message in enumerate(messages):
-        print("message")
-        print(message)
         pipeline_parameters = {
             "message": json.dumps(message),
             "message_type": message_type,
@@ -184,10 +182,6 @@ def rr_to_ecr(rr, ecr):
             'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
         )
         ecr = "\n".join(lines)
-
-    # print(ecr)
-    print(type(ecr))
-    print(ecr)
 
     rr = etree.fromstring(rr)
     ecr = etree.fromstring(ecr)
