@@ -237,7 +237,8 @@ def rr_to_ecr(rr, ecr):
         "{urn:hl7-org:v3}" + "component/structuredBody/component/section"
     )
     templateId_tag = "{urn:hl7-org:v3}" + "templateId"
-    entry_act_tag = "{urn:hl7-org:v3}" + "entry/act"
+    entry_status_tag = "{urn:hl7-org:v3}" + "entry"
+    act_status_tag = "{urn:hl7-org:v3}" + "act"
     sections_for_status = rr.findall(f"./{base_tag_for_status}", namespaces=rr.nsmap)
     rr_entry_for_status_codes = None
     for status_section in sections_for_status:
@@ -249,19 +250,20 @@ def rr_to_ecr(rr, ecr):
             and "2.16.840.1.113883.10.20.15.2.2.3" in templateId.attrib["root"]
         ):
             for entry in status_section.findall(
-                f"./{entry_act_tag}", namespaces=status_section.nsmap
+                f"./{entry_status_tag}", namespaces=status_section.nsmap
             ):
-                entry_act_templateId = entry.find(
-                    f"./{templateId_tag}", namespaces=entry.nsmap
-                )
-                if (
-                    entry_act_templateId is not None
-                    and "2.16.840.1.113883.10.20.15.2.3.29"
-                    in entry_act_templateId.attrib["root"]
-                ):
-                    # only anticipating one status code
-                    rr_entry_for_status_codes = entry
-                    exit
+                for act in entry.findall(f"./{act_status_tag}", namespaces=entry.nsmap):
+                    entry_act_templateId = act.find(
+                        f"./{templateId_tag}", namespaces=act.nsmap
+                    )
+                    if (
+                        entry_act_templateId is not None
+                        and "2.16.840.1.113883.10.20.15.2.3.29"
+                        in entry_act_templateId.attrib["root"]
+                    ):
+                        # only anticipating one status code
+                        rr_entry_for_status_codes = entry
+                        exit
 
     # Create the section element with root-level elements
     # and entry to insert in the eICR
@@ -270,12 +272,13 @@ def rr_to_ecr(rr, ecr):
         ecr_section_tag = "{urn:hl7-org:v3}" + "section"
         ecr_section = etree.Element(ecr_section_tag)
         ecr_section.extend(rr_elements)
-        ecr_section.append(rr_entry_for_status_codes)
+        if rr_entry_for_status_codes is not None:
+            ecr_section.append(rr_entry_for_status_codes)
         ecr_section.append(rr_entry)
 
         # Append the ecr section into the eCR - puts it at the end
         ecr.append(ecr_section)
-
+        
     ecr = etree.tostring(ecr, encoding="unicode", method="xml")
 
     return ecr

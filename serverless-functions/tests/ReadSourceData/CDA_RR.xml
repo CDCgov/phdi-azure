@@ -24,6 +24,38 @@
                     </entry>
                 </section>
             </component>
+            <component>
+                <section>
+                    <templateId extension="2017-04-01" root="2.16.840.1.113883.10.20.15.2.2.3"/>
+                    <code code="88082-3" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Initial case report processing information Document"/>
+                    <entry>
+                        <act classCode="ACT" moodCode="EVN">
+                            <templateId extension="2017-04-01" root="2.16.840.1.113883.10.20.15.2.3.9"/>
+                            <id root="6bff7990-f218-4f9d-a5aa-eb7afa6e9a3c"/>
+                            <code code="RR5" codeSystem="2.16.840.1.114222.4.5.232" codeSystemName="PHIN VS (CDC Local Coding System)" displayName="Received eICR Information"/>
+                            <statusCode code="completed"/>
+                            <effectiveTime value="20220125155734-0600"/>
+                            <reference typeCode="REFR">
+                                <externalDocument classCode="DOCCLIN" moodCode="EVN">
+                                    <templateId extension="2014-06-09" root="2.16.840.1.113883.10.20.22.4.115"/>
+                                    <templateId extension="2017-04-01" root="2.16.840.1.113883.10.20.15.2.3.10"/>
+                                    <id assigningAuthorityName="EPC" root="1.2.840.114350.1.13.478.3.7.8.688883.204846"/>
+                                    <code code="55751-2" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Public Health Case Report (eICR)"/>
+                                    <setId assigningAuthorityName="EPC" extension="c783b7d0-7e29-11ec-82bc-0050561597b4" root="1.2.840.114350.1.13.478.3.7.1.1"/>
+                                    <versionNumber value="1"/>
+                                </externalDocument>
+                            </reference>
+                        </act>
+                    </entry>
+                    <entry>
+                        <act classCode="ACT" moodCode="EVN">
+                            <templateId extension="2017-04-01" root="2.16.840.1.113883.10.20.15.2.3.29"/>
+                            <id root="39d966b9-8a3a-4024-93d8-138e97d5898a"/>
+                            <code code="RRVS19" codeSystem="2.16.840.1.114222.4.5.274" codeSystemName="PHIN VS (CDC Local Coding System)" displayName="eICR processed"/>
+                        </act>
+                    </entry>
+                </section>
+            </component>
         </structuredBody>
     </component>
 </ClinicalDocument>

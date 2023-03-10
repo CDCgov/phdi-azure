@@ -275,13 +275,14 @@ def test_add_rr_to_ecr():
 
     # ensure that status has been pulled over
     entry_tag = "{urn:hl7-org:v3}" + "entry"
-    templateId_tag = "{urn:hl7-org:v3}" + "act/templateId"
-    code_tag = "{urn:hl7-org:v3}" + "act/code"
+    templateId_tag = "{urn:hl7-org:v3}" + "templateId"
+    code_tag = "{urn:hl7-org:v3}" + "code"
     for entry in section.find(f"./{entry_tag}", namespaces=section.nsmap):
-        entry_act_templateId = entry.find(f"./{templateId_tag}", namespaces=entry.nsmap)
-        status_code = entry.find(f"./{code_tag}", namespaces=entry.nsmap)
-        assert entry_act_templateId is not None
-        assert (
-            entry_act_templateId.attrib["root"] == "2.16.840.1.113883.10.20.15.2.3.29"
-        )
-        assert "RRVS19" in status_code.attrib["code"]
+        for temps in entry.findall(f"./{templateId_tag}", namespaces=entry.nsmap):
+            status_code = entry.find(f"./{code_tag}", namespaces=entry.nsmap)
+            assert temps is not None
+            assert 1 == 2
+            assert (
+                temps.attrib["root"] == "2.16.840.1.113883.10.20.15.2.3.29"
+            )
+            assert "RRVS19" in status_code.attrib["code"]
