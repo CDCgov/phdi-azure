@@ -278,7 +278,7 @@ def rr_to_ecr(rr, ecr):
 
         # Append the ecr section into the eCR - puts it at the end
         ecr.append(ecr_section)
-        
+
     ecr = etree.tostring(ecr, encoding="unicode", method="xml")
 
     return ecr

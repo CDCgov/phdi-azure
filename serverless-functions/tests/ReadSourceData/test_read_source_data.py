@@ -281,8 +281,5 @@ def test_add_rr_to_ecr():
         for temps in entry.findall(f"./{templateId_tag}", namespaces=entry.nsmap):
             status_code = entry.find(f"./{code_tag}", namespaces=entry.nsmap)
             assert temps is not None
-            assert 1 == 2
-            assert (
-                temps.attrib["root"] == "2.16.840.1.113883.10.20.15.2.3.29"
-            )
+            assert temps.attrib["root"] == "2.16.840.1.113883.10.20.15.2.3.29"
             assert "RRVS19" in status_code.attrib["code"]
