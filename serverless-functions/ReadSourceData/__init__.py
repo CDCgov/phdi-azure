@@ -172,6 +172,16 @@ def get_reportability_response(
 
 # extract rr fields and insert them into the ecr
 def rr_to_ecr(rr, ecr):
+    """
+    Extracts relevant fields from an RR document, and inserts them into a
+    given eICR document. Ensures that the eICR contains properly formatted
+    RR fields, including templateId, id, code, title, effectiveTime,
+    confidentialityCode, and corresponding entries; and required format tags.
+
+    :param rr: A serialized xml format reportability response (RR) document.
+    :param ecr: A serialized xml format electronic initial case report (eICR) document.
+    :return: An xml format eICR document with additional fields extracted from the RR.
+    """
     # add xmlns:xsi attribute if not there
     lines = ecr.splitlines()
     xsi_tag = "xmlns:xsi"
