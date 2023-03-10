@@ -238,7 +238,9 @@ def rr_to_ecr(rr, ecr):
     )
     templateId_tag = "{urn:hl7-org:v3}" + "templateId"
     entry_act_tag = "{urn:hl7-org:v3}" + "entry/act"
-    sections_for_status = rr.findall(f"./{base_tag_for_status}", namespaces=rr.nsamp)
+    sections_for_status = rr.findall(
+        f"./{base_tag_for_status}", namespaces=base_tag_for_status.nsmap
+    )
     rr_entry_for_status_codes = None
     for status_section in sections_for_status:
         templateId = status_section.find(
