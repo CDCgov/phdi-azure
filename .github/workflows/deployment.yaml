@@ -80,10 +80,10 @@ jobs:
           )" >> $GITHUB_OUTPUT
           echo "short_cid=${CLIENT_ID:0:8}" >> $GITHUB_OUTPUT
 
-      - name: Cache Docker images
-        uses: ScribeMD/docker-cache@0.2.7
-        with:
-          key: docker-${{ runner.os }}-${{ hashFiles('**/LICENSE') }}
+      # - name: Cache Docker images
+      #   uses: ScribeMD/docker-cache@0.2.7
+      #   with:
+      #     key: docker-${{ runner.os }}-${{ hashFiles('**/LICENSE') }}
 
       - name: terraform
         env:
