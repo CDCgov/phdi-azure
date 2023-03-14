@@ -354,17 +354,16 @@ resource "random_password" "postgres_password" {
 }
 
 resource "azurerm_postgresql_flexible_server" "mpi" {
-  name                          = "phdi${terraform.workspace}mpi${substr(var.client_id, 0, 8)}"
-  resource_group_name           = var.resource_group_name
-  location                      = var.location
-  sku_name                      = "Standard_D2s_v3"
-  version                       = "14"
-  storage_mb                    = 51200
-  backup_retention_days         = 7
-  geo_redundant_backup_enabled  = true
-  public_network_access_enabled = true
-  administrator_login           = "postgres"
-  administrator_password        = random_password.postgres_password.result
+  name                         = "phdi${terraform.workspace}mpi${substr(var.client_id, 0, 8)}"
+  resource_group_name          = var.resource_group_name
+  location                     = var.location
+  sku_name                     = "GP_Standard_D2s_v3"
+  version                      = "14"
+  storage_mb                   = 65536
+  backup_retention_days        = 7
+  geo_redundant_backup_enabled = true
+  administrator_login          = "postgres"
+  administrator_password       = random_password.postgres_password.result
   tags = {
     environment = terraform.workspace
     managed-by  = "terraform"
