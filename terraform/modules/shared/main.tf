@@ -364,7 +364,7 @@ resource "azurerm_postgresql_flexible_server" "mpi" {
   geo_redundant_backup_enabled  = true
   public_network_access_enabled = true
   administrator_login           = "postgres"
-  administrator_login_password  = random_password.postgres_password.result
+  administrator_password        = random_password.postgres_password.result
   tags = {
     environment = terraform.workspace
     managed-by  = "terraform"
