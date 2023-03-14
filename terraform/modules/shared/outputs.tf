@@ -38,6 +38,14 @@ output "ingestion_container_url" {
   value = "https://phdi-${terraform.workspace}-ingestion.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
+output "message_parser_url" {
+  value = "https://phdi-${terraform.workspace}-message-parser.${azurerm_container_app_environment.phdi.default_domain}"
+}
+
+output "validation_container_url" {
+  value = "https://phdi-${terraform.workspace}-validation.${azurerm_container_app_environment.phdi.default_domain}"
+}
+
 # TODO: Uncomment when tabulation is implemented
 # output "tabulation_container_url" {
 #   value = "https://phdi-${terraform.workspace}-tabulation.${azurerm_container_app_environment.phdi.default_domain}"

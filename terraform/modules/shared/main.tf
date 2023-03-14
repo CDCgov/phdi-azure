@@ -173,6 +173,8 @@ locals {
     "ingestion",
     "tabulation",
     "alerts",
+    "message-parser",
+    "validation",
   ])
 }
 
