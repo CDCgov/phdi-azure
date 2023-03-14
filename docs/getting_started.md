@@ -94,7 +94,7 @@ The table below summarizes these functions, their purposes, triggers, inputs, an
 | Fhir-converter | Convert Hl7v2 and C-CDA data to FHIR at the beginning of the ingestion pipeline. |  [https://github.com/CDCgov/phdi/tree/main/containers/fhir-converter](https://github.com/CDCgov/phdi/tree/main/containers/fhir-converter) |
 | Ingestion | Provide endpoints for each step of the ingestion pipeline except conversion to FHIR. | [https://github.com/CDCgov/phdi/tree/main/containers/ingestion](https://github.com/CDCgov/phdi/tree/main/containers/ingestion) |
 | Tabulation | Extract and tabularize data from the FHIR server according to user-defined schema. |  [https://github.com/CDCgov/phdi/tree/main/containers/tabulation](https://github.com/CDCgov/phdi/tree/main/containers/tabulation) |
-| Validation | Validate healthcare messages |  [https://github.com/CDCgov/phdi/tree/main/containers/validation](https://github.com/CDCgov/phdi/tree/main/containers/validation) |
+| Validation | Validate healthcare messages. |  [https://github.com/CDCgov/phdi/tree/main/containers/validation](https://github.com/CDCgov/phdi/tree/main/containers/validation) |
 | Message-parser | Extract desired fields from a given healthcare message. |  [https://github.com/CDCgov/phdi/tree/main/containers/message-parser](https://github.com/CDCgov/phdi/tree/main/containers/message-parser) |
 
 
