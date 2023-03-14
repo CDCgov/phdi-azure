@@ -170,10 +170,11 @@ provider "docker" {
 locals {
   images = toset([
     "fhir-converter",
-    "message-parser",
     "ingestion",
     "tabulation",
     "alerts",
+    "message-parser",
+    "validation",
   ])
 }
 

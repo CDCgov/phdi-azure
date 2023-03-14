@@ -34,12 +34,16 @@ output "fhir_converter_url" {
   value = "https://phdi-${terraform.workspace}-fhir-converter.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
+output "ingestion_container_url" {
+  value = "https://phdi-${terraform.workspace}-ingestion.${azurerm_container_app_environment.phdi.default_domain}"
+}
+
 output "message_parser_url" {
   value = "https://phdi-${terraform.workspace}-message-parser.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
-output "ingestion_container_url" {
-  value = "https://phdi-${terraform.workspace}-ingestion.${azurerm_container_app_environment.phdi.default_domain}"
+output "validation_container_url" {
+  value = "https://phdi-${terraform.workspace}-validation.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
 # TODO: Uncomment when tabulation is implemented
