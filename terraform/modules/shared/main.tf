@@ -194,7 +194,12 @@ resource "docker_tag" "tag_for_azure" {
   for_each     = local.images
   source_image = docker_image.ghcr_image[each.key].name
   target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+
+  lifecycle {
+    replace_triggered_by = [data.docker_registry_image.ghcr_data[each.key].sha256_digest]
+  }
 }
+
 
 resource "docker_registry_image" "acr_image" {
   for_each      = local.images
