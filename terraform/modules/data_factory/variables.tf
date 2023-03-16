@@ -18,11 +18,10 @@ variable "ingestion_container_url" {
   description = "URL of the ingestion container"
 }
 
-# TODO: Uncomment when message parser is implemented
-# variable "message_parser_url" {
-#  type        = string
-#  description = "URL of the message parser container"
-# }
+variable "message_parser_url" {
+  type        = string
+  description = "URL of the message parser container"
+}
 
 # TODO: Uncomment when validation is implemented
 # variable "validation_container_url" {
