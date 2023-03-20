@@ -289,6 +289,10 @@ resource "azurerm_container_app" "container_app" {
     username             = azurerm_container_registry.phdi_registry.admin_username
     password_secret_name = "phdi-registry-password"
   }
+
+  lifecycle {
+    ignore_changes = [secret]
+  }
 }
 
 resource "azurerm_container_app_environment_storage" "tabulation_storage" {
