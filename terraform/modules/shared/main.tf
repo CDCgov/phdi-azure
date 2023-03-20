@@ -371,7 +371,7 @@ resource "azurerm_postgresql_flexible_server" "mpi" {
     managed-by  = "terraform"
   }
 
-  ignore_changes = [
-    zone
-  ]
+  lifecycle {
+    ignore_changes = [zone]
+  }
 }
