@@ -370,4 +370,8 @@ resource "azurerm_postgresql_flexible_server" "mpi" {
     environment = terraform.workspace
     managed-by  = "terraform"
   }
+
+  ignore_changes = [
+    zone
+  ]
 }
