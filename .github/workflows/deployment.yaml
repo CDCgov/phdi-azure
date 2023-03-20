@@ -152,6 +152,7 @@ jobs:
           TENANT_ID: ${{ secrets.TENANT_ID }}
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
         run: |
+          az extension add --name containerapp
           for SERVICE in fhir-converter ingestion alerts tabulation validation message-parser; do
             if [[ ! $(az containerapp auth show --name phdi-$TF_ENV-$SERVICE --query platform.enabled) ]]; then
               APP_ID=$(az ad app create --display-name phdi-$TF_ENV-$SERVICE --identifier-uris api://phdi-$TF_ENV-$SERVICE --sign-in-audience AzureADMyOrg --enable-access-token-issuance false --enable-id-token-issuance true --web-home-page-url https://phdi-$TF_ENV-$SERVICE.blackmushroom-4f5b487c.centralus.azurecontainerapps.io --web-redirect-uris https://phdi-$TF_ENV-$SERVICE.blackmushroom-4f5b487c.centralus.azurecontainerapps.io/.auth/login/aad/callback --required-resource-access '[{"resourceAccess": [{"id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d", "type": "Scope"} ], "resourceAppId": "00000003-0000-0000-c000-000000000000"}]' --query appId -o tsv)
