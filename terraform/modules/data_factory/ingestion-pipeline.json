@@ -170,6 +170,35 @@
                 }
             },
             {
+                "name": "message_parser",
+                "description": "Extract desired fields from a given healthcare message.",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "add_patient_hash",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${message_parser_url}/parse_message",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('add_patient_hash').output.bundle}\n}",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
                 "name": "upload_fhir_bundle",
                 "description": "Compute a hashed identifier that can be used for record linkage.",
                 "type": "WebActivity",
