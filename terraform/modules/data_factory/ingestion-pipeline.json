@@ -190,10 +190,10 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "${message_parser_url}",
+                    "url": "${message_parser_url}/parse_message",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"message_format\": \"fhir\"\n,\n    \"parsing_schema_name\": \"ecr.json\"\n,\n    \"message\": @{activity('add_patient_hash').output.bundle}}",
+                        "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('add_patient_hash').output.bundle}\n}",
                         "type": "Expression"
                     }
                 }
