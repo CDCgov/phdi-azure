@@ -243,6 +243,14 @@
                     "body": {
                         "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('add_patient_hash').output.bundle}\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-message-parser",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
