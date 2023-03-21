@@ -66,6 +66,11 @@ variable "fhir_upload_failures_container_name" {
   description = "Container name for failed FHIR uploads"
 }
 
+variable "validation_failures_container_name" {
+  type        = string
+  description = "Container name for failed validations"
+}
+
 variable "fhir_conversion_failures_container_name" {
   type        = string
   description = "Container name for failed FHIR conversions"
