@@ -24,11 +24,10 @@ variable "ingestion_container_url" {
 #  description = "URL of the message parser container"
 # }
 
-# TODO: Uncomment when validation is implemented
-# variable "validation_container_url" {
-#  type        = string
-#  description = "URL of the validation container"
-# }
+ variable "validation_container_url" {
+  type        = string
+  description = "URL of the validation container"
+ }
 
 # TODO: Uncomment when tabulation is implemented
 # variable "tabulation_container_url" {

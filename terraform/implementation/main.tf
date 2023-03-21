@@ -18,6 +18,7 @@ module "data_factory" {
   source                  = "../modules/data_factory"
   resource_group_name     = var.resource_group_name
   location                = var.location
+  validation_container_url= module.shared.validation_container_url
   fhir_converter_url      = module.shared.fhir_converter_url
   ingestion_container_url = module.shared.ingestion_container_url
   # tabulation_container_url                = module.shared.tabulation_container_url
