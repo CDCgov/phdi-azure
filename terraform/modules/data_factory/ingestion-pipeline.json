@@ -193,8 +193,13 @@
                     "url": "${message_parser_url}",
                     "method": "POST",
                     "body": {
-                        "value": "",
-                        "type": ""
+                        "message_format": "fhir",
+                        "message_type": "ecr",
+                        "parsing_schema": {},
+                        "parsing_schema_name": "",
+                        "fhir_converter_url": "${fhir_converter_url}",
+                        "credential_manager": "azure",
+                        "message": "string"
                     }
                 }
             },
