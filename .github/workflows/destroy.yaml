@@ -63,6 +63,7 @@ jobs:
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
           echo fhir_converter_url=\"""\" >> terraform.tfvars
           echo ingestion_container_url=\"""\" >> terraform.tfvars
+          echo message_parser_url=\"""\" >> terraform.tfvars
 
       - name: Set environment
         id: set-environment
