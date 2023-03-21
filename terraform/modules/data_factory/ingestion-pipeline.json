@@ -193,10 +193,8 @@
                     "url": "${message_parser_url}",
                     "method": "POST",
                     "body": {
-                        "body": {
-                            "value": "{\n    \"message_format\": \"fhir\"\n,\n    \"parsing_schema_name\": \"ecr.json\"\n,\n    \"message\": @{activity('add_patient_hash').output.bundle}}",
-                            "type": "Expression"
-                        }
+                        "value": "{\n    \"message_format\": \"fhir\"\n,\n    \"parsing_schema_name\": \"ecr.json\"\n,\n    \"message\": @{activity('add_patient_hash').output.bundle}}",
+                        "type": "Expression"
                     }
                 }
             },
