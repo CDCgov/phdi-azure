@@ -177,7 +177,7 @@
                     {
                         "activity": "add_patient_hash",
                         "dependencyConditions": [
-                            "Completed"
+                            "Succeeded"
                         ]
                     }
                 ],
@@ -193,13 +193,10 @@
                     "url": "${message_parser_url}",
                     "method": "POST",
                     "body": {
-                        "message_format": "fhir",
-                        "message_type": "ecr",
-                        "parsing_schema": {},
-                        "parsing_schema_name": "",
-                        "fhir_converter_url": "${fhir_converter_url}",
-                        "credential_manager": "azure",
-                        "message": "string"
+                        "body": {
+                            "value": "{\n    \"message_format\": \"fhir\"\n,\n    \"parsing_schema_name\": \"ecr.json\"\n,\n    \"message\": @{activity('add_patient_hash').output.bundle}}",
+                            "type": "Expression"
+                        }
                     }
                 }
             },
