@@ -44,6 +44,7 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
     "message" : "",
     "message_type" : "",
     "root_template" : "",
+    "include_error_types" : ""
   }
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
