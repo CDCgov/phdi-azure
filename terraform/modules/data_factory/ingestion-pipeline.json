@@ -45,6 +45,36 @@
                         "type": "Expression"
                     }
                 }
+            },{
+                "name": "validation_if_condition",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "validate_message",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(activity('validate_message').output.response.message_valid, true)]",
+                        "type": "Expression"
+                    },
+                    "ifFalseActivities": [
+                        {
+                            "name": "Fail1",
+                            "type": "Fail",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "message": "Validation failure, logging to validation failure storage.",
+                                "errorCode": "422"
+                            }
+                        }
+                    ]
+                }
             },
             {
                 "name": "convert_to_fhir",
