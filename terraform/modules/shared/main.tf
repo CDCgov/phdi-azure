@@ -377,3 +377,38 @@ resource "azurerm_postgresql_flexible_server" "mpi" {
     ]
   }
 }
+
+resource "azurerm_postgresql_flexible_server_database" "mpi" {
+  name      = "DibbsMpiDB"
+  server_id = azurerm_postgresql_flexible_server.mpi.id
+  collation = "en_US.utf8"
+  charset   = "utf8"
+}
+
+provider "postgresql_database" {
+  alias   = "DibbsMpiDB"
+  host    = azurerm_postgresql_flexible_server.mpi.fqdn
+  port    = 5432
+  user    = azurerm_postgresql_flexible_server.mpi.administrator_login
+  password = azurerm_postgresql_flexible_server.mpi.administrator_password
+  database = azurerm_postgresql_flexible_server_database.mpi.name
+}
+
+# resource "postgresql_database_schema" "mpi" {
+#   provider = postgresql_database.DibbsMpiDB
+#   name     = "my_schema"
+
+#   statement = "CREATE TABLE my_table (id SERIAL PRIMARY KEY, name VARCHAR(50))"
+# }
+
+resource "null_resource" "setup_tables" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      PGPASSWORD=${azurerm_postgresql_flexible_server.mpi.administrator_password} psql -h ${azurerm_postgresql_flexible_server.mpi.fqdn} -U ${azurerm_postgresql_flexible_server.mpi.administrator_login} -d ${azurerm_postgresql_flexible_server_database.mpi.name} -f "../../scripts/dibbs_mp_db.ddl"
+    EOT
+  }
+
+  depends_on = [
+    azurerm_postgresql_database.mpi
+  ]
+}
