@@ -27,6 +27,7 @@ locals {
     fhir_converter_url                      = var.fhir_converter_url,
     ingestion_container_url                 = var.ingestion_container_url,
     fhir_server_url                         = var.fhir_server_url,
+    message_parser_url                      = var.message_parser_url,
     storage_account_url                     = var.phi_storage_account_endpoint_url,
     validation_failures_container_name      = var.validation_failures_container_name,
     fhir_upload_failures_container_name     = var.fhir_upload_failures_container_name,
