@@ -385,14 +385,14 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
   charset   = "utf8"
 }
 
-provider "postgresql_database" {
-  alias   = "DibbsMpiDB"
-  host    = azurerm_postgresql_flexible_server.mpi.fqdn
-  port    = 5432
-  user    = azurerm_postgresql_flexible_server.mpi.administrator_login
-  password = azurerm_postgresql_flexible_server.mpi.administrator_password
-  database = azurerm_postgresql_flexible_server_database.mpi.name
-}
+# provider "postgresql_database" {
+#   alias   = "DibbsMpiDB"
+#   host    = azurerm_postgresql_flexible_server.mpi.fqdn
+#   port    = 5432
+#   user    = azurerm_postgresql_flexible_server.mpi.administrator_login
+#   password = azurerm_postgresql_flexible_server.mpi.administrator_password
+#   database = azurerm_postgresql_flexible_server_database.mpi.name
+# }
 
 # resource "postgresql_database_schema" "mpi" {
 #   provider = postgresql_database.DibbsMpiDB
