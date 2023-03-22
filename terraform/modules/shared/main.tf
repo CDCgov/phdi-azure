@@ -409,6 +409,6 @@ resource "null_resource" "setup_tables" {
   }
 
   depends_on = [
-    azurerm_postgresql_database.mpi
+    azurerm_postgresql_flexible_server_database.mpi
   ]
 }
