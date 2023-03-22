@@ -125,6 +125,8 @@ def main(event: func.EventGridEvent) -> None:
     credentials = cred_manager.get_credential_object()
     adf_client = DataFactoryManagementClient(credentials, subscription_id)
 
+    include_error_types = "fatal, errors"
+
     failed_pipeline_executions = {}
     for idx, message in enumerate(messages):
         pipeline_parameters = {
@@ -132,7 +134,7 @@ def main(event: func.EventGridEvent) -> None:
             "message_type": message_type,
             "root_template": root_template,
             "filename": f"{container_name}/{filename}",
-            "include_error_types": "fatal, errors"
+            "include_error_types": include_error_types
         }
 
         try:
