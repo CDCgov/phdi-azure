@@ -415,7 +415,7 @@ resource "azurerm_postgresql_firewall_rule" "example" {
   server_name         = azurerm_postgresql_flexible_server.mpi.name
   start_ip_address    = null_resource.ipv4
   end_ip_address      = null_resource.ipv4
-  depends_on          = null_resource.ipv4
+  depends_on          = [null_resource.ipv4]
 }
 
 resource "null_resource" "setup_tables" {
