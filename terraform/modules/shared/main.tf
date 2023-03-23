@@ -403,6 +403,14 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
 #   statement = "CREATE TABLE my_table (id SERIAL PRIMARY KEY, name VARCHAR(50))"
 # }
 
+resource "azurerm_postgresql_firewall_rule" "example" {
+  name                = "allow-all"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_flexible_server.mpi.name
+  start_ip_address    = self.ipv4_address
+  end_ip_address      = self.ipv4_address
+}
+
 resource "null_resource" "setup_tables" {
   provisioner "local-exec" {
     command = <<-EOT
