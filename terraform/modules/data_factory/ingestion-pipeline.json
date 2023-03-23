@@ -25,27 +25,6 @@
                 }
             },
             {
-                "name": "log_validation_failure",
-                "description": "Write validation failures to storage.\n",
-                "type": "WebActivity",
-                "dependsOn": [],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"blob\": @{activity('validate_message').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${ validation_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
-                        "type": "Expression"
-                    }
-                }
-            },{
                 "name": "validation_if_condition",
                 "type": "IfCondition",
                 "dependsOn": [
@@ -74,6 +53,33 @@
                             }
                         }
                     ]
+                }
+            },
+            {
+                "name": "log_validation_failure",
+                "description": "Write validation failures to storage.\n",
+                "type": "WebActivity",
+                "dependsOn": [{
+                    "activity": "validation_if_condition",
+                    "dependencyConditions": [
+                        "Failed"
+                    ]
+                }],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"blob\": @{activity('validate_message').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${ validation_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
+                        "type": "Expression"
+                    }
                 }
             },
             {
