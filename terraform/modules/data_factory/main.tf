@@ -49,7 +49,7 @@ resource "null_resource" "adf_credential" {
 
       # Create the credential in Azure Data Factory
       az rest --method put \
-        --uri "https://management.azure.com/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}/providers/Microsoft.DataFactory/factories/${azurerm_data_factory.phdi_data_factory.name}/credentials/exampleCredential?api-version=2018-06-01" \
+        --uri "https://management.azure.com/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}/providers/Microsoft.DataFactory/factories/${azurerm_data_factory.phdi_data_factory.name}/credentials/pipeline-runner-credential?api-version=2018-06-01" \
         --headers "Content-Type=application/json" \
         --headers "Authorization=Bearer $access_token" \
         --body "$credential_payload"
