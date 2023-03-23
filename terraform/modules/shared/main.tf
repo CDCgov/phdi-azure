@@ -415,7 +415,7 @@ resource "null_resource" "ipaddress" {
 }
 
 output "public_ip_address" {
-  value = chomp("${null_resource.ipaddress.*.triggers.%}")
+  value = chomp("${null_resource.ipaddress.*.triggers.ip_address}")
 }
 
 resource "azurerm_postgresql_firewall_rule" "mpi" {
