@@ -21,32 +21,6 @@ resource "azurerm_data_factory" "phdi_data_factory" {
     managed-by  = "terraform"
   }
 }
-locals {
-  ingestion-pipeline-config = jsondecode(templatefile("../modules/data_factory/ingestion-pipeline.json", {
-    environment                             = terraform.workspace,
-    fhir_converter_url                      = var.fhir_converter_url,
-    ingestion_container_url                 = var.ingestion_container_url,
-    fhir_server_url                         = var.fhir_server_url,
-    message_parser_url                      = var.message_parser_url,
-    storage_account_url                     = var.phi_storage_account_endpoint_url,
-    fhir_upload_failures_container_name     = var.fhir_upload_failures_container_name,
-    fhir_conversion_failures_container_name = var.fhir_conversion_failures_container_name,
-  }))
-}
-
-resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
-  name            = "phdi-${terraform.workspace}-ingestion"
-  data_factory_id = azurerm_data_factory.phdi_data_factory.id
-  concurrency     = 10 // Max concurrent instances of the pipeline, between 1 and 50. May need to tune this in the future. 
-  parameters = {
-    "filename" : "",
-    "message" : "",
-    "message_type" : "",
-    "root_template" : "",
-  }
-
-  activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
-}
 
 resource "azurerm_role_assignment" "data_factory_contributor" {
   scope                = azurerm_data_factory.phdi_data_factory.id
@@ -82,5 +56,34 @@ resource "null_resource" "adf_credential" {
     EOT
   }
 
-  depends_on = [azurerm_data_factory.phdi_data_factory]
+  depends_on = [azurerm_data_factory.phdi_data_factory, azurerm_role_assignment.data_factory_contributor]
+}
+
+locals {
+  ingestion-pipeline-config = jsondecode(templatefile("../modules/data_factory/ingestion-pipeline.json", {
+    environment                             = terraform.workspace,
+    fhir_converter_url                      = var.fhir_converter_url,
+    ingestion_container_url                 = var.ingestion_container_url,
+    fhir_server_url                         = var.fhir_server_url,
+    message_parser_url                      = var.message_parser_url,
+    storage_account_url                     = var.phi_storage_account_endpoint_url,
+    fhir_upload_failures_container_name     = var.fhir_upload_failures_container_name,
+    fhir_conversion_failures_container_name = var.fhir_conversion_failures_container_name,
+  }))
+}
+
+resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
+  name            = "phdi-${terraform.workspace}-ingestion"
+  data_factory_id = azurerm_data_factory.phdi_data_factory.id
+  concurrency     = 10 // Max concurrent instances of the pipeline, between 1 and 50. May need to tune this in the future. 
+  parameters = {
+    "filename" : "",
+    "message" : "",
+    "message_type" : "",
+    "root_template" : "",
+  }
+
+  activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
+
+  depends_on = [null_resource.adf_credential]
 }
