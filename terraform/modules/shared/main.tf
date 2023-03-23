@@ -403,19 +403,28 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
 #   statement = "CREATE TABLE my_table (id SERIAL PRIMARY KEY, name VARCHAR(50))"
 # }
 
-resource "null_resource" "ipv4" {
+resource "null_resource" "ipaddress" {
   provisioner "local-exec" {
     command = "curl ifconfig.me"
+    interpreter = ["/bin/bash", "-c"]
+  }
+
+  provisioner "local-exec" {
+    command = "echo 'public_ip_address = \"${chomp(self.local_exec.output)}\"' > public_ip_address.auto.tfvars"
   }
 }
 
-resource "azurerm_postgresql_firewall_rule" "example" {
+output "public_ip_address" {
+  value = chomp("${null_resource.ipaddress.*.triggers.%}")
+}
+
+resource "azurerm_postgresql_firewall_rule" "mpi" {
   name                = "allow-all"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_postgresql_flexible_server.mpi.name
-  start_ip_address    = null_resource.ipv4
-  end_ip_address      = null_resource.ipv4
-  depends_on          = [null_resource.ipv4]
+  start_ip_address    = var.public_ip_address
+  end_ip_address      = var.public_ip_address
+  depends_on          = [null_resource.ipaddress]
 }
 
 resource "null_resource" "setup_tables" {
