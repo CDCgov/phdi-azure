@@ -403,12 +403,19 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
 #   statement = "CREATE TABLE my_table (id SERIAL PRIMARY KEY, name VARCHAR(50))"
 # }
 
+resource "null_resource" "ipv4" {
+  provisioner "local-exec" {
+    command = "echo ${self.ipv4_address}"
+  }
+}
+
 resource "azurerm_postgresql_firewall_rule" "example" {
   name                = "allow-all"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_postgresql_flexible_server.mpi.name
-  start_ip_address    = self.ipv4_address
-  end_ip_address      = self.ipv4_address
+  start_ip_address    = null_resource.ipv4
+  end_ip_address      = null_resource.ipv4
+  depends_on          = null_resource.ipv4
 }
 
 resource "null_resource" "setup_tables" {
@@ -419,6 +426,7 @@ resource "null_resource" "setup_tables" {
   }
 
   depends_on = [
-    azurerm_postgresql_flexible_server_database.mpi
+    azurerm_postgresql_flexible_server_database.mpi,
+    azurerm_postgresql_firewall_rule.example
   ]
 }
