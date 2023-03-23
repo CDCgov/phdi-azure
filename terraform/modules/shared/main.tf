@@ -405,7 +405,7 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
 
 resource "null_resource" "ipv4" {
   provisioner "local-exec" {
-    command = "echo ${self.ipv4}"
+    command = "curl ifconfig.me"
   }
 }
 
