@@ -412,20 +412,22 @@ resource "null_resource" "mpi" {
   # provisioner "local-exec" {
   #   command = "echo 'public_ip_address = \"${chomp(self.local_exec.output)}\"' > public_ip_address.auto.tfvars"
   # }
+
+  output "public_ip_address" {
+    value               = chomp("${null_resource.mpi.*.triggers.ip_address}")
+    depends_on          = [null_resource.mpi]
+  }
 }
 
-output "public_ip_address" {
-  value               = chomp("${null_resource.mpi.*.triggers.ip_address}")
-  depends_on          = [null_resource.mpi]
-}
+
 
 resource "azurerm_postgresql_firewall_rule" "mpi" {
   name                = "allow-all"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_postgresql_flexible_server.mpi.name
-  start_ip_address    = var.public_ip_address
-  end_ip_address      = var.public_ip_address
-  depends_on          = [null_resource.mpi, public_ip_address]
+  start_ip_address    = null_resource.mpi.public_ip_address
+  end_ip_address      = null_resource.mpi.public_ip_address
+  depends_on          = [null_resource.mpi]
 }
 
 resource "null_resource" "setup_tables" {
