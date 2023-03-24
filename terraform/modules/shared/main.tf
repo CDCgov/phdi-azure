@@ -421,6 +421,12 @@ output "public_ip_address" {
   depends_on          = [null_resource.mpi]
 }
 
+resource "null_resource" "wait_for_variable" {
+  provisioner "local-exec" {
+    command = "echo Variable is defined"
+    when = "terraform.workspace != \"default\""
+  }
+}
 
 
 resource "azurerm_postgresql_firewall_rule" "mpi" {
@@ -429,7 +435,7 @@ resource "azurerm_postgresql_firewall_rule" "mpi" {
   server_name         = azurerm_postgresql_flexible_server.mpi.name
   start_ip_address    = var.public_ip_address
   end_ip_address      = var.public_ip_address
-  depends_on          = [null_resource.mpi]
+  depends_on          = [null_resource.mpi, null_resource.wait_for_variable]
 }
 
 resource "null_resource" "setup_tables" {
