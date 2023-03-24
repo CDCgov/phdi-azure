@@ -415,7 +415,7 @@ resource "azurerm_database_migration_project" "mpi" {
   name                = "phdi-${terraform.workspace}-migrate-project"
   location            = var.location
   resource_group_name = var.resource_group_name
-  service_name        = 
+  service_name        = azurerm_database_migration_service.mpi.name
 }
 
 # # Set up Azure Migrate Server Migration
