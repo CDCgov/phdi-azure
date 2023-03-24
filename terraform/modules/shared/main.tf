@@ -392,7 +392,6 @@ resource "azurerm_database_migration_project" "mpi" {
   name                = "dibbs-mp-migrate"
   location            = var.location
   resource_group_name = var.resource_group_name
-  migration_files_path = "../../scripts/migrations/"
 }
 
 # # Set up Azure Migrate Server Migration
