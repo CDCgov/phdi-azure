@@ -416,10 +416,10 @@ resource "null_resource" "mpi" {
   
 }
 
-output "public_ip_address" {
-  value               = chomp("${null_resource.mpi.*.triggers.ip_address}")
-  depends_on          = [null_resource.mpi]
-}
+# output "public_ip_address" {
+#   value               = chomp("${null_resource.mpi.*.triggers.ip_address}")
+#   depends_on          = [null_resource.mpi]
+# }
 
 
 # resource "azurerm_postgresql_firewall_rule" "mpi" {
