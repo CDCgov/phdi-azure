@@ -422,7 +422,7 @@ output "public_ip_address" {
 }
 
 resource "null_resource" "wait_for_variable" {
-  count = "${var.my_variable != "" ? 1 : 0}"
+  count = "${var.public_ip_address != "" ? 1 : 0}"
   provisioner "local-exec" {
     command = "echo Variable is defined"
   }
