@@ -97,7 +97,7 @@ def test_pipeline_trigger_success(
             root_template = "VXU_V04"
 
         elif source_data_subdirectory == "ecr":
-            message_type = "ccda"
+            message_type = "ecr"
             root_template = "CCD"
 
         event = mock.MagicMock()
