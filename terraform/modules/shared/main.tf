@@ -381,7 +381,7 @@ resource "azurerm_postgresql_flexible_server" "mpi" {
 }
 
 resource "azurerm_postgresql_flexible_server_database" "mpi" {
-  name      = "DibbsMpiDB"
+  name      = "phdi-${terraform.workspace}-dibbs-mpi-db"
   server_id = azurerm_postgresql_flexible_server.mpi.id
   collation = "en_US.utf8"
   charset   = "utf8"
@@ -389,7 +389,7 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
 
 # Create an Azure Migrate Project
 resource "azurerm_database_migration_project" "mpi" {
-  name                = "dibbs-mp-migrate"
+  name                = "phdi-${terraform.workspace}-migrate-project"
   location            = var.location
   resource_group_name = var.resource_group_name
 }
