@@ -388,7 +388,7 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
 }
 
 # Create an Azure Migrate Project
-resource "azurerm_migrate_project" "mpi" {
+resource "azurerm_database_migration_project" "mpi" {
   name                = "dibbs-mp-migrate"
   location            = var.location
   resource_group_name = var.resource_group_name
