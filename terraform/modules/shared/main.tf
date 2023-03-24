@@ -422,14 +422,14 @@ resource "null_resource" "mpi" {
 # }
 
 
-# resource "azurerm_postgresql_firewall_rule" "mpi" {
-#   name                = "allow-all"
-#   resource_group_name = var.resource_group_name
-#   server_name         = azurerm_postgresql_flexible_server.mpi.name
-#   start_ip_address    = output.public_ip_address
-#   end_ip_address      = output.public_ip_address
-#   depends_on          = [null_resource.mpi]
-# }
+resource "azurerm_postgresql_firewall_rule" "mpi" {
+  name                = "allow-all"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_flexible_server.mpi.name
+  start_ip_address    = 0.0.0.0
+  end_ip_address      = 255.255.255.255
+  depends_on          = [null_resource.mpi]
+}
 
 resource "null_resource" "setup_tables" {
   provisioner "local-exec" {
@@ -439,6 +439,7 @@ resource "null_resource" "setup_tables" {
   }
 
   depends_on = [
-    azurerm_postgresql_flexible_server_database.mpi
+    azurerm_postgresql_flexible_server_database.mpi,
+    azurerm_postgresql_firewall_rule.mpi
   ]
 }
