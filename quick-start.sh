@@ -206,6 +206,10 @@ done
 spin "Creating federated credential..." az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
 az role assignment create --assignee "$CLIENT_ID" --role "App Resource Provider Registrant" --scope "/subscriptions/$SUBSCRIPTION_ID"  
 
+# Add Application.ReadWrite.All permission to the app
+spin "Adding Application.ReadWrite.All permission..." az ad app permission add --id $CLIENT_ID --api 00000003-0000-0000-c000-000000000000 --api-permissions 1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9=Role
+spin "Granting admin consent..." az ad app permission admin-consent --id $CLIENT_ID
+
 # Cleanup
 rm role.json
 rm credentials.json

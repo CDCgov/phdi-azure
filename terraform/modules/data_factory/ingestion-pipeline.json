@@ -108,6 +108,14 @@
                     "body": {
                         "value": "{\n    \"input_data\": @{pipeline().parameters.message},\n    \"input_type\": \"@{pipeline().parameters.message_type}\",\n    \"root_template\": \"@{pipeline().parameters.root_template}\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-fhir-converter",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -137,6 +145,14 @@
                     "body": {
                         "value": "{\n    \"blob\": @{activity('convert_to_fhir').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_conversion_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -166,6 +182,14 @@
                     "body": {
                         "value": "{\n    \"data\": @{activity('convert_to_fhir').output.response.FhirResource}\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -195,6 +219,14 @@
                     "body": {
                         "value": "{\n    \"data\": @{activity('standardize_name').output.bundle}\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -224,6 +256,14 @@
                     "body": {
                         "value": "{\n    \"bundle\": @{activity('standardize_phone').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -253,6 +293,14 @@
                     "body": {
                         "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -282,6 +330,14 @@
                     "body": {
                         "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('add_patient_hash').output.bundle}\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-message-parser",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -311,6 +367,14 @@
                     "body": {
                         "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('add_patient_hash').output.bundle},\n    \"cred_manager\": \"azure\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -340,6 +404,14 @@
                     "body": {
                         "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.fhir_server_response_body},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_upload_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             }
