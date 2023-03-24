@@ -68,7 +68,7 @@ def main(event: func.EventGridEvent) -> None:
     )
 
     # Handle eICR + Reportability Response messages
-    if message_type == "ccda":
+    if message_type == "ecr":
         ecr = cloud_container_connection.download_object(
             container_name=container_name, filename=filename
         )
