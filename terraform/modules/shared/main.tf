@@ -426,8 +426,8 @@ resource "azurerm_postgresql_firewall_rule" "mpi" {
   name                = "allow-all"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_postgresql_flexible_server.mpi.name
-  start_ip_address    = 0.0.0.0
-  end_ip_address      = 255.255.255.255
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "255.255.255.255"
   depends_on          = [null_resource.mpi]
 }
 
