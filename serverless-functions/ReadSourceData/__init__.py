@@ -44,7 +44,7 @@ def main(event: func.EventGridEvent) -> None:
         root_template = "VXU_V04"
 
     elif filename_parts[0] == "ecr":
-        message_type = "ccda"
+        message_type = "ecr"
         root_template = "CCD"
 
         if any([name for name in ["RR", "html"] if name in filename_parts[1]]):
@@ -68,7 +68,7 @@ def main(event: func.EventGridEvent) -> None:
     )
 
     # Handle eICR + Reportability Response messages
-    if message_type == "ccda":
+    if message_type == "ecr":
         ecr = cloud_container_connection.download_object(
             container_name=container_name, filename=filename
         )
