@@ -422,7 +422,7 @@ output "public_ip_address" {
 }
 
 resource "null_resource" "wait_for_variable" {
-  count = "${var.public_ip_address != "" ? 1 : 0}"
+  count = "${output.public_ip_address != "" ? 1 : 0}"
   provisioner "local-exec" {
     command = "echo Variable is defined"
   }
@@ -433,8 +433,8 @@ resource "azurerm_postgresql_firewall_rule" "mpi" {
   name                = "allow-all"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_postgresql_flexible_server.mpi.name
-  start_ip_address    = var.public_ip_address
-  end_ip_address      = var.public_ip_address
+  start_ip_address    = output.public_ip_address
+  end_ip_address      = output.public_ip_address
   depends_on          = [null_resource.mpi, null_resource.wait_for_variable]
 }
 
