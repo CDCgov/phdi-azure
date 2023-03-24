@@ -387,11 +387,35 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
   charset   = "utf8"
 }
 
+resource "azurerm_virtual_network" "example" {
+  name                = "phdi-${terraform.workspace}-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = var.location
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_subnet" "example" {
+  name                 = "phdi-${terraform.workspace}-subnet"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.example.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+# Create an Azure Migrate Service
+resource "azurerm_database_migration_service" "mpi" {
+  name                = "phdi-${terraform.workspace}-dbms"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = azurerm_subnet.example.id
+  sku_name            = "Standard_1vCores"
+}
+
 # Create an Azure Migrate Project
 resource "azurerm_database_migration_project" "mpi" {
   name                = "phdi-${terraform.workspace}-migrate-project"
   location            = var.location
   resource_group_name = var.resource_group_name
+  service_name        = 
 }
 
 # # Set up Azure Migrate Server Migration
