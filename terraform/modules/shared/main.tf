@@ -413,10 +413,12 @@ resource "null_resource" "mpi" {
   #   command = "echo 'public_ip_address = \"${chomp(self.local_exec.output)}\"' > public_ip_address.auto.tfvars"
   # }
 
-  output "public_ip_address" {
-    value               = chomp("${null_resource.mpi.*.triggers.ip_address}")
-    depends_on          = [null_resource.mpi]
-  }
+  
+}
+
+output "public_ip_address" {
+  value               = chomp("${null_resource.mpi.*.triggers.ip_address}")
+  depends_on          = [null_resource.mpi]
 }
 
 
