@@ -416,6 +416,8 @@ resource "azurerm_database_migration_project" "mpi" {
   location            = var.location
   resource_group_name = var.resource_group_name
   service_name        = azurerm_database_migration_service.mpi.name
+  source_platform     = "SQL"
+  target_platform     = "SQLDB"
 }
 
 # # Set up Azure Migrate Server Migration
