@@ -387,6 +387,55 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
   charset   = "utf8"
 }
 
+# Create an Azure Migrate Project
+resource "azurerm_migrate_project" "mpi" {
+  name                = "dibbs-mp-migrate"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  migration_files_path = "../../scripts/migrations/"
+}
+
+# # Set up Azure Migrate Server Migration
+# resource "azurerm_migrate_assessment" "mpi" {
+#   name                = "my-assessment"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
+#   project_name        = azurerm_migrate_project.mpi.name
+# }
+
+# resource "azurerm_migrate_group_map" "mpi" {
+#   name                = "my-group-map"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
+#   project_name        = azurerm_migrate_project.mpi.name
+# }
+
+# resource "azurerm_migrate_project_credentials" "mpi" {
+#   name                = "my-credentials"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
+#   project_name        = azurerm_migrate_project.mpi.name
+# }
+
+# resource "azurerm_migrate_project_server_assessment" "mpi" {
+#   name                = "my-server-assessment"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
+#   project_name        = azurerm_migrate_project.mpi.name
+#   assessment_name     = azurerm_migrate_assessment.mpi.name
+#   credentials_name    = azurerm_migrate_project_credentials.mpi.name
+# }
+
+# resource "azurerm_migrate_project_server_group_map" "mpi" {
+#   name                = "my-server-group-map"
+#   location            = var.location
+#   resource_group_name = var.resource_group_name
+#   project_name        = azurerm_migrate_project.mpi.name
+#   assessment_name     = azurerm_migrate_assessment.mpi.name
+#   group_map_name      = azurerm_migrate
+# }
+
+
 # provider "postgresql_database" {
 #   alias   = "DibbsMpiDB"
 #   host    = azurerm_postgresql_flexible_server.mpi.fqdn
@@ -403,18 +452,18 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
 #   statement = "CREATE TABLE my_table (id SERIAL PRIMARY KEY, name VARCHAR(50))"
 # }
 
-resource "null_resource" "mpi" {
-  provisioner "local-exec" {
-    command = "curl ifconfig.me"
-    interpreter = ["/bin/bash", "-c"]
-  }
+# resource "null_resource" "mpi" {
+#   provisioner "local-exec" {
+#     command = "curl ifconfig.me"
+#     interpreter = ["/bin/bash", "-c"]
+#   }
 
-  # provisioner "local-exec" {
-  #   command = "echo 'public_ip_address = \"${chomp(self.local_exec.output)}\"' > public_ip_address.auto.tfvars"
-  # }
+#   # provisioner "local-exec" {
+#   #   command = "echo 'public_ip_address = \"${chomp(self.local_exec.output)}\"' > public_ip_address.auto.tfvars"
+#   # }
 
   
-}
+# }
 
 # output "public_ip_address" {
 #   value               = chomp("${null_resource.mpi.*.triggers.ip_address}")
@@ -422,24 +471,24 @@ resource "null_resource" "mpi" {
 # }
 
 
-resource "azurerm_postgresql_firewall_rule" "mpi" {
-  name                = "allow-all"
-  resource_group_name = var.resource_group_name
-  server_name         = azurerm_postgresql_flexible_server.mpi.name
-  start_ip_address    = "0.0.0.0"
-  end_ip_address      = "255.255.255.255"
-  depends_on          = [null_resource.mpi]
-}
+# resource "azurerm_postgresql_firewall_rule" "mpi" {
+#   name                = "allow-all"
+#   resource_group_name = var.resource_group_name
+#   server_name         = azurerm_postgresql_flexible_server.mpi.name
+#   start_ip_address    = "0.0.0.0"
+#   end_ip_address      = "255.255.255.255"
+#   depends_on          = [null_resource.mpi]
+# }
 
-resource "null_resource" "setup_tables" {
-  provisioner "local-exec" {
-    command = <<-EOT
-      PGPASSWORD=${azurerm_postgresql_flexible_server.mpi.administrator_password} psql -h ${azurerm_postgresql_flexible_server.mpi.fqdn} -U ${azurerm_postgresql_flexible_server.mpi.administrator_login} -d ${azurerm_postgresql_flexible_server_database.mpi.name} -f "../../scripts/dibbs_mp_db.ddl"
-    EOT
-  }
+# resource "null_resource" "setup_tables" {
+#   provisioner "local-exec" {
+#     command = <<-EOT
+#       PGPASSWORD=${azurerm_postgresql_flexible_server.mpi.administrator_password} psql -h ${azurerm_postgresql_flexible_server.mpi.fqdn} -U ${azurerm_postgresql_flexible_server.mpi.administrator_login} -d ${azurerm_postgresql_flexible_server_database.mpi.name} -f "../../scripts/dibbs_mp_db.ddl"
+#     EOT
+#   }
 
-  depends_on = [
-    azurerm_postgresql_flexible_server_database.mpi,
-    azurerm_postgresql_firewall_rule.mpi
-  ]
-}
+#   depends_on = [
+#     azurerm_postgresql_flexible_server_database.mpi,
+#     azurerm_postgresql_firewall_rule.mpi
+#   ]
+# }
