@@ -421,22 +421,15 @@ output "public_ip_address" {
   depends_on          = [null_resource.mpi]
 }
 
-resource "null_resource" "wait_for_variable" {
-  count = "${output.public_ip_address != "" ? 1 : 0}"
-  provisioner "local-exec" {
-    command = "echo Variable is defined"
-  }
-}
 
-
-resource "azurerm_postgresql_firewall_rule" "mpi" {
-  name                = "allow-all"
-  resource_group_name = var.resource_group_name
-  server_name         = azurerm_postgresql_flexible_server.mpi.name
-  start_ip_address    = output.public_ip_address
-  end_ip_address      = output.public_ip_address
-  depends_on          = [null_resource.mpi, null_resource.wait_for_variable]
-}
+# resource "azurerm_postgresql_firewall_rule" "mpi" {
+#   name                = "allow-all"
+#   resource_group_name = var.resource_group_name
+#   server_name         = azurerm_postgresql_flexible_server.mpi.name
+#   start_ip_address    = output.public_ip_address
+#   end_ip_address      = output.public_ip_address
+#   depends_on          = [null_resource.mpi]
+# }
 
 resource "null_resource" "setup_tables" {
   provisioner "local-exec" {
@@ -446,7 +439,6 @@ resource "null_resource" "setup_tables" {
   }
 
   depends_on = [
-    azurerm_postgresql_flexible_server_database.mpi,
-    azurerm_postgresql_firewall_rule.mpi
+    azurerm_postgresql_flexible_server_database.mpi
   ]
 }
