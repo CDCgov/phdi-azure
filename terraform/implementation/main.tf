@@ -29,6 +29,7 @@ module "data_factory" {
   pipeline_runner_id                      = module.shared.pipeline_runner_id
   pipeline_runner_principal_id            = module.shared.pipeline_runner_principal_id
   validation_failures_container_name      = module.shared.validation_failures_container_name
+  pipeline_runner_resource_id             = module.shared.pipeline_runner_resource_id
   fhir_upload_failures_container_name     = module.shared.fhir_upload_failures_container_name
   fhir_conversion_failures_container_name = module.shared.fhir_conversion_failures_container_name
   client_id                               = var.client_id
