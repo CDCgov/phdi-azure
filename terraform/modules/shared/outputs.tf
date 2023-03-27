@@ -64,10 +64,6 @@ output "azurerm_postgresql_flexible_server" {
   value = azurerm_postgresql_flexible_server.mpi.name
 }
 
-output "postgresql_flexible_server_database_name" {
-  value = azurerm_postgresql_flexible_server_database.mpi.name
-}
-
 output "postgresql_flexible_server_admin_password" {
   sensitive = true
   value     = azurerm_postgresql_flexible_server.mpi.administrator_password
