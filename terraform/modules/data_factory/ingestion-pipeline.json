@@ -23,7 +23,7 @@
                         "type": "Expression"
                     },
                     "authentication": {
-                        "resource": "api://phdi-${environment}-validate-message",
+                        "resource": "api://phdi-${environment}-validation",
                         "credential": {
                             "referenceName": "pipeline-runner-credential",
                             "type": "CredentialReference"
