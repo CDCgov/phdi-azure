@@ -42,8 +42,3 @@ variable "log_analytics_workspace_id" {
   type        = string
   description = "Log Analytics Workspace ID."
 }
-
-variable "name_prefix" {
-  default     = "postgresqlfs"
-  description = "Prefix of the resource name."
-}
