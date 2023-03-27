@@ -55,3 +55,20 @@ output "validation_container_url" {
 # output "alerts_container_url" {
 #   value = "https://phdi-${terraform.workspace}-alerts.${azurerm_container_app_environment.phdi.default_domain}"
 # }
+
+# output "resource_group_name" {
+#   value = azurerm_resource_group.default.name
+# }
+
+output "azurerm_postgresql_flexible_server" {
+  value = azurerm_postgresql_flexible_server.mpi.name
+}
+
+output "postgresql_flexible_server_database_name" {
+  value = azurerm_postgresql_flexible_server_database.mpi.name
+}
+
+output "postgresql_flexible_server_admin_password" {
+  sensitive = true
+  value     = azurerm_postgresql_flexible_server.mpi.administrator_password
+}
