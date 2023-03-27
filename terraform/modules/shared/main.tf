@@ -353,25 +353,25 @@ resource "azurerm_communication_service" "communication_service" {
 
 ##### Postgres #####
 
-resource "random_name" "name_prefix" {
+resource "random_pet" "name_prefix" {
   prefix = var.name_prefix
   length = 1
 }
 
 # resource "azurerm_resource_group" "default" {
-#   name     = random_name.name_prefix.id
+#   name     = random_pet.name_prefix.id
 #   location = var.location
 # }
 
 resource "azurerm_virtual_network" "default" {
-  name                = "${random_name.name_prefix.id}-vnet"
+  name                = "${random_pet.name_prefix.id}-vnet"
   location            = var.location
   resource_group_name = var.resource_group_name
   address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_network_security_group" "default" {
-  name                = "${random_name.name_prefix.id}-nsg"
+  name                = "${random_pet.name_prefix.id}-nsg"
   location            = var.location
   resource_group_name = var.resource_group_name
 
@@ -414,7 +414,7 @@ resource "azurerm_subnet_network_security_group_association" "default" {
 }
 
 resource "azurerm_private_dns_zone" "default" {
-  name                = "${random_name.name_prefix.id}-pdz.postgres.database.azure.com"
+  name                = "${random_pet.name_prefix.id}-pdz.postgres.database.azure.com"
   resource_group_name = var.resource_group_name
 
   depends_on = [azurerm_subnet_network_security_group_association.default]
