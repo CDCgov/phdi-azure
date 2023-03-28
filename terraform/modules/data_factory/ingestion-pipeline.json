@@ -85,7 +85,7 @@
                     "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"blob\": @{activity('validate_message').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${ validation_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
+                        "value": "{\n    \"blob\": @{activity('validate_message').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${ validation_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
                         "type": "Expression"
                     }
                 }
