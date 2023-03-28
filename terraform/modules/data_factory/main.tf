@@ -21,6 +21,44 @@ resource "azurerm_data_factory" "phdi_data_factory" {
     managed-by  = "terraform"
   }
 }
+
+resource "azurerm_role_assignment" "data_factory_contributor" {
+  scope                = azurerm_data_factory.phdi_data_factory.id
+  role_definition_name = "Contributor"
+  principal_id         = var.pipeline_runner_principal_id
+}
+
+resource "null_resource" "adf_credential" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      # Get an access token for Azure Management API
+      access_token=$(az account get-access-token --query 'accessToken' -o tsv)
+
+      # Define the credential JSON payload
+      credential_payload=$(cat <<-JSON
+      {
+        "properties": {
+          "type": "ManagedIdentity",
+          "typeProperties": {
+            "resourceId": "${var.pipeline_runner_resource_id}"
+          }
+        }
+      }
+      JSON
+      )
+
+      # Create the credential in Azure Data Factory
+      az rest --method put \
+        --uri "https://management.azure.com/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}/providers/Microsoft.DataFactory/factories/${azurerm_data_factory.phdi_data_factory.name}/credentials/pipeline-runner-credential?api-version=2018-06-01" \
+        --headers "Content-Type=application/json" \
+        --headers "Authorization=Bearer $access_token" \
+        --body "$credential_payload"
+    EOT
+  }
+
+  depends_on = [azurerm_data_factory.phdi_data_factory, azurerm_role_assignment.data_factory_contributor]
+}
+
 locals {
   ingestion-pipeline-config = jsondecode(templatefile("../modules/data_factory/ingestion-pipeline.json", {
     environment                             = terraform.workspace,
@@ -46,10 +84,6 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
   }
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
-}
 
-resource "azurerm_role_assignment" "data_factory_contributor" {
-  scope                = azurerm_data_factory.phdi_data_factory.id
-  role_definition_name = "Contributor"
-  principal_id         = var.pipeline_runner_principal_id
+  depends_on = [null_resource.adf_credential]
 }

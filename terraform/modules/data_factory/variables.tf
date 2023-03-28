@@ -61,6 +61,11 @@ variable "pipeline_runner_principal_id" {
   description = "Principal ID of the pipeline runner identity"
 }
 
+variable "pipeline_runner_resource_id" {
+  type        = string
+  description = "Resource ID of the pipeline runner identity"
+}
+
 variable "fhir_upload_failures_container_name" {
   type        = string
   description = "Container name for failed FHIR uploads"

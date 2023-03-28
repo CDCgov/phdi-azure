@@ -22,6 +22,10 @@ output "pipeline_runner_principal_id" {
   value = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
+output "pipeline_runner_resource_id" {
+  value = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourcegroups/${var.resource_group_name}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${azurerm_user_assigned_identity.pipeline_runner.name}"
+}
+
 output "fhir_upload_failures_container_name" {
   value = azurerm_storage_container.fhir_upload_failures_container_name.name
 }
