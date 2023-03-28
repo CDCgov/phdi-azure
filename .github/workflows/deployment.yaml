@@ -155,7 +155,7 @@ jobs:
           az extension add --name containerapp
           DEFAULT_DOMAIN=$(az containerapp env show --name $TF_ENV --query properties.defaultDomain -o tsv)
           for SERVICE in fhir-converter ingestion alerts tabulation validation message-parser; do
-            if [[ $(az containerapp auth show --name phdi-$TF_ENV-$SERVICE --query platform.enabled) == false ]]; then
+            if [[ $(az containerapp auth show --name phdi-$TF_ENV-$SERVICE) == "{}" ]]; then
               if [[ $(az ad app list | grep -c phdi-$TF_ENV-$SERVICE) -gt 0 ]]; then
                 APP_ID=$(az ad app list --display-name phdi-$TF_ENV-$SERVICE --query [].appId -o tsv)
               else
