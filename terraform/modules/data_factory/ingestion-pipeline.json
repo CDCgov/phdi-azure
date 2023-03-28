@@ -46,7 +46,7 @@
                 "userProperties": [],
                 "typeProperties": {
                     "expression": {
-                        "value": "@equals(activity('validate_message').output.response.message_valid, true)",
+                        "value": "@equals(activity('validate_message').output.message_valid, true)",
                         "type": "Expression"
                     },
                     "ifFalseActivities": [
