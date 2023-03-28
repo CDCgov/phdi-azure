@@ -19,7 +19,7 @@
                     "url": "${validation_container_url}/validate",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"message\": @{pipeline().parameters.message},\n    \"message_type\": \"@{pipeline().parameters.message_type}\",\n    \"root_template\": \"@{pipeline().parameters.include_error_types}\"\n}",
+                        "value": "{\n    \"message\": @{pipeline().parameters.message},\n    \"message_type\": \"@{pipeline().parameters.message_type}\",\n    \"include_error_types\": \"@{pipeline().parameters.include_error_types}\"\n}",
                         "type": "Expression"
                     },
                     "authentication": {
