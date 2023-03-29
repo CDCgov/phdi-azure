@@ -23,6 +23,11 @@ variable "message_parser_url" {
   description = "URL of the message parser container"
 }
 
+variable "record_linkage_container_url" {
+ type        = string
+ description = "URL of the record linkage container"
+}
+
 # TODO: Uncomment when validation is implemented
 # variable "validation_container_url" {
 #  type        = string

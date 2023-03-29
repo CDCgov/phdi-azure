@@ -175,6 +175,7 @@ locals {
     "alerts",
     "message-parser",
     "validation",
+    "record-linkage"
   ])
 }
 
