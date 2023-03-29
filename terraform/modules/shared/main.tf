@@ -245,6 +245,12 @@ resource "azurerm_postgresql_flexible_server" "mpi" {
   }
 }
 
+resource "azurerm_postgresql_flexible_server_configuration" "mpi" {
+  name      = "azure.extensions"
+  server_id = azurerm_postgresql_flexible_server.mpi.id
+  value     = "UUID-OSSP"
+}
+
 resource "azurerm_postgresql_flexible_server_database" "mpi" {
   name      = "DibbsMpiDB"
   server_id = azurerm_postgresql_flexible_server.mpi.id
