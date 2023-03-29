@@ -58,6 +58,7 @@ jobs:
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> terraform.tfvars
           echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
           echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
+          echo smarty_licenses=\""$SMARTY_LICENSES"\" >> terraform.tfvars
           echo client_id=\""$CLIENT_ID"\" >> terraform.tfvars
           echo object_id=\""$OBJECT_ID"\" >> terraform.tfvars
           echo ghcr_username=\""$GHCR_USERNAME"\" >> terraform.tfvars

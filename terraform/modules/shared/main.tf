@@ -244,6 +244,10 @@ resource "azurerm_container_app" "container_app" {
         value = var.smarty_auth_token
       }
       env {
+        name  = "LICENSES"
+        value = var.smarty_licenses
+      }
+      env {
         name  = "AZURE_CLIENT_ID"
         value = azurerm_user_assigned_identity.pipeline_runner.client_id
       }
