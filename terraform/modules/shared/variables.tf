@@ -19,7 +19,7 @@ variable "smarty_auth_token" {
 }
 
 variable "smarty_licenses" {
-  type        = list(string)
+  type        = string
   description = "The SmartyStreets licenses to use."
 }
 

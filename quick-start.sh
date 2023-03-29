@@ -75,7 +75,7 @@ echo "Please enter the $(pink 'License Types') of your Smarty Street Account."
 echo "You can select multiple licenses by using the $(pink 'spacebar') to select and $(pink 'enter') to confirm."
 echo "More info: https://www.smarty.com/docs/cloud/licensing"
 echo
-SMARTY_LICENSES="[\n$(gum choose --no-limit "us-standard-cloud" "us-core-cloud" "us-rooftop-geocoding-cloud" "us-rooftop-geocoding-enterprise-cloud" "us-autocomplete-pro-cloud" "international-global-plus-cloud" | awk '{ print "\""$0"\","}')\n]"
+SMARTY_LICENSES="[$(gum choose --no-limit "us-standard-cloud" "us-core-cloud" "us-rooftop-geocoding-cloud" "us-rooftop-geocoding-enterprise-cloud" "us-autocomplete-pro-cloud" "international-global-plus-cloud" | awk '{ print "\""$0"\","}' | tr '\n' ' ' | sed 's/\(.*\),/\1 /' | sed 's/[[:blank:]]*$//')]"
 
 # Login to gh CLI
 clear
