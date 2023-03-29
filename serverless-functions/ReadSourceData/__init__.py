@@ -134,7 +134,7 @@ def main(event: func.EventGridEvent) -> None:
             "message_type": message_type,
             "root_template": root_template,
             "filename": f"{container_name}/{filename}",
-            "include_error_types": include_error_types
+            "include_error_types": include_error_types,
         }
 
         try:
