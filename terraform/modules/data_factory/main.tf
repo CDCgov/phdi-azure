@@ -69,6 +69,7 @@ locals {
     storage_account_url                     = var.phi_storage_account_endpoint_url,
     fhir_upload_failures_container_name     = var.fhir_upload_failures_container_name,
     fhir_conversion_failures_container_name = var.fhir_conversion_failures_container_name,
+    record_linkage_container_url            = var.record_linkage_container_url,
   }))
 }
 
