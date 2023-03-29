@@ -48,6 +48,7 @@ jobs:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
+          SMARTY_LICENSES: ${{ secrets.SMARTY_LICENSES }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           OBJECT_ID: ${{ secrets.OBJECT_ID }}
           GHCR_USERNAME: ${{ github.actor }}
