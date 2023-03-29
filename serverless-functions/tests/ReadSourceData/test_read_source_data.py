@@ -114,7 +114,7 @@ def test_pipeline_trigger_success(
             "message_type": message_type,
             "root_template": root_template,
             "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
-            'include_error_types': 'fatal, errors'
+            "include_error_types": "fatal, errors"
         }
 
         read_source_data(event)
