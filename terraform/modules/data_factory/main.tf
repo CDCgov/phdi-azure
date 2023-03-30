@@ -61,12 +61,14 @@ resource "null_resource" "adf_credential" {
 
 locals {
   ingestion-pipeline-config = jsondecode(templatefile("../modules/data_factory/ingestion-pipeline.json", {
+    validation_container_url                = var.validation_container_url,
     environment                             = terraform.workspace,
     fhir_converter_url                      = var.fhir_converter_url,
     ingestion_container_url                 = var.ingestion_container_url,
     fhir_server_url                         = var.fhir_server_url,
     message_parser_url                      = var.message_parser_url,
     storage_account_url                     = var.phi_storage_account_endpoint_url,
+    validation_failures_container_name      = var.validation_failures_container_name,
     fhir_upload_failures_container_name     = var.fhir_upload_failures_container_name,
     fhir_conversion_failures_container_name = var.fhir_conversion_failures_container_name,
     record_linkage_container_url            = var.record_linkage_container_url,
@@ -82,6 +84,7 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
     "message" : "",
     "message_type" : "",
     "root_template" : "",
+    "include_error_types" : ""
   }
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)

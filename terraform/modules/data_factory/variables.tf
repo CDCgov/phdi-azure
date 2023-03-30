@@ -23,16 +23,15 @@ variable "message_parser_url" {
   description = "URL of the message parser container"
 }
 
+variable "validation_container_url" {
+  type        = string
+  description = "URL of the validation container"
+}
+
 variable "record_linkage_container_url" {
   type        = string
   description = "URL of the record linkage container"
 }
-
-# TODO: Uncomment when validation is implemented
-# variable "validation_container_url" {
-#  type        = string
-#  description = "URL of the validation container"
-# }
 
 # TODO: Uncomment when tabulation is implemented
 # variable "tabulation_container_url" {
@@ -74,6 +73,11 @@ variable "pipeline_runner_resource_id" {
 variable "fhir_upload_failures_container_name" {
   type        = string
   description = "Container name for failed FHIR uploads"
+}
+
+variable "validation_failures_container_name" {
+  type        = string
+  description = "Container name for failed validations"
 }
 
 variable "fhir_conversion_failures_container_name" {

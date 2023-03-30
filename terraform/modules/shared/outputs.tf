@@ -30,6 +30,10 @@ output "fhir_upload_failures_container_name" {
   value = azurerm_storage_container.fhir_upload_failures_container_name.name
 }
 
+output "validation_failures_container_name" {
+  value = azurerm_storage_container.validation_failures_container_name.name
+}
+
 output "fhir_conversion_failures_container_name" {
   value = azurerm_storage_container.fhir_conversion_failures_container_name.name
 }
