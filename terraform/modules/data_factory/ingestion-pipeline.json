@@ -3,10 +3,113 @@
     "properties": {
         "activities": [
             {
+                "name": "validate_message",
+                "description": "Validate Hl7 or CCD message.\n",
+                "type": "WebActivity",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${validation_container_url}/validate",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"message\": @{pipeline().parameters.message},\n    \"message_type\": \"@{pipeline().parameters.message_type}\",\n    \"include_error_types\": \"@{pipeline().parameters.include_error_types}\"\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-validation",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
+                "name": "validation_if_condition",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "validate_message",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(activity('validate_message').output.message_valid, true)",
+                        "type": "Expression"
+                    },
+                    "ifFalseActivities": [
+                        {
+                            "name": "Fail1",
+                            "type": "Fail",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "message": "Validation failure, logging to validation failure storage.",
+                                "errorCode": "422"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "log_validation_failure",
+                "description": "Write validation failures to storage.\n",
+                "type": "WebActivity",
+                "dependsOn": [{
+                    "activity": "validation_if_condition",
+                    "dependencyConditions": [
+                        "Failed"
+                    ]
+                }],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"blob\": @{activity('validate_message').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${validation_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
                 "name": "convert_to_fhir",
                 "description": "Convert message from Hl7 or CCD to FHIR.\n",
                 "type": "WebActivity",
-                "dependsOn": [],
+                "dependsOn": [
+                    {
+                    "activity": "validation_if_condition",
+                    "dependencyConditions": [
+                        "Succeeded"
+                    ]
+                }
+                ],
                 "policy": {
                     "timeout": "0.12:00:00",
                     "retry": 0,
@@ -340,6 +443,9 @@
                 "type": "String"
             },
             "filename": {
+                "type": "String"
+            },
+            "include_error_types": {
                 "type": "String"
             }
         },
