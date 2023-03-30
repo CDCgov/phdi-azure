@@ -291,8 +291,8 @@ resource "azurerm_container_app" "container_app" {
         value = var.smarty_auth_token
       }
       env {
-        name  = "LICENSES"
-        value = var.smarty_licenses
+        name  = "LICENSE_TYPE"
+        value = var.smarty_license_type
       }
       env {
         name  = "AZURE_CLIENT_ID"
