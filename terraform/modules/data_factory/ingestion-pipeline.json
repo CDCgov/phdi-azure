@@ -284,8 +284,8 @@
                 }
             },
             {
-                "name": "add_patient_hash",
-                "description": "Compute a hashed identifier that can be used for record linkage.",
+                "name": "record_linkage",
+                "description": "Link new healthcare messages to existing records if a connection exists.",
                 "type": "WebActivity",
                 "dependsOn": [
                     {
@@ -304,7 +304,7 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "${ingestion_container_url}/fhir/linkage/link/add_patient_identifier_in_bundle",
+                    "url": "${record_linkage_container_url}/link-record",
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
@@ -326,7 +326,7 @@
                 "type": "WebActivity",
                 "dependsOn": [
                     {
-                        "activity": "add_patient_hash",
+                        "activity": "record_linkage",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -344,7 +344,7 @@
                     "url": "${message_parser_url}/parse_message",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('add_patient_hash').output.bundle}\n}",
+                        "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('record_linkage').output.bundle}\n}",
                         "type": "Expression"
                     },
                     "authentication": {
