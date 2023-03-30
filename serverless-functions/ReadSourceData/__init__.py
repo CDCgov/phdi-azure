@@ -36,11 +36,11 @@ def main(event: func.EventGridEvent) -> None:
     filename_parts = filename.split("/")
 
     if filename_parts[0] == "elr":
-        message_type = "hl7v2"
+        message_type = "elr"
         root_template = "ORU_R01"
 
     elif filename_parts[0] == "vxu":
-        message_type = "hl7v2"
+        message_type = "vxu"
         root_template = "VXU_V04"
 
     elif filename_parts[0] == "ecr":
@@ -103,7 +103,7 @@ def main(event: func.EventGridEvent) -> None:
         messages = [ecr]
 
     # Handle batch Hl7v2 messages.
-    elif message_type == "hl7v2":
+    elif message_type == "vxu" or message_type == "elr":
         blob_contents = cloud_container_connection.download_object(
             container_name=container_name, filename=filename
         )

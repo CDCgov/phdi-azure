@@ -89,11 +89,11 @@ def test_pipeline_trigger_success(
     patched_adf_management_client.return_value = adf_client
     for source_data_subdirectory in ["elr", "vxu", "ecr"]:
         if source_data_subdirectory == "elr":
-            message_type = "hl7v2"
+            message_type = "elr"
             root_template = "ORU_R01"
 
         elif source_data_subdirectory == "vxu":
-            message_type = "hl7v2"
+            message_type = "vxu"
             root_template = "VXU_V04"
 
         elif source_data_subdirectory == "ecr":
