@@ -180,6 +180,7 @@ locals {
     "alerts",
     "message-parser",
     "validation",
+    "record-linkage"
   ])
 }
 
@@ -219,6 +220,47 @@ resource "azurerm_container_app_environment" "phdi" {
   location                   = var.location
   resource_group_name        = var.resource_group_name
   log_analytics_workspace_id = var.log_analytics_workspace_id
+}
+
+##### Postgres #####
+resource "random_password" "postgres_password" {
+  length           = 32
+  special          = true
+  override_special = "_%@"
+}
+
+resource "azurerm_postgresql_flexible_server" "mpi" {
+  name                         = "phdi${terraform.workspace}mpi${substr(var.client_id, 0, 8)}"
+  resource_group_name          = var.resource_group_name
+  location                     = var.location
+  sku_name                     = "GP_Standard_D2s_v3"
+  version                      = "14"
+  storage_mb                   = 65536
+  backup_retention_days        = 7
+  geo_redundant_backup_enabled = true
+  administrator_login          = "postgres"
+  administrator_password       = random_password.postgres_password.result
+  tags = {
+    environment = terraform.workspace
+    managed-by  = "terraform"
+  }
+
+  lifecycle {
+    ignore_changes = [zone]
+  }
+}
+
+resource "azurerm_postgresql_flexible_server_configuration" "mpi" {
+  name      = "azure.extensions"
+  server_id = azurerm_postgresql_flexible_server.mpi.id
+  value     = "UUID-OSSP"
+}
+
+resource "azurerm_postgresql_flexible_server_database" "mpi" {
+  name      = "DibbsMpiDB"
+  server_id = azurerm_postgresql_flexible_server.mpi.id
+  collation = "en_US.utf8"
+  charset   = "utf8"
 }
 
 resource "azurerm_container_app" "container_app" {
@@ -271,6 +313,22 @@ resource "azurerm_container_app" "container_app" {
       env {
         name  = "COMMUNICATION_SERVICE_NAME"
         value = azurerm_communication_service.communication_service.name
+      }
+      env {
+        name  = "DB_USER"
+        value = "postgres"
+      }
+      env {
+        name  = "DB_PASSWORD"
+        value = random_password.postgres_password.result
+      }
+      env {
+        name  = "DB_HOST"
+        value = azurerm_postgresql_flexible_server.mpi.fqdn
+      }
+      env {
+        name  = "DB_NAME"
+        value = azurerm_postgresql_flexible_server_database.mpi.name
       }
     }
   }
@@ -354,33 +412,4 @@ resource "azurerm_communication_service" "communication_service" {
   resource_group_name = var.resource_group_name
   data_location       = "United States"
 
-}
-
-##### Postgres #####
-
-resource "random_password" "postgres_password" {
-  length           = 32
-  special          = true
-  override_special = "_%@"
-}
-
-resource "azurerm_postgresql_flexible_server" "mpi" {
-  name                         = "phdi${terraform.workspace}mpi${substr(var.client_id, 0, 8)}"
-  resource_group_name          = var.resource_group_name
-  location                     = var.location
-  sku_name                     = "GP_Standard_D2s_v3"
-  version                      = "14"
-  storage_mb                   = 65536
-  backup_retention_days        = 7
-  geo_redundant_backup_enabled = true
-  administrator_login          = "postgres"
-  administrator_password       = random_password.postgres_password.result
-  tags = {
-    environment = terraform.workspace
-    managed-by  = "terraform"
-  }
-
-  lifecycle {
-    ignore_changes = [zone]
-  }
 }

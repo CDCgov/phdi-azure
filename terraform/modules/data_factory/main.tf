@@ -71,6 +71,7 @@ locals {
     validation_failures_container_name      = var.validation_failures_container_name,
     fhir_upload_failures_container_name     = var.fhir_upload_failures_container_name,
     fhir_conversion_failures_container_name = var.fhir_conversion_failures_container_name,
+    record_linkage_container_url            = var.record_linkage_container_url,
   }))
 }
 
