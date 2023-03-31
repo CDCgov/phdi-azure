@@ -19,6 +19,11 @@ variable "smarty_auth_token" {
   description = "value of the SmartyStreets Auth Token"
 }
 
+variable "smarty_license_type" {
+  type        = string
+  description = "value of the SmartyStreets license type to use"
+}
+
 variable "client_id" {
   description = "Client ID"
 }

@@ -71,6 +71,11 @@ echo "More info: https://www.smarty.com/docs/cloud/authentication"
 echo
 SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 
+echo "Please select the $(pink 'License Type') of your Smarty Street Account."
+echo "More info: https://www.smarty.com/docs/cloud/licensing"
+echo
+SMARTY_LICENSE_TYPE=$(gum choose "us-standard-cloud" "us-core-cloud" "us-rooftop-geocoding-cloud" "us-rooftop-geocoding-enterprise-cloud" "us-autocomplete-pro-cloud" "international-global-plus-cloud")
+
 # Login to gh CLI
 clear
 echo "We will now login to the $(pink 'GitHub CLI')."
@@ -228,6 +233,7 @@ spin "Setting LOCATION..." gh -R "${GITHUB_REPO}" secret set LOCATION --body "${
 spin "Setting TENANT_ID..." gh -R "${GITHUB_REPO}" secret set TENANT_ID --body "${TENANT_ID}"
 spin "Setting SMARTY_AUTH_ID..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
 spin "Setting SMARTY_AUTH_TOKEN..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
+spin "Setting SMARTY_LICENSE_TYPE..." gh -R "${GITHUB_REPO}" secret set SMARTY_LICENSE_TYPE --body "${SMARTY_LICENSE_TYPE}"
 
 box "Repository secrets $(pink 'set')!"
 echo
