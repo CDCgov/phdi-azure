@@ -7,7 +7,7 @@ resource "azurerm_storage_account" "phi" {
   account_tier             = "Standard"
   account_kind             = "StorageV2"
   account_replication_type = "GRS"
-  is_hns_enabled            = true
+  is_hns_enabled           = true
 
   identity {
     type         = "UserAssigned"
