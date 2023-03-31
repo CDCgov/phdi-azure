@@ -307,7 +307,7 @@
                     "url": "${record_linkage_container_url}/link-record",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
+                        "value": "{\n    \"fhir_bundle\" :@{activity('geocode').output.bundle}\n}",
                         "type": "Expression"
                     },
                     "authentication": {
