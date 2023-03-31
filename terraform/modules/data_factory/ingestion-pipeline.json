@@ -311,7 +311,7 @@
                         "type": "Expression"
                     },
                     "authentication": {
-                        "resource": "api://phdi-${environment}-ingestion",
+                        "resource": "api://phdi-${environment}-record-linkage",
                         "credential": {
                             "referenceName": "pipeline-runner-credential",
                             "type": "CredentialReference"
@@ -344,7 +344,7 @@
                     "url": "${message_parser_url}/parse_message",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('record_linkage').output.bundle}\n}",
+                        "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('record_linkage').output.updated_bundle}\n}",
                         "type": "Expression"
                     },
                     "authentication": {
@@ -381,7 +381,7 @@
                     "url": "${ingestion_container_url}/fhir/transport/http/upload_bundle_to_fhir_server",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('record_linkage').output.bundle},\n    \"cred_manager\": \"azure\"\n}",
+                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('record_linkage').output.updated_bundle},\n    \"cred_manager\": \"azure\"\n}",
                         "type": "Expression"
                     },
                     "authentication": {
