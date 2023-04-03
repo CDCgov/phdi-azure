@@ -437,7 +437,7 @@ resource "azurerm_eventhub_namespace" "phdi" {
 
 resource "azurerm_eventhub" "phdi" {
   name                = "phdi${terraform.workspace}evh${substr(var.client_id, 0, 8)}"
-  namespace_name      = azurerm_eventhub_namespace.event_hub.name
+  namespace_name      = azurerm_eventhub_namespace.phdi.name
   resource_group_name = var.resource_group_name
   partition_count     = 2
   message_retention   = 1
