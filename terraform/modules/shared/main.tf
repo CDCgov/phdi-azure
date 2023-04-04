@@ -264,6 +264,14 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
   charset   = "utf8"
 }
 
+resource "azurerm_postgresql_firewall_rule" "allow_azure_services" {
+  name                = "allow_azure_services"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_flexible_server.mpi.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
+}
+
 resource "azurerm_container_app" "container_app" {
   for_each                     = local.images
   name                         = "phdi-${terraform.workspace}-${each.key}"
