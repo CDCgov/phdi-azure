@@ -266,7 +266,7 @@ resource "azurerm_postgresql_flexible_server_database" "mpi" {
 
 // Allow Azure services to access the database
 // See here: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_firewall_rule
-resource "azurerm_postgresql_firewall_rule" "allow_azure_services" {
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
   name                = "allow_azure_services"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_postgresql_flexible_server.mpi.name
