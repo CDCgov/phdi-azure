@@ -388,7 +388,12 @@
                         "Content-Type": "application/json"
                     },
                     "authentication": {
-                        "type": "ManagedIdentity"
+                        "resource": "https://${eventhub_namespace_name}.servicebus.windows.net",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
