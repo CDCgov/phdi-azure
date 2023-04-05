@@ -390,11 +390,6 @@ resource "azurerm_healthcare_service" "fhir_server" {
   kind                = "fhir-R4"
   cosmosdb_throughput = 1400
 
-  access_policy_object_ids = [
-    azurerm_user_assigned_identity.pipeline_runner.principal_id,
-    var.object_id
-  ]
-
   lifecycle {
     ignore_changes = [name, tags]
   }
@@ -405,10 +400,16 @@ resource "azurerm_healthcare_service" "fhir_server" {
   }
 }
 
-resource "azurerm_role_assignment" "fhir_contributor" {
+resource "azurerm_role_assignment" "gh_sp_fhir_contributor" {
   scope                = azurerm_healthcare_service.fhir_server.id
   role_definition_name = "FHIR Data Contributor"
   principal_id         = var.object_id
+}
+
+resource "azurerm_role_assignment" "pipeline_runner_fhir_contributor" {
+  scope                = azurerm_healthcare_service.fhir_server.id
+  role_definition_name = "FHIR Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
 ##### User Assigned Identity #####
