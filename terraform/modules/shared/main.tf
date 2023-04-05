@@ -456,5 +456,11 @@ resource "azurerm_eventhub" "phdi" {
 resource "azurerm_role_assignment" "event_hub_contributor" {
   scope                = azurerm_eventhub_namespace.phdi.id
   role_definition_name = "Azure Event Hubs Data Owner"
-  principal_id         = var.object_id
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+resource "azurerm_role_assignment" "service_bus_contributor" {
+  scope                = azurerm_eventhub_namespace.phdi.id
+  role_definition_name = "Azure Service Bus Data Owner"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }

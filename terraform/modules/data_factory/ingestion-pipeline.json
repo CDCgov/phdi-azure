@@ -385,7 +385,7 @@
                         "type": "Expression"
                     },
                     "headers": {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/atom+xml;type=entry;charset=utf-8"
                     },
                     "authentication": {
                         "resource": "https://${eventhub_namespace_name}.servicebus.windows.net",
