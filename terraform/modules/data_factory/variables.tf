@@ -89,3 +89,13 @@ variable "client_id" {
   type        = string
   description = "Client ID"
 }
+
+variable "eventhub_namespace_name" {
+  type        = string
+  description = "Event Hub Namespace Name"
+}
+
+variable "eventhub_name" {
+  type        = string
+  description = "Event Hub Name"
+}

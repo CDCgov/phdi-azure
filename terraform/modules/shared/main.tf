@@ -428,3 +428,39 @@ resource "azurerm_communication_service" "communication_service" {
   data_location       = "United States"
 
 }
+
+
+##### Event Hub #####
+
+resource "azurerm_eventhub_namespace" "phdi" {
+  name                = "phdi${terraform.workspace}evhns${substr(var.client_id, 0, 8)}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  sku                 = "Standard"
+  capacity            = 1
+
+  tags = {
+    environment = terraform.workspace
+    managed-by  = "terraform"
+  }
+}
+
+resource "azurerm_eventhub" "phdi" {
+  name                = "phdi${terraform.workspace}evh${substr(var.client_id, 0, 8)}"
+  namespace_name      = azurerm_eventhub_namespace.phdi.name
+  resource_group_name = var.resource_group_name
+  partition_count     = 2
+  message_retention   = 1
+}
+
+resource "azurerm_role_assignment" "event_hub_contributor" {
+  scope                = azurerm_eventhub_namespace.phdi.id
+  role_definition_name = "Azure Event Hubs Data Owner"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+resource "azurerm_role_assignment" "service_bus_contributor" {
+  scope                = azurerm_eventhub_namespace.phdi.id
+  role_definition_name = "Azure Service Bus Data Owner"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
