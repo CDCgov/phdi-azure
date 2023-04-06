@@ -1,5 +1,15 @@
 # Execution Guide: How to run data through the Azure Starter Kit
 
+### Set up accounts prior to running data though the pipeline
+First, please confirm that you meet the following user requirements:
+1. Owner access to the Azure subscription where you would like to deploy the PHDI Starter Kit.
+1. A GitHub account with a verified email address.
+1. Access to create new repositories in the GitHub account or organization where your copy of this repository will be created.
+1. If you are planning to use an organization account, you must be able to authorize the GitHub CLI to interact with the organization.
+
+If you have not implemented the pipeline or do not meet one of the user requirements above, please follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
+
+
 ### Run an Hl7v2 vaccination message through the pipeline 
 
 Now that the starter kit has been deployed, we can run some data through it! The `sample-data/` directory in your forked version of the repository contains some dummy VXU messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
@@ -29,11 +39,12 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 1. To see that the pipeline has executed, search for `Data factories` and go to the Data factories page.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Select your data factory, which will be titled `phdi-{environment}-data-factory`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`.![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
-1. Select your ingestion pipeline, which will be titled `phdi-{environment}-ingestion`.![azure-select-ingestion-pipeline-in-studio](./images/azure-select-ingestion-pipeline-in-studio.png)
+1. Select your ingestion pipeline, which will be titled `phdi-{environment}-ingestion`. If you see multiple piplines with this name, select the one at the top (the most recently opened one).![azure-select-ingestion-pipeline-in-studio](./images/azure-select-ingestion-pipeline-in-studio.png)
 1. You should now see a diagram showing the steps of the pipeline. To view the status of our attempted run, click `Monitor` on the left sidebar.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
 1. We should now see that the ingestion pipeline has processed one message successfully.![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png)
-1. To view the JSON configuration for the pipeline and a visualization of the process, go to the `AUTHOR` tab.![azure-workflow-source](./images/azure-workflow-source.png)
+1. To view the JSON configuration for the pipeline and a visualization of the process, go to the `AUTHOR` tab (pencil icon).![azure-workflow-source](./images/azure-workflow-source.png)
 1. To view the cleaned and enriched data in the FHIR server, visit https://shell.azure.com to open the Cloud Shell.![azure-cloud-shell](./images/azure-cloud-shell.png)
+1. Select the bash option.
 1. Type the command `az login` and press enter. Copy the code provided, click the link, and paste the code. Then follow the prompts to complete login.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)![azure-device-login](./images/azure-device-login.png)
 1. To search for a patient named John Doe, enter the following commands, replacing `dev` with whichever environment you are currently searching in:
 ```bash
