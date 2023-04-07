@@ -2,10 +2,10 @@
 
 ### Set up accounts prior to running data though the pipeline
 First, please confirm that you meet the following user requirements:
-1. Owner access to the Azure subscription where you would like to deploy the PHDI Starter Kit.
-1. A GitHub account with a verified email address.
-1. Access to create new repositories in the GitHub account or organization where your copy of this repository will be created.
-1. If you are planning to use an organization account, you must be able to authorize the GitHub CLI to interact with the organization.
+1. Access to an Azure resource group where the starter kit has been deployed. Access must include the following roles:
+    - `Storage Blob Data Contributor` on the PHI storage account
+    - `FHIR Data Contributor` on the FHIR server
+2. All of the files in the [sample-data/](../sample-data/) directory easily available on your computer.
 
 If you have not implemented the pipeline or do not meet one of the user requirements above, please follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
 
