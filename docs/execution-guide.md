@@ -7,7 +7,12 @@ First, please confirm that you meet the following user requirements:
     - `FHIR Data Contributor` on the FHIR server
 2. All of the files in the [sample-data/](../sample-data/) directory have been downloaded to your computer.
 
-If you have not implemented the pipeline or do not meet one of the user requirements above, please follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
+
+
+If you have not implemented the pipeline, please follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
+
+If you or your organization, have deployed the starter kit, but you do not have sufficient access please contact your organization's Azure administrator.
+
 
 
 ### Run an Hl7v2 vaccination message through the pipeline 
