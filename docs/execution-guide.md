@@ -45,24 +45,25 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 15. Select your ingestion pipeline, which will be titled `phdi-{environment}-ingestion`. If you see multiple piplines with this name, select the one at the top (aka the most recently run pipeline).![azure-select-ingestion-pipeline-in-studio](./images/azure-select-ingestion-pipeline-in-studio.png)
 16. After clicking into your ingestion pipeline, you should see a diagram showing the steps of the pipeline.
 17. We should now see that the ingestion pipeline has processed one message successfully.![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png)
-19. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another window/tab and go to https://shell.azure.com.![azure-cloud-shell](./images/azure-cloud-shell.png)
+19. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another window/tab and go to https://shell.azure.com. ![azure-cloud-shell](./images/azure-cloud-shell.png)
 20. If this is your first time accessing Azure Cloud Shell, a pop up will appear asking you to select either the Bash or PowerShell option. Select the Bash option. 
 21. If this is NOT your first time accessing Azure Cloud Shell, confirm that you're in Bash mode by checking that the dropdown in the top left under the "Microsoft Azure" header has "Bash" selected.
 22. Then in the terminal, type the command `az login` and press enter. Copy the code provided, click the link, and paste the code. Then follow the prompts to complete login.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)![azure-device-login](./images/azure-device-login.png)
 23. Now you'll need to update the URL in the code with the URL of your FHIR server. To get the URL of your FHIR server, first go back to portal.azure.com in another tab. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.
 24. On the Azure API for FHIR page, click into your FHIR server API which should open a right sidebar. Within this sidebar, go to the FHIR metadata endpoint text under "Essentials" and select the URL prior to the "/metadata" portion so you that have a URL copied that looks something like: "https://devfhir9d194c64.azurehealthcareapis.com".
-25. To search for a patient named John Doe, go back to the tab with Cloud Shell open. 
-26. First, type in the command below into the terminal. Then replace the URL after '--resource=' with the URL you copied above. Hit enter to run this command.
-```bash
-token=$(az account get-access-token --resource=https://phdi-dev-fhir-server.azurehealthcareapis.com --query accessToken --output tsv)
-27. Then, type in the command below, replacing the URL in-between 'Bearer $token' and '/Patient' with the URL you copied above. Hit enter to run this command.
-RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" https://phdi-dev-fhir-server.azurehealthcareapis.com/Patient?family=DOE&given=JOHN)
-28. Finally, press the up arrow until you see the echo $RESPONSE | jq command below. Hit enter to run this command.
-echo $RESPONSE | jq
-```
+25. To search for a patient named John Doe, go back to the tab with Cloud Shell open. Type this command into the terminal:```bash
+token=$(az account get-access-token --resource=https://phdi-dev-fhir-server.azurehealthcareapis.com --query accessToken --output tsv)```
+Replace the URL after ```--resource=``` with the URL you copied above. Hit enter to run this command.
+
+26. Then, type in this command: ```RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" https://phdi-dev-fhir-server.azurehealthcareapis.com/Patient?family=DOE&given=JOHN)```
+Replace the URL in-between ```Bearer $token``` and ```/Patient``` with the URL you copied above. Hit enter to run this command.
+
+
+27. Finally, press the up arrow until you see this command: ```echo $RESPONSE | jq``` Hit enter to run this command.
+
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 
-29. The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Feel free to try them out for yourself by repeating steps 6-14 above! 
+28. The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Feel free to try them out for yourself by repeating steps 6-14 above! 
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
