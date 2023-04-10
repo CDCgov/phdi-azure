@@ -501,7 +501,7 @@ resource "azurerm_synapse_workspace" "phdi" {
   }
 
   identity {
-    type = "UserAssigned"
+    type = "SystemAssigned, UserAssigned"
     identity_ids = [
       azurerm_user_assigned_identity.pipeline_runner.id
     ]
