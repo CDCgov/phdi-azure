@@ -510,8 +510,8 @@ resource "azurerm_synapse_spark_pool" "phdi" {
   cache_size           = 100
 
   auto_scale {
-    max_node_count = 10
-    min_node_count = 1
+    max_node_count = 50
+    min_node_count = 3
   }
 
   auto_pause {
