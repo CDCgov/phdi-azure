@@ -57,11 +57,11 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 23. Now you'll need to update the URL in the code with the URL of your FHIR server. To get the URL of your FHIR server, first go back to portal.azure.com in another tab. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.
 24. On the Azure API for FHIR page, click into your FHIR server API which should open a right sidebar. Within this sidebar, go to the FHIR metadata endpoint text under "Essentials" and select the URL prior to the "/metadata" portion so you that have a URL copied that looks something like: "https://devfhir9d194c64.azurehealthcareapis.com".
 
-25. To search for a patient named John Doe, go back to the tab with Cloud Shell open. Type this command into the terminal:```bash
-token=$(az account get-access-token --resource=https://phdi-dev-fhir-server.azurehealthcareapis.com --query accessToken --output tsv)```.
+25. To search for a patient named John Doe, go back to the tab with Cloud Shell open. Copy and paste this command into the terminal and replace the "INSERT_URL_HERE" text with your FHIR metadata URL:<pre>
+token=$(az account get-access-token --resource=<b>INSERT_URL_HERE</b> --query accessToken --output tsv)</pre>.
 Replace the URL after ```--resource=``` with the URL you copied above. Hit enter to run this command.
 
-26. Then, type in this command: ```RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" https://phdi-dev-fhir-server.azurehealthcareapis.com/Patient?family=DOE&given=JOHN)```
+26. Then, copy and paste this command into the terminal and replace the "INSERT_URL_HERE" text with your FHIR metadata URL: <pre> RESPONSE=$(curl -X GET --header "Authorization: Bearer $token"<b>INSERT_URL_HERE</b>Patient?family=DOE&given=JOHN)</pre>
 Replace the URL in-between ```Bearer $token``` and ```/Patient``` with the URL you copied above. Hit enter to run this command.
 
 
