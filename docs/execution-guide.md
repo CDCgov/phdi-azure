@@ -15,7 +15,7 @@ If you or your organization, have deployed the starter kit, but you do not have 
 
 ## How to Use: Run an Hl7v2 vaccination message through the pipeline 
 ### Overview
-This guide is divided into 3 sections:
+This how-to guide is divided into 3 sections:
 1. Accessing your Azure account
 2. Running data through the pipeline
 3. Viewing data in the FHIR server
