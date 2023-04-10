@@ -503,7 +503,7 @@ resource "azurerm_synapse_workspace" "phdi" {
 }
 
 resource "azurerm_synapse_spark_pool" "phdi" {
-  name                 = "phdi${terraform.workspace}sparkpool${substr(var.client_id, 0, 8)}"
+  name                 = "${terraform.workspace}pool"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small"
