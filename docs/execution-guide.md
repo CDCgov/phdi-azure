@@ -14,7 +14,14 @@ If you or your organization, have deployed the starter kit, but you do not have 
 
 
 ## How to Use: Run an Hl7v2 vaccination message through the pipeline 
-Now that the starter kit has been deployed, we can run some data through it! The `sample-data/` directory contains some dummy VXU messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
+### Overview
+This guide is divided into 3 sections:
+1. Accessing your Azure account
+2. Running data through the pipeline
+3. Viewing data in the FHIR server
+
+### Example: VXU Sample Message 
+The `sample-data/` directory contains some dummy VXU messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
 2. The patient's phone number is not in a standard format.
 3. The patient's address is non-standard and has not been geocoded.
@@ -29,7 +36,8 @@ PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M1
 |||M^Married||4880776||||N^NOT HISPANIC OR LATINO^HL70189||N||US^United States of America^ISO3166_1||||N|||20080110015014+0315|||||||
 ```
 
-If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice. To run this message through the ingestion pipeline follow the steps below.
+If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice. Below are steps on how to run a VXU message through the pipeline.
+
 
 ### Access your Azure account 
 > Tip: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.
