@@ -77,7 +77,7 @@ resource "azurerm_storage_share" "tables" {
 }
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "phi" {
-  name               = "phdi${terraform.workspace}asdlg2fs"
+  name               = "synapse-data"
   storage_account_id = azurerm_storage_account.phi.id
 }
 
@@ -494,16 +494,41 @@ resource "azurerm_synapse_workspace" "phdi" {
   sql_administrator_login              = "sqladminuser"
   sql_administrator_login_password     = random_password.synapse_sql_password.result
 
-  aad_admin {
-    login     = "AzureAD Admin"
-    object_id = data.azurerm_client_config.current.object_id
-    tenant_id = data.azurerm_client_config.current.tenant_id
-  }
-
   identity {
     type = "SystemAssigned, UserAssigned"
     identity_ids = [
       azurerm_user_assigned_identity.pipeline_runner.id
     ]
+  }
+}
+
+resource "azurerm_synapse_spark_pool" "phdi" {
+  name                 = "phdi${terraform.workspace}sparkpool${substr(var.client_id, 0, 8)}"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  node_size_family     = "MemoryOptimized"
+  node_size            = "Small"
+  cache_size           = 100
+
+  auto_scale {
+    max_node_count = 10
+    min_node_count = 1
+  }
+
+  auto_pause {
+    delay_in_minutes = 15
+  }
+
+  library_requirement {
+    content  = <<EOF
+phdi
+EOF
+    filename = "requirements.txt"
+  }
+
+  spark_config {
+    content  = <<EOF
+spark.shuffle.spill                true
+EOF
+    filename = "config.txt"
   }
 }
