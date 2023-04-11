@@ -75,7 +75,7 @@ token=$(az account get-access-token --resource=<b>INSERT_URL_HERE</b> --query ac
 Replace the URL after ```--resource=``` with the URL you copied above. Hit enter to run this command.
 1. Then, copy and paste this command into the terminal and replace the "**INSERT_URL_HERE**" text with your FHIR metadata URL: <pre> RESPONSE=$(curl -X GET --header "Authorization: Bearer $token"<b>INSERT_URL_HERE</b>Patient?family=DOE&given=JOHN)</pre>
 Replace the URL in-between ```Bearer $token``` and ```/Patient``` with the URL you copied above. Hit enter to run this command.
-1. Finally, press the up arrow until you see this command: ```echo $RESPONSE | jq``` Hit enter to run this command.
+1. Finally, copy and paste this command into the terminal: ```echo $RESPONSE | jq``` Hit enter to run this command.
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 
 ### Run another VXU message through the pipeline
