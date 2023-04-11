@@ -64,8 +64,11 @@ jobs:
           echo object_id=\""$OBJECT_ID"\" >> terraform.tfvars
           echo ghcr_username=\""$GHCR_USERNAME"\" >> terraform.tfvars
           echo ghcr_token=\""$GHCR_TOKEN"\" >> terraform.tfvars
+          echo use_oidc=true >> terraform.tfvars
           echo resource_group_name=\""$RESOURCE_GROUP_NAME"\" >> backend.tfvars
           echo storage_account_name=\"phditfstate"${CLIENT_ID:0:8}"\" >> backend.tfvars
+          echo use_oidc=true >> backend.tfvars
+          echo use_msi=true >> backend.tfvars
           az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
 
       - name: Set environment
