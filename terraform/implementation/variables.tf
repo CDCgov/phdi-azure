@@ -41,3 +41,9 @@ variable "ghcr_token" {
   type        = string
   description = "GitHub Container Registry token."
 }
+
+variable "use_oidc" {
+  type        = bool
+  description = "Use OIDC for authentication."
+  default     = false
+}
