@@ -7,14 +7,12 @@ terraform {
   }
 
   backend "azurerm" {
-    use_oidc       = true
     container_name = "tfstate"
     key            = "prod.terraform.tfstate"
-    use_msi        = true
   }
 }
 
 provider "azurerm" {
-  use_oidc = true
+  use_oidc = var.use_oidc
   features {}
 }
