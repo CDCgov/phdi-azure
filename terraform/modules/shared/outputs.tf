@@ -67,3 +67,11 @@ output "record_linkage_container_url" {
 # output "alerts_container_url" {
 #   value = "https://phdi-${terraform.workspace}-alerts.${azurerm_container_app_environment.phdi.default_domain}"
 # }
+
+output "eventhub_namespace_name" {
+  value = azurerm_eventhub_namespace.phdi.name
+}
+
+output "eventhub_name" {
+  value = azurerm_eventhub.phdi.name
+}
