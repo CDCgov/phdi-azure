@@ -18,3 +18,4 @@ OBX|1|CE|30963-3^Vaccine Funding Source^LN|1|PHC70^Private^CDCPHINVS||||||F|||20
 OBX|2|CE|64994-7^Vaccine Funding Program Eligibility^LN|2|V01^Not VFC Eligible^HL70064||||||F|||20210818|||VXC40^per immunization^CDCPHINVS
 OBX|3|CE|69764-9^Document Type^LN|3|253088698300028811170411^Tetanus/Diphtheria (Td) Vaccine VIS^cdcgs1vis||||||F|||20210818
 OBX|4|DT|29769-7^Date Vis Presented^LN|3|20210818||||||F|||20210818
+
