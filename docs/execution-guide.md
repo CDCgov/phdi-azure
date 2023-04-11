@@ -6,6 +6,7 @@ First, please confirm that you meet the following user requirements:
     - `Storage Blob Data Contributor` on the PHI storage account
     - `FHIR Data Contributor` on the FHIR server
 2. All of the files in the [sample-data/](../sample-data/) directory have been downloaded to your computer.
+    - They can be downloaded as a zip file from [this link](https://github.com/CDCgov/phdi-azure/archive/refs/heads/main.zip).
 
 
 If you have not implemented the pipeline, please follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
@@ -40,28 +41,32 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 
 
 ### Access your Azure account 
-> Tip: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.
+> Tip: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser.![azure-portal](./images/azure-portal.png)
 1. If you're not already logged in, log into Azure with your username and password and follow the steps for multifactor authentication (MFA). 
 1. Make sure you're logged into the account that has access to the Azure resource group we have used so far. To check, click on 'Resource groups' under the "Azure services" heading and look for the name of the appropriate Azure resource group![azure-portal-check-account](./images/azure-portal-check-account.png)
-1. Then, click on the search bar and search for `Storage accounts`. Select the 'Storage accounts' option in the search dropdown to view all storage accounts we have deployed.![azure-search-cloud-storage](./images/azure-search-cloud-storage.png)
+
+### Upload and run data through the pipeline
+> Tip: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
+1. To begin, click on the search bar and search for `Storage accounts`. Select the 'Storage accounts' option in the search dropdown to view all storage accounts we have deployed.![azure-search-cloud-storage](./images/azure-search-cloud-storage.png)
 1. Click on the name of the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
 1. After you've clicked into the storage bucket, click 'Containers' under the 'Data storage' header on the left sidebar. ![azure-select-containers](./images/azure-select-containers.png)
 1. In the list of containers, click on the `source-data` container. Then click into the `vxu` folder. ![azure-select-source-data-container](./images/azure-select-source-data-container.png)
 1. Now we're ready to run a VXU message through the pipeline! First, click the 'Upload' button in the toolbar which should open up a sidebar to the right.
-
-### Upload and run data through the pipeline
 1. Within the Upload sidebar, click 'Browse for files' and navigate to the `sample-data/` folder on your computer where you've downloaded or forked the `sample-data/` from this GitHub repository. Select the `VXU-V04-01_success_single.hl7` file to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)
      
      > Note: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
 
-1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar, and search for `Data factories`. Click on the 'Data factories' option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
-1. Select your data factory, which will be titled `phdi-{environment}-data-factory`. If you see multiple data factories with the same name, choose the first one in the list. If you do not see any data factories, skip to step 13.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
+### Viewing the pipeline run
+
+1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the Azure Portal, and search for `Data factories`. Click on the 'Data factories' option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
+1. Select your data factory, which will be titled `phdi-{environment}-data-factory-{client-id}`. If you see multiple data factories with the same name, choose the first one in the list. If you do not see any data factories, skip to step 13.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`.![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
 1. Click on the 'Monitor' tab in the left sidebar (radar icon) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
-1. Select your ingestion pipeline, which will be titled `phdi-{environment}-ingestion`. If you see multiple piplines with this name, select the one at the top (aka the most recently run pipeline).![azure-select-ingestion-pipeline-in-studio](./images/azure-select-ingestion-pipeline-in-studio.png)
-1. After clicking into your ingestion pipeline, you should see a diagram showing the steps of the pipeline.
-1. We should now see that the ingestion pipeline has processed one message successfully.![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png)
+1. Select your pipeline run, which will be titled `phdi-{environment}-ingestion`. If you see multiple piplinee runs with this name, select the one at the top (aka the most recently run pipeline).
+![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png)
+1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline.
+1. We should now see that the ingestion pipeline has processed one message successfully.
 
 ### View data in the FHIR server
 1. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another window/tab and go to https://shell.azure.com. ![azure-cloud-shell](./images/azure-cloud-shell.png)
@@ -69,18 +74,20 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 1. If this is NOT your first time accessing Azure Cloud Shell, confirm that you're in Bash mode by checking that the dropdown in the top left under the "Microsoft Azure" header has "Bash" selected.
 1. Then in the terminal, type the command `az login` and press enter. Copy the code provided, click the link, and paste the code. Then follow the prompts to complete login.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)![azure-device-login](./images/azure-device-login.png)
 1. Now you'll need to update the URL in the code with the URL of your FHIR server. To get the URL of your FHIR server, first go back to portal.azure.com in another tab. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.
-1. On the Azure API for FHIR page, click into your FHIR server API which should open a right sidebar. Within this sidebar, go to the FHIR metadata endpoint text under "Essentials" and select the URL prior to the "/metadata" portion so you that have a URL copied that looks something like: "https://devfhir9d194c64.azurehealthcareapis.com".
-1. To search for a patient named John Doe, go back to the tab with Cloud Shell open. Copy and paste this command into the terminal and replace the "**INSERT_URL_HERE**" text with your FHIR metadata URL:<pre>
-token=$(az account get-access-token --resource=<b>INSERT_URL_HERE</b> --query accessToken --output tsv)</pre>.
-Replace the URL after ```--resource=``` with the URL you copied above. Hit enter to run this command.
-1. Then, copy and paste this command into the terminal and replace the "**INSERT_URL_HERE**" text with your FHIR metadata URL: <pre> RESPONSE=$(curl -X GET --header "Authorization: Bearer $token"<b>INSERT_URL_HERE</b>Patient?family=DOE&given=JOHN)</pre>
-Replace the URL in-between ```Bearer $token``` and ```/Patient``` with the URL you copied above. Hit enter to run this command.
-1. Finally, copy and paste this command into the terminal: ```echo $RESPONSE | jq``` Hit enter to run this command.
+1. On the Azure API for FHIR page, you should see your FHIR server listed as something like `{environment}fhir{client-id}`.Click into your FHIR server which should open a right sidebar. Within this sidebar, copy the name of your FHIR server (`{environment}fhir{client-id}`).
+1. To search for a patient named John Doe, go back to the tab with Cloud Shell open. Copy and paste this command into the terminal and replace the "{FHIR_SERVER}" text with your FHIR server name you copied in the previous step:<pre>
+token=$(az account get-access-token --resource=https://<b>{FHIR_SERVER}</b>.azurehealthcareapis.com --query accessToken --output tsv)</pre>
+Hit enter to run this command.
+1. Then, copy and paste this command into the terminal and replace the "{FHIR_SERVER}" text with your FHIR server name: <pre>RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://<b>{FHIR_SERVER}</b>.azurehealthcareapis.comPatient?family=DOE&given=JOHN)"</pre>
+Hit enter to run this command.
+1. Finally, copy and paste this command into the terminal: <pre>echo $RESPONSE | jq</pre> Hit enter to run this command.
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 
 ### Run another VXU message through the pipeline
 1. The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what an expected error or a batch message will look like. 
-2. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat steps 1-8 in the ["Upload and run data through the pipeline" section](https://github.com/CDCgov/phdi-azure/edit/execution-guide-edits/docs/execution-guide.md#upload-and-run-data)! 
+1. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat steps 1-6 in the ["Upload and run data through the pipeline" section](#upload-and-run-data-through-the-pipeline)! 
+1. Repeat steps 1-7 in the ["Viewing the pipeline run" section](#viewing-the-pipeline-run).
+1. If your pipeline run contains a failure, follow the ["Viewing pipeline failures in ADF" section](#viewing-pipeline-failures-in-adf) to see why the failure occurred.
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
@@ -89,3 +96,14 @@ Replace the URL in-between ```Bearer $token``` and ```/Patient``` with the URL y
 |VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
 |VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
 |VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
+
+### Viewing pipeline failures in ADF
+
+When a pipeline run ends in failure, Azure Data Factory makes it easy to see the error that caused the failure.
+
+1. On the `Monitor` tab in Azure Data Factory Studio (the page we opened in step 4 of the ["Viewing the pipeline run" section](#viewing-the-pipeline-run)), select the pipeline run that failed.
+![azure-data-factory-failure](./images/azure-data-factory-failure.png)
+1. In this view, click the button next to "Failed" on any steps that failed in the "Activity Runs" section to view the relevant error.
+![azure-data-factory-error-button](./images/azure-data-factory-error-button.png)
+1. The error message should provide the information you need to resolve the issue before reuploading the data for another pipeline run.
+![azure-data-factory-error-details](./images/azure-data-factory-error-details.png)
