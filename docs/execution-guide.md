@@ -70,16 +70,18 @@ This how-to guide is divided into 3 sections:
 1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline in addition to a table with information about each activity. We should now see that the ingestion pipeline has processed one message successfully..![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
 
 ### View data in the FHIR server
-1. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another window/tab and open [https://shell.azure.com](https://shell.azure.com).![azure-cloud-shell](./images/azure-cloud-shell.png)
-     > **Notes for first time users**: 
+1. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another window/tab and open [https://shell.azure.com](https://shell.azure.com).
+     > **Instructions for first time users**: 
      
-     > A pop up will appear asking you to select either the Bash or PowerShell option. Select the Bash option. 
+     > A pop up will appear asking you to select either the Bash or PowerShell option. Select the Bash option.![azure-cloud-select-bash](./images/azure-cloud-select-bash.png) 
      
      > A second pop up will appear stating "You have no storage mounted". Click "Create storage".![azure-cloud-create-storage](./images/azure-cloud-create-storage.png)
-1. Confirm that you're in Bash mode by checking that the dropdown in the top left under the "Microsoft Azure" header has "Bash" selected.
-1. Then in the terminal, type the command `az login` and press enter. Copy the code provided, click the link, and paste the code. Then follow the prompts to complete login.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)![azure-device-login](./images/azure-device-login.png)
-1. Now you'll need to update the URL in the code with the URL of your FHIR server. To get the URL of your FHIR server, first go back to portal.azure.com in another tab. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.
-1. On the Azure API for FHIR page, you should see your FHIR server listed as something like `{environment}fhir{client-id}`. Click into your FHIR server. Within this sidebar, copy the name of your FHIR server (`{environment}fhir{client-id}`).
+1. Confirm that you're in Bash mode by checking that the dropdown in the top left under the "Microsoft Azure" header has "Bash" selected.![azure-cloud-shell](./images/azure-cloud-shell.png)
+1. Then in the terminal, type the command `az login` and press enter.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)![azure-device-login](./images/azure-device-login.png)
+1. Copy the authentication code provided.![azure-cloud-copy-code](./images/azure-cloud-copy-code)
+1. then click the device login link, and paste in the authentication code. Then follow the prompts to complete login.
+1. Now you'll need to update the URL in the code with the URL of your FHIR server. To get the URL of your FHIR server, go back to the tab with [portal.azure.com](portal.azure.com) open. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.
+1. On the Azure API for FHIR page, you should see your FHIR server which will have the following form: `{environment}fhir{client-id}`. Click on the name of your FHIR server. Within this sidebar, copy the name of your FHIR server (`{environment}fhir{client-id}`).
 1. To search for a patient named John Doe, go back to the tab with Cloud Shell open. Copy and paste this command into the terminal and replace the "{FHIR_SERVER}" text with your FHIR server name you copied in the previous step:<pre>
 token=$(az account get-access-token --resource=https://<b>{FHIR_SERVER}</b>.azurehealthcareapis.com --query accessToken --output tsv)</pre>
 Hit enter to run this command.
