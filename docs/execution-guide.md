@@ -15,12 +15,6 @@ If you or your organization, have deployed the starter kit, but you do not have 
 
 
 ## How to Use: Run an Hl7v2 vaccination message through the pipeline 
-### Overview
-This how-to guide is divided into 3 sections:
-1. Accessing your Azure account
-2. Running data through the pipeline
-3. Viewing data in the FHIR server
-
 ### Example: VXU Sample Message 
 The `sample-data/` directory contains some dummy VXU messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
@@ -39,12 +33,17 @@ PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M1
 
 If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice. Below are steps on how to run a VXU message through the pipeline.
 
+### Overview
+This how-to guide is divided into 3 sections:
+1. Accessing your Azure account
+2. Running data through the pipeline
+3. Viewing data in the FHIR server
 
 ### Access your Azure account 
 > Tip: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser.![azure-portal](./images/azure-portal.png)
 1. If you're not already logged in, log into Azure with your username and password and follow the steps for multifactor authentication (MFA). 
-1. Make sure you're logged into the account that has access to the Azure resource group we have used so far. To check, click on 'Resource groups' under the "Azure services" heading and look for the name of the appropriate Azure resource group![azure-portal-check-account](./images/azure-portal-check-account.png)
+1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. To confirm, click on 'Resource groups' under the "Azure services" heading and look for the name of the appropriate Azure resource group![azure-portal-check-account](./images/azure-portal-check-account.png)
 
 ### Upload and run data through the pipeline
 > Tip: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
@@ -60,7 +59,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 ### Viewing the pipeline run
 
 1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the Azure Portal, and search for `Data factories`. Click on the 'Data factories' option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
-1. Select your data factory, which will be titled `phdi-{environment}-data-factory-{client-id}`. If you see multiple data factories with the same name, choose the first one in the list. If you do not see any data factories, skip to step 13.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
+1. Select your data factory, which will be titled `phdi-{environment}-data-factory-{client-id}`. If you see multiple data factories with the same name, choose the first one in the list. ![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`.![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
 1. Click on the 'Monitor' tab in the left sidebar (radar icon) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
 1. Select your pipeline run, which will be titled `phdi-{environment}-ingestion`. If you see multiple piplinee runs with this name, select the one at the top (aka the most recently run pipeline).
@@ -74,7 +73,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 1. If this is NOT your first time accessing Azure Cloud Shell, confirm that you're in Bash mode by checking that the dropdown in the top left under the "Microsoft Azure" header has "Bash" selected.
 1. Then in the terminal, type the command `az login` and press enter. Copy the code provided, click the link, and paste the code. Then follow the prompts to complete login.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)![azure-device-login](./images/azure-device-login.png)
 1. Now you'll need to update the URL in the code with the URL of your FHIR server. To get the URL of your FHIR server, first go back to portal.azure.com in another tab. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.
-1. On the Azure API for FHIR page, you should see your FHIR server listed as something like `{environment}fhir{client-id}`.Click into your FHIR server which should open a right sidebar. Within this sidebar, copy the name of your FHIR server (`{environment}fhir{client-id}`).
+1. On the Azure API for FHIR page, you should see your FHIR server listed as something like `{environment}fhir{client-id}`. Click into your FHIR server. Within this sidebar, copy the name of your FHIR server (`{environment}fhir{client-id}`).
 1. To search for a patient named John Doe, go back to the tab with Cloud Shell open. Copy and paste this command into the terminal and replace the "{FHIR_SERVER}" text with your FHIR server name you copied in the previous step:<pre>
 token=$(az account get-access-token --resource=https://<b>{FHIR_SERVER}</b>.azurehealthcareapis.com --query accessToken --output tsv)</pre>
 Hit enter to run this command.
