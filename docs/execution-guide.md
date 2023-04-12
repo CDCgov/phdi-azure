@@ -40,13 +40,13 @@ This how-to guide is divided into 3 sections:
 3. Viewing data in the FHIR server
 
 ### Access your Azure account 
-> **Tip**: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
+> **Note**: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
 1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. To check, go to the "Azure services" heading and click on `Resource groups`.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
 1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 
 ### Upload and run data through the pipeline
-> **Tip**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
+> **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
 1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click on the "Type" filter, then select the "Storage account" value and click apply.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click into the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
 1. Go to the left sidebar and under the `Data storage` header, click `Containers`. ![azure-containers](./images/azure-containers.png)
@@ -56,7 +56,7 @@ This how-to guide is divided into 3 sections:
 1. Then click `Browse for files` and navigate to the folder on your computer where you've downloaded or forked the `sample-data/` folder.![azure-browse](./images/azure-browse.png)     
 1. Select the `VXU-V04-01_success_single.hl7` file and click `Open` to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)    
 
-     > Note: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
+     > **Note**: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
 
 ### Viewing the pipeline run
 
