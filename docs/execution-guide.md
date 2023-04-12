@@ -92,7 +92,7 @@ Now that we're authenticated, we're going to try to search for a patient named "
 token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthcareapis.com --query accessToken --output tsv)</pre>
 1. Then, copy and paste this command into the terminal and hit enter. This uses the bearer token above to authenticate, then search for the "John Doe" user in the VXU message: <pre>RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://$FHIR_SERVER.azurehealthcareapis.com/Patient?family=DOE&given=JOHN")</pre>
 Hit enter to run this command.
-1. Finally, copy and paste this command into the terminal, then hit enter. This pretty-prints the JSON response showing that John Doe was found in the VXU message: <pre>echo $RESPONSE | jq | less</pre> 
+1. Finally, copy and paste this command into the terminal, then hit enter. This pretty-prints the JSON response showing that John Doe was found in the VXU message. After you're down reviewing the response, press 'q' on your keyboard to exit out of the jq tool and return to the terminal. <pre>echo $RESPONSE | jq | less</pre> 
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 
 ### Run another VXU message through the pipeline
