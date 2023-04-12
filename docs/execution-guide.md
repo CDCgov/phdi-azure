@@ -80,21 +80,23 @@ This how-to guide is divided into 3 sections:
 1. Then in the terminal, type the command `az login` and press enter.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)
 1. Copy the authentication code provided.![azure-cloud-copy-code](./images/azure-cloud-copy-code.png)
 1. Then click the device login link, and paste in the authentication code.![azure-device-login](./images/azure-device-login.png)
-1. Then follow the prompts to complete login. After logging in, you should see a pop up that says "You have signed in..."![azure-cloud-logged-in](./images/azure-cloud-logged-in.png)
+1. Then follow the prompts to complete login. After logging in, you should see a pop up that says "You have signed in..." You can close this tab.![azure-cloud-logged-in](./images/azure-cloud-logged-in.png)
 1. Return to the tab with Azure Cloud Shell open.![azure-cloud-logged-in-terminal](./images/azure-cloud-logged-in-terminal.png)
-1. The next few steps will involve entering commands into the terminal. A couple of these commands will require you to update the URL in the command with the URL of your FHIR server. To get the URL of your FHIR server, go back to the tab with [portal.azure.com](portal.azure.com) open. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.![azure-fhir-api-search](./images/azure-fhir-api-search.png)
+
+Now that we're authenticated, we're going to try to search for a patient named "John Doe" within the VXU message we just ran by using the terminal. 
+1. A couple of the commands below will require you to update the URL in the command with the URL of your FHIR server. To get the URL of your FHIR server, go back to the tab with [portal.azure.com](portal.azure.com) open. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.![azure-fhir-api-search](./images/azure-fhir-api-search.png)
 1. On the Azure API for FHIR page, you should see your FHIR server which will have the following form: `{environment}fhir{client-id}`. Click on the name of your FHIR server.![azure-find-fhir-server](./images/azure-find-fhir-server.png)
-1. Within FHIR server page, copy the name of your FHIR server (`{environment}fhir{client-id}`).![azure-fhir-server](./images/azure-fhir-server.png)
-1. To search for a patient named John Doe, go back to the tab with Cloud Shell open. Copy and paste this command into the terminal and replace the "{FHIR_SERVER}" text with your FHIR server name you copied in the previous step:<pre>
-token=$(az account get-access-token --resource=https://<b>{FHIR_SERVER}</b>.azurehealthcareapis.com --query accessToken --output tsv)</pre>
+1. Within FHIR server page, copy the name of your FHIR server which will have the following format: (`{environment}fhir{client-id}`).![azure-fhir-server](./images/azure-fhir-server.png)
+1. Go back to the tab with Cloud Shell open. Copy and paste this command, then replace the **FHIR_SERVER** text with the pasted name of your FHIR server. This will save the name of your FHIR server into a variable that will be referenced in the commands below. <pre>export FHIR_SERVER=<b>FHIR_SERVER</b></pre>![azure-cloud_set_FHIR_variable](./images/azure-cloud_set_FHIR_variable.png)
+1. Then copy and paste this command into the terminal and hit enter. This gets you a bearer token that will be used to authenticate in the next command:<pre>
+token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthcareapis.com --query accessToken --output tsv)</pre>
+1. Then, copy and paste this command into the terminal and hit enter. This uses the bearer token above to authenticate, then search for the "John Doe" user in the VXU message: <pre>RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://$FHIR_SERVER.azurehealthcareapis.com/Patient?family=DOE&given=JOHN")</pre>
 Hit enter to run this command.
-1. Then, copy and paste this command into the terminal and replace the "{FHIR_SERVER}" text with your FHIR server name: <pre>RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://<b>{FHIR_SERVER}</b>.azurehealthcareapis.comPatient?family=DOE&given=JOHN")</pre>
-Hit enter to run this command.
-1. Finally, copy and paste this command into the terminal: <pre>echo $RESPONSE | jq</pre> Hit enter to run this command.
+1. Finally, copy and paste this command into the terminal, then hit enter. This pretty-prints the JSON response showing that John Doe was found in the VXU message: <pre>echo $RESPONSE | jq | less</pre> 
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 
 ### Run another VXU message through the pipeline
-1. The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what an expected error or a batch message will look like. 
+The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what a pipeline run with an expected error or a batch message will look like. 
 1. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat steps 1-6 in the ["Upload and run data through the pipeline" section](#upload-and-run-data-through-the-pipeline)! 
 1. Repeat steps 1-7 in the ["Viewing the pipeline run" section](#viewing-the-pipeline-run).
 1. If your pipeline run contains a failure, follow the ["Viewing pipeline failures in ADF" section](#viewing-pipeline-failures-in-adf) to see why the failure occurred.
