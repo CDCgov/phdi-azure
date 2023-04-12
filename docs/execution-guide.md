@@ -41,12 +41,14 @@ This how-to guide is divided into 3 sections:
 
 ### Access your Azure account 
 > **Note**: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
+
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
 1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. To check, go to the "Azure services" heading and click on `Resource groups`.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
 1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 
 ### Upload and run data through the pipeline
 > **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
+
 1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click on the "Type" filter, then select the "Storage account" value and click apply.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click into the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
 1. Go to the left sidebar and under the `Data storage` header, click `Containers`. ![azure-containers](./images/azure-containers.png)
@@ -63,10 +65,11 @@ This how-to guide is divided into 3 sections:
 1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the Azure Portal, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
-     > **Note**: this will open a new tab with Data Factory Studio open.
 1. In the left sidebar, click on the the 'Monitor' tab (radar icon) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
-1. Click into your pipeline run, which will have the form `phdi-{environment}-ingestion`. If you see multiple pipline runs with this name, select the  pipeline with the most recent run start time.![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png) 
+1. Click into your pipeline run, which will have the form `phdi-{environment}-ingestion`. If you see multiple pipline runs with this name, select the  pipeline with the most recent run start time.
+
      > **Note**: this pipeline may still have an `In progress` status.
+![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png) 
 
 1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline and a table with information about each activity. We should now see that the ingestion pipeline has processed one message successfully.![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
 
