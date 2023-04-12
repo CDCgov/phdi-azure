@@ -76,6 +76,11 @@ resource "azurerm_storage_share" "tables" {
   enabled_protocol     = "SMB"
 }
 
+resource "azurerm_storage_data_lake_gen2_filesystem" "phi" {
+  name               = "synapse-data"
+  storage_account_id = azurerm_storage_account.phi.id
+}
+
 ##### Key Vault #####
 
 resource "azurerm_key_vault" "phdi_key_vault" {
@@ -463,4 +468,60 @@ resource "azurerm_role_assignment" "service_bus_contributor" {
   scope                = azurerm_eventhub_namespace.phdi.id
   role_definition_name = "Azure Service Bus Data Owner"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+
+##### Synapse #####
+
+resource "random_password" "synapse_sql_password" {
+  length           = 32
+  special          = true
+  override_special = "_%@"
+}
+
+# Store password in key vault
+resource "azurerm_key_vault_secret" "synapse_sql_password" {
+  name         = "synapse-sql-password"
+  value        = random_password.synapse_sql_password.result
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_synapse_workspace" "phdi" {
+  name                                 = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
+  resource_group_name                  = var.resource_group_name
+  location                             = var.location
+  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.phi.id
+  sql_administrator_login              = "sqladminuser"
+  sql_administrator_login_password     = random_password.synapse_sql_password.result
+
+  identity {
+    type = "SystemAssigned, UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.pipeline_runner.id
+    ]
+  }
+}
+
+resource "azurerm_synapse_spark_pool" "phdi" {
+  name                 = "${terraform.workspace}pool"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  node_size_family     = "MemoryOptimized"
+  node_size            = "Small"
+  cache_size           = 100
+
+  auto_scale {
+    max_node_count = 50
+    min_node_count = 3
+  }
+
+  auto_pause {
+    delay_in_minutes = 15
+  }
+
+  spark_config {
+    content  = <<EOF
+spark.shuffle.spill                true
+EOF
+    filename = "config.txt"
+  }
 }
