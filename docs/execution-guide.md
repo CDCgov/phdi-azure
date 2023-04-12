@@ -31,7 +31,7 @@ PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M1
 |||M^Married||4880776||||N^NOT HISPANIC OR LATINO^HL70189||N||US^United States of America^ISO3166_1||||N|||20080110015014+0315|||||||
 ```
 
-If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice. Below are steps on how to run a VXU message through the pipeline.
+If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice.
 
 ### Overview
 This how-to guide is divided into 3 sections:
@@ -40,66 +40,66 @@ This how-to guide is divided into 3 sections:
 3. Viewing data in the FHIR server
 
 ### Access your Azure account 
-> Tip: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
+> **Tip**: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
-1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. To check, click on 'Resource groups' under the "Azure services" heading.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
-1. Click on the name of the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
+1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. To check, go to the "Azure services" heading and click on `Resource groups`.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
+1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 
 ### Upload and run data through the pipeline
-> Tip: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
-1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click on the "Type" filter, then under "Value" select the "Storage account" option. Click apply.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
-1. Click on the name of the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
-1. After you've clicked into the storage bucket, go to the left sidebar and under the "Data storage" header click 'Containers'. ![azure-containers](./images/azure-containers.png)
-1. Click on the name of the `source-data` container.![azure-select-source-data-container](./images/azure-select-source-data-container.png)
+> **Tip**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
+1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click on the "Type" filter, then select the "Storage account" value and click apply.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
+1. Click into the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
+1. Go to the left sidebar and under the `Data storage` header, click `Containers`. ![azure-containers](./images/azure-containers.png)
+1. Click into the `source-data` container.![azure-select-source-data-container](./images/azure-select-source-data-container.png)
 1. Then click into the `vxu` folder.![azure-select-vxu-folder](./images/azure-select-vxu-folder.png)
-1. Now we're ready to run a VXU message through the pipeline! First, click the 'Upload' button in the toolbar.![azure-upload](./images/azure-upload.png)
-1. Then click 'Browse for files' and navigate to the folder on your computer where you've downloaded or forked the `sample-data/` from this GitHub repository.![azure-browse](./images/azure-browse.png)     
-1. Select the `VXU-V04-01_success_single.hl7` file to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)    
+1. Now we're ready to run a VXU message through the pipeline! First, click the `Upload` button in the toolbar.![azure-upload](./images/azure-upload.png)
+1. Then click `Browse for files` and navigate to the folder on your computer where you've downloaded or forked the `sample-data/` folder.![azure-browse](./images/azure-browse.png)     
+1. Select the `VXU-V04-01_success_single.hl7` file and click `Open` to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)    
 
      > Note: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
 
 ### Viewing the pipeline run
 
-1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the Azure Portal, and search for `Data factories`. Click on the 'Data factories' option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
-1. Click on the name of your data factory, which will be titled `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
-1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio` (Note: this will open a new tab)![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
-1. In the left sidebar, click on the the 'Monitor' tab (radar icon, 3rd from top) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
-1. Click the name of your pipeline run, which will be titled `phdi-{environment}-ingestion`. If you see multiple pipline runs with this name, select the most recently run pipeline (the pipeline with the most recent run start time).![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png) 
-     > Note: this pipeline may still have an "In progress" status.
+1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the Azure Portal, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
+1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
+1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
+     > **Note**: this will open a new tab with Data Factory Studio open.
+1. In the left sidebar, click on the the 'Monitor' tab (radar icon) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
+1. Click into your pipeline run, which will have the form `phdi-{environment}-ingestion`. If you see multiple pipline runs with this name, select the  pipeline with the most recent run start time.![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png) 
+     > **Note**: this pipeline may still have an `In progress` status.
 
-1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline in addition to a table with information about each activity. We should now see that the ingestion pipeline has processed one message successfully..![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
+1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline and a table with information about each activity. We should now see that the ingestion pipeline has processed one message successfully.![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
 
 ### View data in the FHIR server
-1. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another window/tab and open [https://shell.azure.com](https://shell.azure.com).
+1. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another tab and go to [https://shell.azure.com](https://shell.azure.com).
      > **Instructions for first time users**: 
      
-     > A pop up will appear asking you to select either the Bash or PowerShell option. Select the Bash option.![azure-cloud-select-bash](./images/azure-cloud-select-bash.png) 
+     > A pop up will appear asking you to select either the Bash or PowerShell option. Select the `Bash` option.![azure-cloud-select-bash](./images/azure-cloud-select-bash.png) 
      
-     > A second pop up will appear stating "You have no storage mounted". Click "Create storage".![azure-cloud-create-storage](./images/azure-cloud-create-storage.png)
-1. Confirm that you're in Bash mode by checking that the dropdown in the top left under the "Microsoft Azure" header has "Bash" selected.![azure-cloud-shell](./images/azure-cloud-shell.png)
+     > A second pop up will appear stating "You have no storage mounted". Click `Create storage`.![azure-cloud-create-storage](./images/azure-cloud-create-storage.png)
+1. Confirm that you're in Bash mode by checking that the dropdown in the top left under the `Microsoft Azure` header has `Bash` selected.![azure-cloud-shell](./images/azure-cloud-shell.png)
 1. Then in the terminal, type the command `az login` and press enter.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)
 1. Copy the authentication code provided.![azure-cloud-copy-code](./images/azure-cloud-copy-code.png)
-1. Then click the device login link, and paste in the authentication code.![azure-device-login](./images/azure-device-login.png)
-1. Then follow the prompts to complete login. After logging in, you should see a pop up that says "You have signed in..." You can close this tab.![azure-cloud-logged-in](./images/azure-cloud-logged-in.png)
+1. Click the device login link, and paste in the authentication code.![azure-device-login](./images/azure-device-login.png)
+1. Follow the prompts to complete login. After logging in, you should see a pop up that says "You have signed in...".![azure-cloud-logged-in](./images/azure-cloud-logged-in.png)
 1. Return to the tab with Azure Cloud Shell open.![azure-cloud-logged-in-terminal](./images/azure-cloud-logged-in-terminal.png)
 
-Now that we're authenticated, we're going to try to search for a patient named "John Doe" within the VXU message we just ran by using the terminal. 
-1. A couple of the commands below will require you to update the URL in the command with the URL of your FHIR server. To get the URL of your FHIR server, go back to the tab with [portal.azure.com](portal.azure.com) open. Then in the search bar, type in "Azure API for FHIR" and select this option in the search dropdown.![azure-fhir-api-search](./images/azure-fhir-api-search.png)
-1. On the Azure API for FHIR page, you should see your FHIR server which will have the following form: `{environment}fhir{client-id}`. Click on the name of your FHIR server.![azure-find-fhir-server](./images/azure-find-fhir-server.png)
-1. Within FHIR server page, copy the name of your FHIR server which will have the following format: (`{environment}fhir{client-id}`).![azure-fhir-server](./images/azure-fhir-server.png)
-1. Go back to the tab with Cloud Shell open. Copy and paste this command, then replace the **FHIR_SERVER** text with the pasted name of your FHIR server. This will save the name of your FHIR server into a variable that will be referenced in the commands below. <pre>export FHIR_SERVER=<b>FHIR_SERVER</b></pre>![azure-cloud_set_FHIR_variable](./images/azure-cloud_set_FHIR_variable.png)
-1. Then copy and paste this command into the terminal and hit enter. This gets you a bearer token that will be used to authenticate in the next command:<pre>
+Now that we're authenticated, we're going to try to search for a patient named "John Doe" in the VXU message we ran earlier. 
+1. A couple of the commands below will require you to update the URL in the command with the URL of your FHIR server. To get the URL of your FHIR server, go back to the tab with [portal.azure.com](portal.azure.com) open. Then in the search bar, type in `Azure API for FHIR` and select this option in the search dropdown.![azure-fhir-api-search](./images/azure-fhir-api-search.png)
+1. You should see your FHIR server which will have the following form: `{environment}fhir{client-id}`. Click into your FHIR server.![azure-find-fhir-server](./images/azure-find-fhir-server.png)
+1. Copy the name of your FHIR server which will have the following form: (`{environment}fhir{client-id}`).![azure-fhir-server](./images/azure-fhir-server.png)
+1. Go back to the tab with Cloud Shell open. Copy and paste the command below, then replace the **FHIR_SERVER** text with the pasted name of your FHIR server. This will save the name of your FHIR server into a variable that will be referenced in later commands. <pre>export FHIR_SERVER=<b>FHIR_SERVER</b></pre>![azure-cloud_set_FHIR_variable](./images/azure-cloud_set_FHIR_variable.png)
+1. Copy and paste the below command into the terminal and hit enter. This gets you a bearer token that will be used to authenticate in the next command:<pre>
 token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthcareapis.com --query accessToken --output tsv)</pre>
-1. Then, copy and paste this command into the terminal and hit enter. This uses the bearer token above to authenticate, then search for the "John Doe" user in the VXU message: <pre>RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://$FHIR_SERVER.azurehealthcareapis.com/Patient?family=DOE&given=JOHN")</pre>
-Hit enter to run this command.
-1. Finally, copy and paste this command into the terminal, then hit enter. This pretty-prints the JSON response showing that John Doe was found in the VXU message. After you're down reviewing the response, press 'q' on your keyboard to exit out of the jq tool and return to the terminal. <pre>echo $RESPONSE | jq | less</pre> 
+1. Copy and paste the below command into the terminal and hit enter. This uses the bearer token from above to authenticate and search for the "John Doe" user: <pre>RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://$FHIR_SERVER.azurehealthcareapis.com/Patient?family=DOE&given=JOHN")</pre>
+1. Finally, copy and paste the below command into the terminal and hit enter. This pretty-prints the JSON response showing that John Doe was found in the VXU message. After you're down reviewing the response, press 'q' on your keyboard to exit out of the jq tool and return to the terminal. <pre>echo $RESPONSE | jq | less</pre> 
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 
 ### Run another VXU message through the pipeline
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what a pipeline run with an expected error or a batch message will look like. 
-1. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat steps 1-6 in the ["Upload and run data through the pipeline" section](#upload-and-run-data-through-the-pipeline)! 
-1. Repeat steps 1-7 in the ["Viewing the pipeline run" section](#viewing-the-pipeline-run).
-1. If your pipeline run contains a failure, follow the ["Viewing pipeline failures in ADF" section](#viewing-pipeline-failures-in-adf) to see why the failure occurred.
+1. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat the steps in the ["Upload and run data through the pipeline" section](#upload-and-run-data-through-the-pipeline)! 
+1. Then repeat the steps in the ["Viewing the pipeline run" section](#viewing-the-pipeline-run).
+1. If your pipeline run contains a failure, follow the steps in the ["Viewing pipeline failures in ADF" section](#viewing-pipeline-failures-in-adf) to see why the failure occurred.
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
