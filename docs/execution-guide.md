@@ -52,19 +52,20 @@ This how-to guide is divided into 3 sections:
 1. After you've clicked into the storage bucket, go to the left sidebar and under the "Data storage" header click 'Containers'. ![azure-containers](./images/azure-containers.png)
 1. Click on the name of the `source-data` container.![azure-select-source-data-container](./images/azure-select-source-data-container.png)
 1. Then click into the `vxu` folder.![azure-select-vxu-folder](./images/azure-select-vxu-folder.png)
-1. Now we're ready to run a VXU message through the pipeline! First, click the 'Upload' button in the toolbar which should open up a sidebar to the right.
-1. Within the Upload sidebar, click 'Browse for files' and navigate to the `sample-data/` folder on your computer where you've downloaded or forked the `sample-data/` from this GitHub repository. Select the `VXU-V04-01_success_single.hl7` file to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)
-     
+1. Now we're ready to run a VXU message through the pipeline! First, click the 'Upload' button in the toolbar.![azure-upload](./images/azure-upload.png)
+1. Then click 'Browse for files' and navigate to the folder on your computer where you've downloaded or forked the `sample-data/` from this GitHub repository.![azure-browse](./images/azure-browse.png)     
+1. Select the `VXU-V04-01_success_single.hl7` file to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)    
+
      > Note: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
 
 ### Viewing the pipeline run
 
 1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the Azure Portal, and search for `Data factories`. Click on the 'Data factories' option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
-1. Select your data factory, which will be titled `phdi-{environment}-data-factory-{client-id}`. If you see multiple data factories with the same name, choose the first one in the list. ![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
-1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`.![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
-1. Click on the 'Monitor' tab in the left sidebar (radar icon) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
-1. Select your pipeline run, which will be titled `phdi-{environment}-ingestion`. If you see multiple piplinee runs with this name, select the one at the top (aka the most recently run pipeline).
-![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png)
+1. Click on the name of your data factory, which will be titled `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
+1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio` (Note: this will open a new tab)![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
+1. In the left sidebar, click on the the 'Monitor' tab (radar icon, 3rd from top) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
+1. Select your pipeline run, which will be titled `phdi-{environment}-ingestion`. If you see multiple pipline runs with this name, select the most recently run pipeline (the pipeline with the most recent run start time).![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png)
+     > Note: this pipeline may still have an "In progress" status.
 1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline.
 1. We should now see that the ingestion pipeline has processed one message successfully.
 
