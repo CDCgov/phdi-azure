@@ -18,6 +18,33 @@ variable "ingestion_container_url" {
   description = "URL of the ingestion container"
 }
 
+variable "message_parser_url" {
+  type        = string
+  description = "URL of the message parser container"
+}
+
+variable "validation_container_url" {
+  type        = string
+  description = "URL of the validation container"
+}
+
+variable "record_linkage_container_url" {
+  type        = string
+  description = "URL of the record linkage container"
+}
+
+# TODO: Uncomment when tabulation is implemented
+# variable "tabulation_container_url" {
+#   type        = string
+#   description = "URL of the tabulation container"
+# }
+
+# TODO: Uncomment when alerts are implemented
+# variable "alerts_container_url" {
+#   type        = string
+#   description = "URL of the alerts container"
+# }
+
 variable "fhir_server_url" {
   type        = string
   description = "URL of the FHIR server"
@@ -38,9 +65,19 @@ variable "pipeline_runner_principal_id" {
   description = "Principal ID of the pipeline runner identity"
 }
 
+variable "pipeline_runner_resource_id" {
+  type        = string
+  description = "Resource ID of the pipeline runner identity"
+}
+
 variable "fhir_upload_failures_container_name" {
   type        = string
   description = "Container name for failed FHIR uploads"
+}
+
+variable "validation_failures_container_name" {
+  type        = string
+  description = "Container name for failed validations"
 }
 
 variable "fhir_conversion_failures_container_name" {
@@ -51,4 +88,14 @@ variable "fhir_conversion_failures_container_name" {
 variable "client_id" {
   type        = string
   description = "Client ID"
+}
+
+variable "eventhub_namespace_name" {
+  type        = string
+  description = "Event Hub Namespace Name"
+}
+
+variable "eventhub_name" {
+  type        = string
+  description = "Event Hub Name"
 }

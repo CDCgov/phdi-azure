@@ -3,10 +3,113 @@
     "properties": {
         "activities": [
             {
+                "name": "validate_message",
+                "description": "Validate Hl7 or CCD message.\n",
+                "type": "WebActivity",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${validation_container_url}/validate",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"message\": @{pipeline().parameters.message},\n    \"message_type\": \"@{pipeline().parameters.message_type}\",\n    \"include_error_types\": \"@{pipeline().parameters.include_error_types}\"\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-validation",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
+                "name": "validation_if_condition",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "validate_message",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(activity('validate_message').output.message_valid, true)",
+                        "type": "Expression"
+                    },
+                    "ifFalseActivities": [
+                        {
+                            "name": "Fail1",
+                            "type": "Fail",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "message": "Validation failure, logging to validation failure storage.",
+                                "errorCode": "422"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "log_validation_failure",
+                "description": "Write validation failures to storage.\n",
+                "type": "WebActivity",
+                "dependsOn": [{
+                    "activity": "validation_if_condition",
+                    "dependencyConditions": [
+                        "Failed"
+                    ]
+                }],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"blob\": @{activity('validate_message').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${validation_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
                 "name": "convert_to_fhir",
                 "description": "Convert message from Hl7 or CCD to FHIR.\n",
                 "type": "WebActivity",
-                "dependsOn": [],
+                "dependsOn": [
+                    {
+                    "activity": "validation_if_condition",
+                    "dependencyConditions": [
+                        "Succeeded"
+                    ]
+                }
+                ],
                 "policy": {
                     "timeout": "0.12:00:00",
                     "retry": 0,
@@ -21,6 +124,14 @@
                     "body": {
                         "value": "{\n    \"input_data\": @{pipeline().parameters.message},\n    \"input_type\": \"@{pipeline().parameters.message_type}\",\n    \"root_template\": \"@{pipeline().parameters.root_template}\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-fhir-converter",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -50,6 +161,14 @@
                     "body": {
                         "value": "{\n    \"blob\": @{activity('convert_to_fhir').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_conversion_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -79,6 +198,14 @@
                     "body": {
                         "value": "{\n    \"data\": @{activity('convert_to_fhir').output.response.FhirResource}\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -108,6 +235,14 @@
                     "body": {
                         "value": "{\n    \"data\": @{activity('standardize_name').output.bundle}\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -137,12 +272,20 @@
                     "body": {
                         "value": "{\n    \"bundle\": @{activity('standardize_phone').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
             {
-                "name": "add_patient_hash",
-                "description": "Compute a hashed identifier that can be used for record linkage.",
+                "name": "record_linkage",
+                "description": "Link new healthcare messages to existing records if a connection exists.",
                 "type": "WebActivity",
                 "dependsOn": [
                     {
@@ -161,11 +304,96 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "${ingestion_container_url}/fhir/linkage/link/add_patient_identifier_in_bundle",
+                    "url": "${record_linkage_container_url}/link-record",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
+                        "value": "{\n    \"fhir_bundle\" :@{activity('geocode').output.bundle}\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-record-linkage",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
+                "name": "message_parser",
+                "description": "Extract desired fields from a given healthcare message.",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "record_linkage",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${message_parser_url}/parse_message",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('record_linkage').output.updated_bundle}\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-message-parser",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
+                "name": "post_to_eventhub",
+                "description": "Post the output of the message_parser activity to an Azure Event Hub.",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "message_parser",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "https://${eventhub_namespace_name}.servicebus.windows.net/${eventhub_name}/messages",
+                    "method": "POST",
+                    "body": {
+                        "value": "@{activity('message_parser').output}",
+                        "type": "Expression"
+                    },
+                    "headers": {
+                        "Content-Type": "application/atom+xml;type=entry;charset=utf-8"
+                    },
+                    "authentication": {
+                        "resource": "https://${eventhub_namespace_name}.servicebus.windows.net",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -175,7 +403,7 @@
                 "type": "WebActivity",
                 "dependsOn": [
                     {
-                        "activity": "add_patient_hash",
+                        "activity": "record_linkage",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -193,8 +421,16 @@
                     "url": "${ingestion_container_url}/fhir/transport/http/upload_bundle_to_fhir_server",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('add_patient_hash').output.bundle},\n    \"cred_manager\": \"azure\"\n}",
+                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('record_linkage').output.updated_bundle},\n    \"cred_manager\": \"azure\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             },
@@ -224,6 +460,14 @@
                     "body": {
                         "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.fhir_server_response_body},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_upload_failures_container_name}\",\n    \"file_name\": \"@{pipeline().parameters.filename}\"\n}",
                         "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
                     }
                 }
             }
@@ -239,6 +483,9 @@
                 "type": "String"
             },
             "filename": {
+                "type": "String"
+            },
+            "include_error_types": {
                 "type": "String"
             }
         },

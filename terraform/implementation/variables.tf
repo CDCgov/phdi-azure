@@ -19,14 +19,25 @@ variable "smarty_auth_token" {
   description = "value of the SmartyStreets Auth Token"
 }
 
-variable "fhir_converter_url" {
-  description = "URL of the FHIR converter"
-}
-
-variable "ingestion_container_url" {
-  description = "URL of the ingestion container"
+variable "smarty_license_type" {
+  type        = string
+  description = "value of the SmartyStreets license type to use"
 }
 
 variable "client_id" {
   description = "Client ID"
+}
+
+variable "object_id" {
+  description = "Object ID"
+}
+
+variable "ghcr_username" {
+  type        = string
+  description = "GitHub Container Registry username."
+}
+
+variable "ghcr_token" {
+  type        = string
+  description = "GitHub Container Registry token."
 }

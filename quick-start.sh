@@ -71,6 +71,11 @@ echo "More info: https://www.smarty.com/docs/cloud/authentication"
 echo
 SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 
+echo "Please select the $(pink 'License Type') of your Smarty Street Account."
+echo "More info: https://www.smarty.com/docs/cloud/licensing"
+echo
+SMARTY_LICENSE_TYPE=$(gum choose "us-standard-cloud" "us-core-cloud" "us-rooftop-geocoding-cloud" "us-rooftop-geocoding-enterprise-cloud" "us-autocomplete-pro-cloud" "international-global-plus-cloud")
+
 # Login to gh CLI
 clear
 echo "We will now login to the $(pink 'GitHub CLI')."
@@ -185,6 +190,7 @@ spin "Creating custom role..." az role definition create --role-definition role.
 
 # Create service principal and grant necessary roles
 spin "Creating service principal..." az ad sp create-for-rbac --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME --role owner --name $APP_REG_NAME
+OBJECT_ID=$(az ad sp show --id $CLIENT_ID --query id --output tsv)
 
 # Create federated credential
 cat << EOF > credentials.json
@@ -205,6 +211,10 @@ done
 spin "Creating federated credential..." az ad app federated-credential create --id $CLIENT_ID --parameters credentials.json
 az role assignment create --assignee "$CLIENT_ID" --role "App Resource Provider Registrant" --scope "/subscriptions/$SUBSCRIPTION_ID"  
 
+# Add Application.ReadWrite.All permission to the app
+spin "Adding Application.ReadWrite.All permission..." az ad app permission add --id $CLIENT_ID --api 00000003-0000-0000-c000-000000000000 --api-permissions 1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9=Role
+spin "Granting admin consent..." az ad app permission admin-consent --id $CLIENT_ID
+
 # Cleanup
 rm role.json
 rm credentials.json
@@ -218,10 +228,12 @@ echo
 spin "Setting RESOURCE_GROUP_NAME..." gh -R "${GITHUB_REPO}" secret set RESOURCE_GROUP_NAME --body "${RESOURCE_GROUP_NAME}"
 spin "Setting SUBSCRIPTION_ID..." gh -R "${GITHUB_REPO}" secret set SUBSCRIPTION_ID --body "${SUBSCRIPTION_ID}"
 spin "Setting CLIENT_ID..." gh -R "${GITHUB_REPO}" secret set CLIENT_ID --body "${CLIENT_ID}"
+spin "Setting OBJECT_ID..." gh -R "${GITHUB_REPO}" secret set OBJECT_ID --body "${OBJECT_ID}"
 spin "Setting LOCATION..." gh -R "${GITHUB_REPO}" secret set LOCATION --body "${LOCATION}"
 spin "Setting TENANT_ID..." gh -R "${GITHUB_REPO}" secret set TENANT_ID --body "${TENANT_ID}"
 spin "Setting SMARTY_AUTH_ID..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
 spin "Setting SMARTY_AUTH_TOKEN..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
+spin "Setting SMARTY_LICENSE_TYPE..." gh -R "${GITHUB_REPO}" secret set SMARTY_LICENSE_TYPE --body "${SMARTY_LICENSE_TYPE}"
 
 box "Repository secrets $(pink 'set')!"
 echo
@@ -230,10 +242,11 @@ echo
 spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}/environments/dev" --silent
 
 # Enable GitHub Actions
+GITHUB_ACTIONS_URL="https://github.com/${GITHUB_REPO}/actions"
 if [[ $PRIVATE != "true" ]]; then
   echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
   echo
-  echo "Please open $(pink "https://github.com/${GITHUB_REPO}/actions") in a new tab."
+  echo "Please open $(pink $GITHUB_ACTIONS_URL) in a new tab."
   echo "Click the green button to enable $(pink 'GitHub Workflows')."
   echo
   echo "Continuing from this point will begin a series of GitHub actions that may take 20+ minutes to complete"
@@ -243,7 +256,7 @@ if [[ $PRIVATE != "true" ]]; then
   WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
   while [ "$WORKFLOWS_ENABLED" = "0" ]; do
     echo "Looks like that didn't work! Please try again."
-    echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab."
+    echo "Please open $GITHUB_ACTIONS_URL in a new tab."
     echo "Click the green button to enable $(pink 'GitHub Workflows')."
     echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
     echo
@@ -257,7 +270,7 @@ if [[ $PRIVATE != "true" ]]; then
 fi
 
 echo "If you would like to see the following workflows run in more detail please click here:"
-echo "https://github.com/${GITHUB_REPO}/actions"
+echo $(pink $GITHUB_ACTIONS_URL)
 
 # Run Terraform Setup workflow
 echo "We will now run the $(pink 'Terraform Setup') workflow."
@@ -317,7 +330,7 @@ gh -R "${GITHUB_REPO}" run watch $DEPLOYMENT_WORKFLOW_ID
 DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run view $DEPLOYMENT_WORKFLOW_ID --json conclusion -q '.conclusion')
 if [ "$DEPLOY_SUCCESS" != "success" ]; then
   echo "Looks like that didn't work! Please contact the PHDI team for help."
-  echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
+  echo "To view the status of your workflows, go to $GITHUB_ACTIONS_URL."
   echo
   exit 1
 fi

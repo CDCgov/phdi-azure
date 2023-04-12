@@ -18,7 +18,32 @@ variable "smarty_auth_token" {
   description = "The SmartyStreets Auth Token."
 }
 
+variable "smarty_license_type" {
+  type        = string
+  description = "The SmartyStreets license type to use."
+}
+
 variable "client_id" {
   type        = string
   description = "Client ID"
+}
+
+variable "object_id" {
+  type        = string
+  description = "Object ID"
+}
+
+variable "ghcr_username" {
+  type        = string
+  description = "GitHub Container Registry username."
+}
+
+variable "ghcr_token" {
+  type        = string
+  description = "GitHub Container Registry token."
+}
+
+variable "log_analytics_workspace_id" {
+  type        = string
+  description = "Log Analytics Workspace ID."
 }

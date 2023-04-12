@@ -37,3 +37,13 @@ variable "client_id" {
   type        = string
   description = "Client ID of the app registration used to authenticate to Azure"
 }
+
+variable "wait_time" {
+  type        = number
+  description = "The number of seconds to wait when polling for a resource."
+}
+
+variable "sleep_time" {
+  type        = number
+  description = "The number of seconds to sleep in lookup tries for a resource."
+}
