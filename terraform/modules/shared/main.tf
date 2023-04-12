@@ -490,7 +490,7 @@ resource "azurerm_synapse_workspace" "phdi" {
   name                                 = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
   resource_group_name                  = var.resource_group_name
   location                             = var.location
-  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.phi.id
+  storage_data_lake_gen2_filesystem_id = azurerm_storage_container.source_data.id
   sql_administrator_login              = "sqladminuser"
   sql_administrator_login_password     = random_password.synapse_sql_password.result
 
@@ -508,6 +508,7 @@ resource "azurerm_synapse_spark_pool" "phdi" {
   node_size_family     = "MemoryOptimized"
   node_size            = "Small"
   cache_size           = 100
+  spark_version        = 3.3
 
   auto_scale {
     max_node_count = 50
