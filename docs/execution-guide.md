@@ -41,17 +41,15 @@ This how-to guide is divided into 3 sections:
 
 ### Access your Azure account 
 > Tip: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
-1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser.![azure-portal](./images/azure-portal.png)
-1. If you're not already logged in, log into Azure with your username and password and follow the steps for multifactor authentication (MFA). 
-
-1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. Click on 'Resource groups' under the "Azure services" heading.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
-1. Look for the name of the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
+1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
+1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. To check, click on 'Resource groups' under the "Azure services" heading.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
+1. Click on the name of the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 
 ### Upload and run data through the pipeline
 > Tip: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
-1. Within your `Resource group`, filter down to `Storage accounts` by clicking on the "Type" filter and selecting "Storage account" as the "Value".![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
+1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click on the "Type" filter, then under "Value" select the "Storage account" option. Click apply.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click on the name of the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
-1. After you've clicked into the storage bucket, click 'Containers' under the 'Data storage' header on the left sidebar. ![azure-select-containers](./images/azure-select-containers.png)
+1. After you've clicked into the storage bucket, go to the left sidebar and under the "Data storage" header click 'Containers'. ![azure-containers](./images/azure-containers.png)
 1. In the list of containers, click on the `source-data` container. Then click into the `vxu` folder. ![azure-select-source-data-container](./images/azure-select-source-data-container.png)
 1. Now we're ready to run a VXU message through the pipeline! First, click the 'Upload' button in the toolbar which should open up a sidebar to the right.
 1. Within the Upload sidebar, click 'Browse for files' and navigate to the `sample-data/` folder on your computer where you've downloaded or forked the `sample-data/` from this GitHub repository. Select the `VXU-V04-01_success_single.hl7` file to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)
