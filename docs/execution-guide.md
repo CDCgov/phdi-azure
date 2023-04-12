@@ -50,7 +50,8 @@ This how-to guide is divided into 3 sections:
 1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click on the "Type" filter, then under "Value" select the "Storage account" option. Click apply.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click on the name of the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
 1. After you've clicked into the storage bucket, go to the left sidebar and under the "Data storage" header click 'Containers'. ![azure-containers](./images/azure-containers.png)
-1. In the list of containers, click on the `source-data` container. Then click into the `vxu` folder. ![azure-select-source-data-container](./images/azure-select-source-data-container.png)
+1. Click on the name of the `source-data` container.![azure-select-source-data-container](./images/azure-select-source-data-container.png)
+1. Then click into the `vxu` folder.![azure-select-vxu-folder](./images/azure-select-vxu-folder.png)
 1. Now we're ready to run a VXU message through the pipeline! First, click the 'Upload' button in the toolbar which should open up a sidebar to the right.
 1. Within the Upload sidebar, click 'Browse for files' and navigate to the `sample-data/` folder on your computer where you've downloaded or forked the `sample-data/` from this GitHub repository. Select the `VXU-V04-01_success_single.hl7` file to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)
      
