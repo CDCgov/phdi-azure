@@ -43,11 +43,13 @@ This how-to guide is divided into 3 sections:
 > Tip: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser.![azure-portal](./images/azure-portal.png)
 1. If you're not already logged in, log into Azure with your username and password and follow the steps for multifactor authentication (MFA). 
-1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. To confirm, click on 'Resource groups' under the "Azure services" heading and look for the name of the appropriate Azure resource group![azure-portal-check-account](./images/azure-portal-check-account.png)
+
+1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. Click on 'Resource groups' under the "Azure services" heading.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
+1. Look for the name of the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 
 ### Upload and run data through the pipeline
 > Tip: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
-1. To begin, click on the search bar and search for `Storage accounts`. Select the 'Storage accounts' option in the search dropdown to view all storage accounts we have deployed.![azure-search-cloud-storage](./images/azure-search-cloud-storage.png)
+1. Within your `Resource group`, filter down to `Storage accounts` by clicking on the "Type" filter and selecting "Storage account" as the "Value".![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click on the name of the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
 1. After you've clicked into the storage bucket, click 'Containers' under the 'Data storage' header on the left sidebar. ![azure-select-containers](./images/azure-select-containers.png)
 1. In the list of containers, click on the `source-data` container. Then click into the `vxu` folder. ![azure-select-source-data-container](./images/azure-select-source-data-container.png)
