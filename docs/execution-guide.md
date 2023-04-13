@@ -9,7 +9,7 @@ First, please confirm that you meet the following user requirements:
     - They can be downloaded as a zip file from [this link](https://github.com/CDCgov/phdi-azure/archive/refs/heads/main.zip).
 
 
-If your organization has not yet implemented the pipeline, please have you/your administrator follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
+If your organization has not yet implemented the pipeline, please follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
 
 If you do not have sufficient access, please contact your organization's Azure administrator.
 
@@ -49,7 +49,7 @@ This how-to guide is divided into 3 sections:
 ### Upload and run data through the pipeline
 > **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
 
-1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click on the "Type" filter, then select the "Storage account" value and click apply.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
+1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click into the `Filter for any field...` search box and type in `Storage account`.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click into the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
 1. Go to the left sidebar and under the `Data storage` header, click `Containers`. ![azure-containers](./images/azure-containers.png)
 1. Click into the `source-data` container.![azure-select-source-data-container](./images/azure-select-source-data-container.png)
