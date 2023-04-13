@@ -9,9 +9,9 @@ First, please confirm that you meet the following user requirements:
     - They can be downloaded as a zip file from [this link](https://github.com/CDCgov/phdi-azure/archive/refs/heads/main.zip).
 
 
-If you have not implemented the pipeline, please follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
+If your organization has not yet implemented the pipeline, please have you/your administrator follow the steps in this [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md). 
 
-If you or your organization, have deployed the starter kit, but you do not have sufficient access please contact your organization's Azure administrator.
+If you do not have sufficient access, please contact your organization's Azure administrator.
 
 
 ## How to Use: Run an Hl7v2 vaccination message through the pipeline 
