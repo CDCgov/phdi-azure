@@ -55,8 +55,8 @@ This how-to guide is divided into 3 sections:
 1. Click into the `source-data` container.![azure-select-source-data-container](./images/azure-select-source-data-container.png)
 1. Then click into the `vxu` folder.![azure-select-vxu-folder](./images/azure-select-vxu-folder.png)
 1. Now we're ready to run a VXU message through the pipeline! First, click the `Upload` button in the toolbar.![azure-upload](./images/azure-upload.png)
-1. Then click `Browse for files` and navigate to the folder on your computer where you've downloaded or forked the `sample-data/` folder.![azure-browse](./images/azure-browse.png)     
-1. Select the `VXU-V04-01_success_single.hl7` file and click `Open` to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)    
+1. Then click `Browse for files`.![azure-browse](./images/azure-browse.png)     
+1. Navigate to the folder on your computer where you've downloaded or forked the `sample-data/` folder and select the `VXU-V04-01_success_single.hl7` file. Click `Open`, then click `Upload` to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)    
 
      > **Note**: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
 
