@@ -291,7 +291,7 @@
                 "type": "WebActivity",
                 "dependsOn": [
                     {
-                        "activity": "standardize_phone",
+                        "activity": "standardize_dob",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -309,7 +309,7 @@
                     "url": "${ingestion_container_url}/fhir/geospatial/geocode/geocode_bundle",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\": @{activity('standardize_phone').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
+                        "value": "{\n    \"bundle\": @{activity('standardize_dob').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
                         "type": "Expression"
                     },
                     "authentication": {
