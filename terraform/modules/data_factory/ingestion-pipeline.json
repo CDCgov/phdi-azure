@@ -249,6 +249,43 @@
                 }
             },
             {
+                "name": "standardize_dob",
+                "description": "Standardize date of birth.",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "standardize_phone",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_dob",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"data\": @{activity('standardize_phones').output.response.FhirResource}\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
                 "name": "geocode",
                 "description": "Geocode and standardize patient address.",
                 "type": "WebActivity",
@@ -273,43 +310,6 @@
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"bundle\": @{activity('standardize_phone').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
-                        "type": "Expression"
-                    },
-                    "authentication": {
-                        "resource": "api://phdi-${environment}-ingestion",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
-                        },
-                        "type": "UserAssignedManagedIdentity"
-                    }
-                }
-            },
-            {
-                "name": "standardize_dob",
-                "description": "Standardize date of birth.",
-                "type": "WebActivity",
-                "dependsOn": [
-                    {
-                        "activity": "convert_to_fhir",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_dob",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"data\": @{activity('convert_to_fhir').output.response.FhirResource}\n}",
                         "type": "Expression"
                     },
                     "authentication": {
