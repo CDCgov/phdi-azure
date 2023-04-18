@@ -7,6 +7,7 @@ from azure.identity import ManagedIdentityCredential
 from azure.storage.filedatalake import DataLakeFileClient
 from azure.core.credentials import AccessToken
 import time
+from pyspark.sql import SparkSession
 
 
 # Set up authentication
