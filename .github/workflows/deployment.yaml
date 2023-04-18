@@ -186,6 +186,12 @@ jobs:
             fi
           done
 
+      - name: Deploy Synapse notebooks
+        run: |
+          if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI"; then
+            az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI" --file "scripts/Synapse/convertParquet.ipynb"
+          fi
+
   end-to-end:
     name: End-to-end tests
     needs: deployment
