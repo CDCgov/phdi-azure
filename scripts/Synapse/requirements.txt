@@ -1,0 +1,4 @@
+phdi @ git+https://github.com/CDCgov/phdi@main
+pyarrow
+azure-storage-file-datalake
+azure-synapse-spark
