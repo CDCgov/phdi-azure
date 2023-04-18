@@ -272,7 +272,7 @@
                     "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_dob",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"data\": @{activity('standardize_phones').output.response.FhirResource}\n}",
+                        "value": "{\n    \"data\": @{activity('standardize_phone').output.response.FhirResource}\n}",
                         "type": "Expression"
                     },
                     "authentication": {
