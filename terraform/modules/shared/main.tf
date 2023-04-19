@@ -356,7 +356,7 @@ resource "azurerm_container_app" "container_app" {
         name = "MPI_PATIENT_TABLE"
         value = "patient"
       }
-      end {
+      env {
         name = "MPI_PERSON_TABLE"
         value = "person"
       }
