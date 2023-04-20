@@ -63,6 +63,11 @@ resource "azurerm_storage_container" "validation_failures_container_name" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
+resource "azurerm_storage_container" "patient_data_container_name" {
+  name                 = "patient-data"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
 resource "azurerm_role_assignment" "phi_storage_contributor" {
   scope                = azurerm_storage_account.phi.id
   role_definition_name = "Storage Blob Data Contributor"
