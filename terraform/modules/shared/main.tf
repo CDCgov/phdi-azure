@@ -329,20 +329,36 @@ resource "azurerm_container_app" "container_app" {
         value = azurerm_communication_service.communication_service.name
       }
       env {
-        name  = "DB_USER"
+        name  = "MPI_DB_TYPE"
         value = "postgres"
       }
       env {
-        name  = "DB_PASSWORD"
+        name  = "MPI_PASSWORD"
         value = random_password.postgres_password.result
       }
       env {
-        name  = "DB_HOST"
+        name  = "MPI_USER"
+        value = azurerm_postgresql_flexible_server.mpi.administrator_login
+      }
+      env {
+        name  = "MPI_PORT"
+        value = "5432"
+      }
+      env {
+        name  = "MPI_HOST"
         value = azurerm_postgresql_flexible_server.mpi.fqdn
       }
       env {
-        name  = "DB_NAME"
+        name  = "MPI_DBNAME"
         value = azurerm_postgresql_flexible_server_database.mpi.name
+      }
+      env {
+        name  = "MPI_PATIENT_TABLE"
+        value = "patient"
+      }
+      env {
+        name  = "MPI_PERSON_TABLE"
+        value = "person"
       }
     }
   }
