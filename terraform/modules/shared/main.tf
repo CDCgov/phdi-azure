@@ -353,11 +353,11 @@ resource "azurerm_container_app" "container_app" {
         value = azurerm_postgresql_flexible_server_database.mpi.name
       }
       env {
-        name = "MPI_PATIENT_TABLE"
+        name  = "MPI_PATIENT_TABLE"
         value = "patient"
       }
       env {
-        name = "MPI_PERSON_TABLE"
+        name  = "MPI_PERSON_TABLE"
         value = "person"
       }
     }
