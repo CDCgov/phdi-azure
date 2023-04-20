@@ -1,0 +1,60 @@
+{
+  "name": "kafka_to_delta_table",
+  "properties": {
+    "activities": [
+      {
+      "name": "kafka_to_delta_table",
+      "description": "Read messages from Azure Event Hub and write to storage delta table.\n",
+      "type": "WebActivity",
+      "dependsOn": [],
+      "policy": {
+        "timeout": "0.12:00:00",
+        "retry": 0,
+        "retryIntervalInSeconds": 30,
+        "secureOutput": false,
+        "secureInput": false
+      },
+      "userProperties": [],
+      "typeProperties": {
+        "url": "${kafka_to_delta_tables_container_url}/kafka-to-delta-table",
+        "method": "POST",
+        "body": {
+//          What inputs?
+          "value": "{\n    \"message\": @{pipeline().parameters.message},\n    \"message_type\": \"@{pipeline().parameters.message_type}\",\n    \"include_error_types\": \"@{pipeline().parameters.include_error_types}\"\n}",
+          "type": "Expression"
+        },
+        "authentication": {
+          "resource": "api://phdi-${environment}-kafka-to-delta-table",
+          "credential": {
+            "referenceName": "pipeline-runner-credential",
+            "type": "CredentialReference"
+          },
+          "type": "UserAssignedManagedIdentity"
+        }
+      }
+    }
+    ],
+    "parameters": {
+      "message": {
+        "type": "String"
+      },
+      "message_type": {
+        "type": "String"
+      },
+      "root_template": {
+        "type": "String"
+      },
+      "filename": {
+        "type": "String"
+      },
+      "include_error_types": {
+        "type": "String"
+      }
+    },
+    "annotations": [
+      "FileName"
+    ],
+    "lastPublishTime": "2022-11-01T21:23:29Z"
+  },
+  "type": "Microsoft.DataFactory/factories/pipelines"
+}
