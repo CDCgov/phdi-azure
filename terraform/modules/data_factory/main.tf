@@ -74,7 +74,7 @@ locals {
     record_linkage_container_url            = var.record_linkage_container_url,
     eventhub_namespace_name                 = var.eventhub_namespace_name,
     eventhub_name                           = var.eventhub_name,
-  })),
+  }))
   kafka-to-delta-table-pipeline-config = jsondecode(templatefile("../modules/data_factory/kafka-to-delta-table-pipeline.json", {
     environment                             = terraform.workspace,
     eventhub_namespace_name                 = var.eventhub_namespace_name,
