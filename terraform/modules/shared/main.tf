@@ -146,7 +146,7 @@ resource "azurerm_key_vault_secret" "smarty_auth_token" {
 
 
 resource "azuread_application" "kafka_to_delta_app_registration" {
-  display_name = "Kafka to Delta App Registration"
+  display_name = "Kafka-to-Delta-App-Registration"
 }
 
 resource "azuread_application_password" "kafka_to_delta_app_registration_password" {
@@ -154,13 +154,13 @@ resource "azuread_application_password" "kafka_to_delta_app_registration_passwor
 }
 
 resource "azurerm_key_vault_secret" "kafka_to_delta_app_password" {
-  name         = "Kafka to delta app password"
+  name         = "Kafka-to-delta-app-password"
   value        = azuread_application_password.kafka_to_delta_app_registration_password.value
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "eventhub_connection_string" {
-  name         = "Eventhub connection string"
+  name         = "Eventhub-connection-string"
   value        = azurerm_eventhub_namespace.phdi.default_primary_connection_string
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
