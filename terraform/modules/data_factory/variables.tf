@@ -129,3 +129,8 @@ variable "eventhub_connection_string_secret_name" {
   type        = string
   description = "eventhub_connection_string_secret_name"
 }
+
+variable "kafka_to_delta_tables_container_url" {
+  type        = string
+  description = "kafka_to_delta_tables_container_url"
+}

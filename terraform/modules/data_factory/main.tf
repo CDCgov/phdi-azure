@@ -79,6 +79,7 @@ locals {
     environment                             = terraform.workspace,
     eventhub_namespace_name                 = var.eventhub_namespace_name,
     eventhub_name                           = var.eventhub_name,
+    kafka_to_delta_tables_container_url     = var.kafka_to_delta_tables_container_url
   }))
 }
 
