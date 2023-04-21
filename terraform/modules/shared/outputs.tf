@@ -38,6 +38,14 @@ output "fhir_conversion_failures_container_name" {
   value = azurerm_storage_container.fhir_conversion_failures_container_name.name
 }
 
+output "delta_tables_container_name" {
+  value = azurerm_storage_container.delta_tables_container_name.name
+}
+
+output "phi_storage_account_name" {
+  value = azurerm_storage_account.phi.name
+}
+
 output "fhir_converter_url" {
   value = "https://phdi-${terraform.workspace}-fhir-converter.${azurerm_container_app_environment.phdi.default_domain}"
 }
@@ -74,4 +82,20 @@ output "eventhub_namespace_name" {
 
 output "eventhub_name" {
   value = azurerm_eventhub.phdi.name
+}
+
+output "kafka_to_delta_app_password_secret_name" {
+  value = azurerm_key_vault_secret.kafka_to_delta_app_password.name
+}
+
+output "kafka_to_delta_client_id" {
+  value = azuread_application.kafka_to_delta_app_registration.id
+}
+
+output "key_vault_name" {
+  value = azurerm_key_vault.phdi_key_vault.name
+}
+
+output "eventhub_connection_string_secret_name" {
+  value = azurerm_key_vault_secret.eventhub_connection_string.name
 }
