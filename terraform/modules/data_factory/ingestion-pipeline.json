@@ -4,7 +4,7 @@
         "activities": [
             {
                 "name": "validate_message",
-                "description": "Validate Hl7 or CCD message.\n",
+                "description": "Validate Hl7 or CDA message.\n",
                 "type": "WebActivity",
                 "dependsOn": [],
                 "policy": {
