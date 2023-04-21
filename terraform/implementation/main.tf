@@ -42,6 +42,7 @@ module "data_factory" {
   kafka_to_delta_client_id                = module.shared.kafka_to_delta_client_id
   key_vault_name                          = module.shared.key_vault_name
   eventhub_connection_string_secret_name  = module.shared.eventhub_connection_string_secret_name
+  phi_storage_account_name                = module.shared.phi_storage_account_name
 }
 
 
