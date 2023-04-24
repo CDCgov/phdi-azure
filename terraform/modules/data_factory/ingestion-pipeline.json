@@ -4,7 +4,7 @@
         "activities": [
             {
                 "name": "validate_message",
-                "description": "Validate Hl7 or CCD message.\n",
+                "description": "Validate Hl7 or CDA message.\n",
                 "type": "WebActivity",
                 "dependsOn": [],
                 "policy": {
@@ -346,7 +346,7 @@
                     "url": "${record_linkage_container_url}/link-record",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"fhir_bundle\" :@{activity('geocode').output.bundle}\n}",
+                        "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
                         "type": "Expression"
                     },
                     "authentication": {
