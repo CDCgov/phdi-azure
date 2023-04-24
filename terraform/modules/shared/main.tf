@@ -63,6 +63,11 @@ resource "azurerm_storage_container" "validation_failures_container_name" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
+resource "azurerm_storage_container" "patient_data_container_name" {
+  name                 = "patient-data"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
 resource "azurerm_role_assignment" "phi_storage_contributor" {
   scope                = azurerm_storage_account.phi.id
   role_definition_name = "Storage Blob Data Contributor"
@@ -136,6 +141,12 @@ resource "azurerm_key_vault_secret" "smarty_auth_id" {
 resource "azurerm_key_vault_secret" "smarty_auth_token" {
   name         = "smarty-auth-token"
   value        = var.smarty_auth_token
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "mpi_db_password" {
+  name         = "mpi-db-password"
+  value        = azurerm_postgresql_flexible_server.mpi.administrator_password
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
@@ -334,7 +345,7 @@ resource "azurerm_container_app" "container_app" {
       }
       env {
         name  = "MPI_PASSWORD"
-        value = random_password.postgres_password.result
+        value = azurerm_postgresql_flexible_server.mpi.administrator_password
       }
       env {
         name  = "MPI_USER"
