@@ -63,6 +63,11 @@ resource "azurerm_storage_container" "validation_failures_container_name" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
+resource "azurerm_storage_container" "patient_data_container_name" {
+  name                 = "patient-data"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
 resource "azurerm_storage_container" "delta_tables_container_name" {
   name                 = "delta-tables"
   storage_account_name = azurerm_storage_account.phi.name
@@ -141,6 +146,12 @@ resource "azurerm_key_vault_secret" "smarty_auth_id" {
 resource "azurerm_key_vault_secret" "smarty_auth_token" {
   name         = "smarty-auth-token"
   value        = var.smarty_auth_token
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "mpi_db_password" {
+  name         = "mpi-db-password"
+  value        = azurerm_postgresql_flexible_server.mpi.administrator_password
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
@@ -356,20 +367,36 @@ resource "azurerm_container_app" "container_app" {
         value = azurerm_communication_service.communication_service.name
       }
       env {
-        name  = "DB_USER"
+        name  = "MPI_DB_TYPE"
         value = "postgres"
       }
       env {
-        name  = "DB_PASSWORD"
-        value = random_password.postgres_password.result
+        name  = "MPI_PASSWORD"
+        value = azurerm_postgresql_flexible_server.mpi.administrator_password
       }
       env {
-        name  = "DB_HOST"
+        name  = "MPI_USER"
+        value = azurerm_postgresql_flexible_server.mpi.administrator_login
+      }
+      env {
+        name  = "MPI_PORT"
+        value = "5432"
+      }
+      env {
+        name  = "MPI_HOST"
         value = azurerm_postgresql_flexible_server.mpi.fqdn
       }
       env {
-        name  = "DB_NAME"
+        name  = "MPI_DBNAME"
         value = azurerm_postgresql_flexible_server_database.mpi.name
+      }
+      env {
+        name  = "MPI_PATIENT_TABLE"
+        value = "patient"
+      }
+      env {
+        name  = "MPI_PERSON_TABLE"
+        value = "person"
       }
     }
   }
@@ -522,6 +549,13 @@ resource "azurerm_synapse_workspace" "phdi" {
       azurerm_user_assigned_identity.pipeline_runner.id
     ]
   }
+}
+
+resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
+  name                 = "AllowAllWindowsAzureIps"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  start_ip_address     = "0.0.0.0"
+  end_ip_address       = "0.0.0.0"
 }
 
 resource "azurerm_synapse_spark_pool" "phdi" {

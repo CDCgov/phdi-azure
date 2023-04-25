@@ -98,7 +98,7 @@ def test_pipeline_trigger_success(
 
         elif source_data_subdirectory == "ecr":
             message_type = "ecr"
-            root_template = "CCD"
+            root_template = "EICR"
 
         event = mock.MagicMock()
         event.get_json.return_value = {

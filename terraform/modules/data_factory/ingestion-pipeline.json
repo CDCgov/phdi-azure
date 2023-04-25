@@ -4,7 +4,7 @@
         "activities": [
             {
                 "name": "validate_message",
-                "description": "Validate Hl7 or CCD message.\n",
+                "description": "Validate Hl7 or CDA message.\n",
                 "type": "WebActivity",
                 "dependsOn": [],
                 "policy": {
@@ -67,12 +67,14 @@
                 "name": "log_validation_failure",
                 "description": "Write validation failures to storage.\n",
                 "type": "WebActivity",
-                "dependsOn": [{
-                    "activity": "validation_if_condition",
-                    "dependencyConditions": [
-                        "Failed"
-                    ]
-                }],
+                "dependsOn": [
+                    {
+                        "activity": "validation_if_condition",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
                 "policy": {
                     "timeout": "0.12:00:00",
                     "retry": 0,
@@ -104,11 +106,11 @@
                 "type": "WebActivity",
                 "dependsOn": [
                     {
-                    "activity": "validation_if_condition",
-                    "dependencyConditions": [
-                        "Succeeded"
-                    ]
-                }
+                        "activity": "validation_if_condition",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
@@ -247,8 +249,8 @@
                 }
             },
             {
-                "name": "geocode",
-                "description": "Geocode and standardize patient address.",
+                "name": "standardize_dob",
+                "description": "Standardize date of birth.",
                 "type": "WebActivity",
                 "dependsOn": [
                     {
@@ -267,10 +269,47 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
+                    "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_dob",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"data\": @{activity('standardize_phone').output.bundle}\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
+                "name": "geocode",
+                "description": "Geocode and standardize patient address.",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "standardize_dob",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
                     "url": "${ingestion_container_url}/fhir/geospatial/geocode/geocode_bundle",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\": @{activity('standardize_phone').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
+                        "value": "{\n    \"bundle\": @{activity('standardize_dob').output.bundle},\n    \"geocode_method\": \"smarty\"\n}",
                         "type": "Expression"
                     },
                     "authentication": {
@@ -307,7 +346,7 @@
                     "url": "${record_linkage_container_url}/link-record",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"fhir_bundle\" :@{activity('geocode').output.bundle}\n}",
+                        "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
                         "type": "Expression"
                     },
                     "authentication": {

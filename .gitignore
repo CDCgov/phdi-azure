@@ -50,10 +50,6 @@ data/
 # Jetbrains IDE settings
 /.idea
 
-# Notebooks
-*.ipynb*
-!examples/*.ipynb*
-
 .DS_Store
 
 # Azure Application Creds
