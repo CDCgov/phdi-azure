@@ -34,19 +34,34 @@
     }
     ],
     "parameters": {
-      "message": {
+      "kafka_provider": {
         "type": "String"
       },
-      "message_type": {
+      "event_hub": {
         "type": "String"
       },
-      "root_template": {
+      "event_hubs_namespace": {
         "type": "String"
       },
-      "filename": {
+      "connection_string_secret_name": {
         "type": "String"
       },
-      "include_error_types": {
+      "storage_account": {
+        "type": "String"
+      },
+      "client_secret_name": {
+        "type": "String"
+      },
+      "client_id": {
+        "type": "String"
+      },
+      "container": {
+        "type": "String"
+      },
+      "key_vault_name": {
+        "type": "String"
+      },
+      "schema_name": {
         "type": "String"
       }
     },
