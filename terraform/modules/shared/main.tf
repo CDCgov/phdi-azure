@@ -122,6 +122,19 @@ resource "azurerm_key_vault" "phdi_key_vault" {
       "Get",
     ]
   }
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = azurerm_synapse_workspace.phdi.identity.0.principal_id
+
+    key_permissions = [
+      "Get",
+    ]
+
+    secret_permissions = [
+      "Get",
+    ]
+  }
 }
 
 resource "random_uuid" "salt" {}
