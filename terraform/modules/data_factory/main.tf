@@ -75,6 +75,10 @@ locals {
     eventhub_namespace_name                 = var.eventhub_namespace_name,
     eventhub_name                           = var.eventhub_name,
   }))
+  pipeline-metrics-dashboard-config = jsondecode(templatefile("../modules/data_factory/pipeline-metrics-dashboard.json", {
+    data_factory_id = azurerm_data_factory.phdi_data_factory.id,
+    environment     = terraform.workspace,
+  }))
 }
 
 resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
@@ -92,4 +96,18 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
 
   depends_on = [null_resource.adf_credential]
+}
+
+
+##### Pipeline metrics dashboard #####
+
+resource "azurerm_portal_dashboard" "pipeline_metrics" {
+  name                = "pipeline-metrics-${terraform.workspace}"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  tags = {
+    source = "terraform"
+  }
+
+  dashboard_properties = jsonencode(local.pipeline-metrics-dashboard-config.properties)
 }
