@@ -1,9 +1,10 @@
-name: Bug Report
-description: File a bug report
-title: "[Bug]: "
-labels: ["bug", "triage"]
+name: Support
+description: File a support ticket to us improve our pipeline
+title: "[Support]: "
+labels: ["support", "user test"]
 assignees:
-  - octocat
+  - pkchau
+  - millzpaugh
 body:
   - type: markdown
     attributes:
