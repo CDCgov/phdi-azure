@@ -19,7 +19,7 @@
         "url": "${kafka_to_delta_tables_container_url}/kafka-to-delta-table",
         "method": "POST",
         "body": {
-          "value": "{\n    \"kafka_provider\": @{pipeline().parameters.kafka_provider},\n \"event_hub\": @{pipeline().parameters.event_hub},\n \"event_hubs_namespace\": @{pipeline().parameters.event_hubs_namespace},\n \"connection_string_secret_name\": @{pipeline().parameters.connection_string_secret_name},\n \"storage_account\": @{pipeline().parameters.storage_account},\n \"client_secret_name\": @{pipeline().parameters.client_secret_name},\n \"client_id\": @{pipeline().parameters.client_id},\n \"tenant_id\": @{pipeline().parameters.tenant_id},\n \"container\": @{pipeline().parameters.container},\n    \"storage_provider\": \"@{pipeline().parameters.storage_provider}\",\n    \"key_vault_name\": \"@{pipeline().parameters.key_vault_name}\"\n}",
+          "value": "{\n    \"kafka_provider\": \"@{pipeline().parameters.kafka_provider}\",\n \"event_hub\": \"@{pipeline().parameters.event_hub}\",\n \"event_hubs_namespace\": \"@{pipeline().parameters.event_hubs_namespace}\",\n \"connection_string_secret_name\": \"@{pipeline().parameters.connection_string_secret_name}\",\n \"storage_account\": \"@{pipeline().parameters.storage_account}\",\n \"client_secret_name\": \"@{pipeline().parameters.client_secret_name}\",\n \"client_id\": \"@{pipeline().parameters.client_id}\",\n \"tenant_id\": \"@{pipeline().parameters.tenant_id}\",\n \"container\": \"@{pipeline().parameters.container}\",\n    \"storage_provider\": \"@{pipeline().parameters.storage_provider}\",\n    \"key_vault_name\": \"@{pipeline().parameters.key_vault_name}\"\n}",
           "type": "Expression"
         },
         "authentication": {
