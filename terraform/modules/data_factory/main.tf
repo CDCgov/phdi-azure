@@ -118,6 +118,7 @@ resource "azurerm_data_factory_pipeline" "phdi_kafka_to_delta_table_pipeline" {
     "tenant_id" : data.azurerm_client_config.current.tenant_id,
     "container" : var.delta_tables_container_name,
     "key_vault_name" : var.key_vault_name,
+    "schema_name" : "ecr.json"
   }
 
   activities_json = jsonencode(local.kafka-to-delta-table-pipeline-config.properties.activities)
