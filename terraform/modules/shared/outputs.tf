@@ -67,7 +67,7 @@ output "record_linkage_container_url" {
 }
 
 output "kafka_to_delta_tables_container_url" {
-  value = "https://phdi-${terraform.workspace}-record-linkage.${azurerm_container_app_environment.phdi.default_domain}"
+  value = "https://phdi-${terraform.workspace}-kafka-to-delta-table.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
 # TODO: Uncomment when tabulation is implemented
