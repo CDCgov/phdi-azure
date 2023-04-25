@@ -9,4 +9,6 @@ Support requests are reviewed at least once per week.
 **Please DO NOT include any PHI/PII in support requests, as they are public.**
 
 ## Contact us
-If for some reason opening a Github issue is not appropriate, you can get in touch with the team at `DMIBuildingBlocks@cdc.gov`. This is a shared inbox, so please do not include any PHI/PII in emails to this address.
+If for some reason opening a Github issue is not appropriate, you can get in touch with the team at `DMIBuildingBlocks@cdc.gov`. 
+
+**Please DO NOT include any PHI/PII in emails to this address, as it is a shared inbox.**
