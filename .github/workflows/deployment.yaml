@@ -193,10 +193,10 @@ jobs:
           SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
         run: |
           if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI"; then
-            az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI" --file "scripts/Synapse/convertParquetMPI.ipynb"
+            az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI" --file @"scripts/Synapse/convertParquetMPI.ipynb"
           fi
           if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MCI"; then
-            az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MCI" --file "scripts/Synapse/convertParquetMCI.ipynb"
+            az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MCI" --file @"scripts/Synapse/convertParquetMCI.ipynb"
           fi
 
   end-to-end:
