@@ -19,15 +19,15 @@ resource "azurerm_storage_account" "phi" {
   }
 }
 
-resource "azurerm_storage_container" "source_data" {
-  name                 = "source-data"
-  storage_account_name = azurerm_storage_account.phi.name
+resource "azurerm_storage_data_lake_gen2_filesystem" "source_data" {
+  name               = "source-data"
+  storage_account_id = azurerm_storage_account.phi.id
 }
 
 resource "azurerm_storage_blob" "vxu" {
   name                   = "vxu/.keep"
   storage_account_name   = azurerm_storage_account.phi.name
-  storage_container_name = azurerm_storage_container.source_data.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.source_data.name
   type                   = "Block"
   source_content         = ""
 }
@@ -35,7 +35,7 @@ resource "azurerm_storage_blob" "vxu" {
 resource "azurerm_storage_blob" "ecr" {
   name                   = "ecr/.keep"
   storage_account_name   = azurerm_storage_account.phi.name
-  storage_container_name = azurerm_storage_container.source_data.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.source_data.name
   type                   = "Block"
   source_content         = ""
 }
@@ -43,7 +43,7 @@ resource "azurerm_storage_blob" "ecr" {
 resource "azurerm_storage_blob" "elr" {
   name                   = "elr/.keep"
   storage_account_name   = azurerm_storage_account.phi.name
-  storage_container_name = azurerm_storage_container.source_data.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.source_data.name
   type                   = "Block"
   source_content         = ""
 }
@@ -60,6 +60,16 @@ resource "azurerm_storage_container" "fhir_upload_failures_container_name" {
 
 resource "azurerm_storage_container" "validation_failures_container_name" {
   name                 = "validation-failures"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
+resource "azurerm_storage_container" "patient_data_container_name" {
+  name                 = "patient-data"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
+resource "azurerm_storage_container" "delta_tables_container_name" {
+  name                 = "delta-tables"
   storage_account_name = azurerm_storage_account.phi.name
 }
 
@@ -117,6 +127,19 @@ resource "azurerm_key_vault" "phdi_key_vault" {
       "Get",
     ]
   }
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = azurerm_synapse_workspace.phdi.identity.0.principal_id
+
+    key_permissions = [
+      "Get",
+    ]
+
+    secret_permissions = [
+      "Get",
+    ]
+  }
 }
 
 resource "random_uuid" "salt" {}
@@ -136,6 +159,33 @@ resource "azurerm_key_vault_secret" "smarty_auth_id" {
 resource "azurerm_key_vault_secret" "smarty_auth_token" {
   name         = "smarty-auth-token"
   value        = var.smarty_auth_token
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "mpi_db_password" {
+  name         = "mpi-db-password"
+  value        = azurerm_postgresql_flexible_server.mpi.administrator_password
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+
+resource "azuread_application" "kafka_to_delta_app_registration" {
+  display_name = "Kafka-to-Delta-App-Registration"
+}
+
+resource "azuread_application_password" "kafka_to_delta_app_registration_password" {
+  application_object_id = azuread_application.kafka_to_delta_app_registration.object_id
+}
+
+resource "azurerm_key_vault_secret" "kafka_to_delta_app_password" {
+  name         = "Kafka-to-delta-app-password"
+  value        = azuread_application_password.kafka_to_delta_app_registration_password.value
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "eventhub_connection_string" {
+  name         = "Eventhub-connection-string"
+  value        = azurerm_eventhub_namespace.phdi.default_primary_connection_string
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
@@ -181,7 +231,8 @@ locals {
     "alerts",
     "message-parser",
     "validation",
-    "record-linkage"
+    "record-linkage",
+    "kafka-to-delta-table"
   ])
 }
 
@@ -329,20 +380,36 @@ resource "azurerm_container_app" "container_app" {
         value = azurerm_communication_service.communication_service.name
       }
       env {
-        name  = "DB_USER"
+        name  = "MPI_DB_TYPE"
         value = "postgres"
       }
       env {
-        name  = "DB_PASSWORD"
-        value = random_password.postgres_password.result
+        name  = "MPI_PASSWORD"
+        value = azurerm_postgresql_flexible_server.mpi.administrator_password
       }
       env {
-        name  = "DB_HOST"
+        name  = "MPI_USER"
+        value = azurerm_postgresql_flexible_server.mpi.administrator_login
+      }
+      env {
+        name  = "MPI_PORT"
+        value = "5432"
+      }
+      env {
+        name  = "MPI_HOST"
         value = azurerm_postgresql_flexible_server.mpi.fqdn
       }
       env {
-        name  = "DB_NAME"
+        name  = "MPI_DBNAME"
         value = azurerm_postgresql_flexible_server_database.mpi.name
+      }
+      env {
+        name  = "MPI_PATIENT_TABLE"
+        value = "patient"
+      }
+      env {
+        name  = "MPI_PERSON_TABLE"
+        value = "person"
       }
     }
   }
@@ -388,7 +455,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
   location            = "eastus"
   resource_group_name = var.resource_group_name
   kind                = "fhir-R4"
-  cosmosdb_throughput = 1400
+  cosmosdb_throughput = 400
 
   lifecycle {
     ignore_changes = [name, tags]
@@ -463,4 +530,68 @@ resource "azurerm_role_assignment" "service_bus_contributor" {
   scope                = azurerm_eventhub_namespace.phdi.id
   role_definition_name = "Azure Service Bus Data Owner"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+
+##### Synapse #####
+
+resource "random_password" "synapse_sql_password" {
+  length           = 32
+  special          = true
+  override_special = "_%@"
+}
+
+# Store password in key vault
+resource "azurerm_key_vault_secret" "synapse_sql_password" {
+  name         = "synapse-sql-password"
+  value        = random_password.synapse_sql_password.result
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_synapse_workspace" "phdi" {
+  name                                 = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
+  resource_group_name                  = var.resource_group_name
+  location                             = var.location
+  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.source_data.id
+  sql_administrator_login              = "sqladminuser"
+  sql_administrator_login_password     = random_password.synapse_sql_password.result
+
+  identity {
+    type = "SystemAssigned, UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.pipeline_runner.id
+    ]
+  }
+}
+
+resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
+  name                 = "AllowAllWindowsAzureIps"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  start_ip_address     = "0.0.0.0"
+  end_ip_address       = "0.0.0.0"
+}
+
+resource "azurerm_synapse_spark_pool" "phdi" {
+  name                 = "${terraform.workspace}pool"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  node_size_family     = "MemoryOptimized"
+  node_size            = "Small"
+  cache_size           = 100
+  spark_version        = 3.3
+
+  auto_scale {
+    max_node_count = 50
+    min_node_count = 3
+  }
+
+  auto_pause {
+    delay_in_minutes = 15
+  }
+
+  spark_config {
+    content  = <<EOF
+spark.shuffle.spill                true
+EOF
+    filename = "config.txt"
+  }
 }

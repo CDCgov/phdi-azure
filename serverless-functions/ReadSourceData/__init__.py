@@ -45,7 +45,7 @@ def main(event: func.EventGridEvent) -> None:
 
     elif filename_parts[0] == "ecr":
         message_type = "ecr"
-        root_template = "CCD"
+        root_template = "EICR"
 
         if any([name for name in ["RR", "html"] if name in filename_parts[1]]):
             logging.info(

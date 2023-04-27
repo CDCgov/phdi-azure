@@ -4,17 +4,23 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "= 3.43.0"
     }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "= 2.37.2"
+    }
   }
 
   backend "azurerm" {
-    use_oidc       = true
     container_name = "tfstate"
     key            = "prod.terraform.tfstate"
-    use_msi        = true
   }
 }
 
 provider "azurerm" {
-  use_oidc = true
+  use_oidc = var.use_oidc
   features {}
+}
+
+provider "azuread" {
+  use_oidc = var.use_oidc
 }
