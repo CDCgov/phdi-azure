@@ -141,7 +141,7 @@ resource "azurerm_data_factory_trigger_schedule" "phdi_kafka_to_delta_table_pipe
 ##### Pipeline metrics dashboard #####
 
 resource "azurerm_portal_dashboard" "pipeline_metrics" {
-  name                = "Pipeline Metrics (${terraform.workspace})"
+  name                = "pipeline-metrics-${terraform.workspace}"
   resource_group_name = var.resource_group_name
   location            = var.location
   tags = {
