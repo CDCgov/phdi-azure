@@ -25,7 +25,7 @@
 
 ## Overview
 
-The purpose of this repository is to implement our cloud-based **Starter Kit pipeline** in Azure. Our Starter Kit is composed of **Building Blocks**—modular software tools that, when composed together, can improve data quality and reduce data cleaning workloads—developed from the [PHDI SDK](https://github.com/CDCgov/phdi). This repository will allow users to begin deploying these Building Blocks to their own Azure environment. For more information for using our repository beyond what is contained in this README, please refer to our [Getting Started](getting_started.md) document, which offers additional resources on how to set up a local development environment, how these Building Blocks are deployed, and more.
+The purpose of this repository is to implement our cloud-based **Starter Kit pipeline** in Azure. Our Starter Kit is composed of **Building Blocks**—modular software tools that, when combined together, can improve data quality and reduce data cleaning workloads—developed from the [PHDI SDK](https://github.com/CDCgov/phdi). This repository will allow users to begin deploying these Building Blocks to their own Azure environment. For more information for using our repository beyond what is contained in this README, please refer to our [Getting Started](getting_started.md) document, which offers additional resources on how to set up a local development environment, how these Building Blocks are deployed, and more.
 
 ### Problem Scope
 
@@ -78,45 +78,27 @@ The PHDI Building Blocks containerized web services are deployed in Azure as Azu
 
 ### Serverless Functions
 
-The PHDI Building Blocks are implemented as Azure Function Apps. Azure Function Apps are Azure's version of serverless functions, similar to Lambda in Amazon Web Services (AWS) and Azure Function Apps in Mircosoft Azure. Severless function provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. Since they are serverless, Azure abstracts all aspects of the underlying infrastructure allowing us to simply write and excute our Building Blocks without worrying about the computers they run on. The `cloud-functions` directory contains Python source code for Azure Function Apps that implement Building Blocks from the PHDI SDK.
+The pipeline deployed by the Starter kit processes data as it is received in real time. We achieve this event-driven behavior by using an Azure Function to “listen” for new data to be uploaded. Azure Functions are Azure's version of serverless functions, similar to Lambda in Amazon Web Services (AWS). Serverless functions provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. The `serverless-functions` directory contains the Python source code for this Azure Function.
 
 #### Pipeline Orchestration
 
-Since the Building Blocks are designed to be composable users may want to chain serveral together into pipelines.  We use Microsofts Azure Data Factory (ADF) to define the process that require the use of multiple Building Blocks.  These pipelines can be configured using **TBD TODO**
+Since the Building Blocks are designed to be composable users will likely want to chain several together into pipelines.  We use Microsofts Azure Data Factory (ADF) to define the process that requires the use of multiple Building Blocks. These pipelines can be configured using the ADF interface (web UI).
 
 #### Infrastructure as Code
 
-Every resource required to use the Building Blocks and pipelines implemented in this respostory are defined using Terraform. This makes it simple for users to deploy all of the functionality provided in this repository to their own Azure environments. The Terraform code can be found in the `terraform` directory.
+Every resource required to use the Building Blocks and pipelines implemented in this repository are defined using Terraform. This makes it simple for users to deploy all of the functionality provided in this repository to their own Azure environments. The Terraform code can be found in the [`terraform` directory](https://github.com/CDCgov/phdi-azure/tree/main/terraform).
 
 #### Continuous Integration and Continuous Deployment
 
-In order to ensure high code quality and reliability we have implemented a Continuous Integation (CI) pipeline consisting of a suite of tests all new contributions must pass before they are merged into `main`. We have also built a Continuous Deployment (CD) pipeline that automatically deploys the code in the repositiory to linked Azure environments when changes are made. The combined CI/CD pipeline is implemented with GitHub Actions in the `.github` directory. 
+In order to ensure high code quality and reliability we have implemented a Continuous Integration (CI) pipeline consisting of a suite of tests all new contributions must pass before they are merged into `main`. We have also built a Continuous Deployment (CD) pipeline that automatically deploys the code in the repository to linked Azure environments when changes are made. The combined CI/CD pipeline is implemented with GitHub Actions in the [`.github` directory](https://github.com/CDCgov/phdi-azure/tree/main/.github/workflows). 
 
-### Target Users
+## Additional Starter Kit Setup Guidance
 
-Target users of this system include:
+Additional documentation for setting up our Starter Kit pipeline in Azure can be found below:
 
-- Public Health Departments
-  - Epidemiologists who rely on health data to take regular actions
-  - Senior stakeholders who make executive decisions using aggregate health data
-  - IT teams who have to support epidemiologists and external stakeholders integrating with the PHD
-  - PHDs may include state, county, city, and tribal organizations
-- CDC
-  - Employees and contractors working on CDC projects with access to a Azure environment and interest in using PHDI Building Blocks
-
-
-## Access Request, Repo Creation Request
-
-* [CDC GitHub Open Project Request Form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) _[Requires a CDC Office365 login, if you do not have a CDC Office365 please ask a friend who does to submit the request on your behalf. If you're looking for access to the CDCEnt private organization, please use the [GitHub Enterprise Cloud Access Request form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUQjVJVDlKS1c0SlhQSUxLNVBaOEZCNUczVS4u).]_
-
-## Related documents
-
-* [Open Practices](open_practices.md)
-* [Rules of Behavior](rules_of_behavior.md)
-* [Thanks and Acknowledgements](thanks.md)
-* [Disclaimer](DISCLAIMER.md)
-* [Contribution Notice](CONTRIBUTING.md)
-* [Code of Conduct](code-of-conduct.md)
+* [Getting Started](https://github.com/CDCgov/phdi-azure/blob/main/docs/getting_started.md): Helps developers understand the technical implementation of our Starter Kit
+* [Implementation Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/implementation-guide.md): Offers a detailed guide for implementing the Starter Kit pipeline provided in this repository
+* [Execution Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/execution-guide.md): Gives instructions for how to run the Starter Kit pipeline with sample data
 
 ## Standard Notices
   
@@ -160,6 +142,14 @@ CDC including this GitHub page may be subject to applicable federal law, includi
 This repository is not a source of government records, but is a copy to increase
 collaboration and collaborative potential. All government records will be
 published through the [CDC web site](http://www.cdc.gov).
+
+### Related documents
+
+* [Open Practices](open_practices.md)
+* [Rules of Behavior](rules_of_behavior.md)
+* [Disclaimer](DISCLAIMER.md)
+* [Contribution Notice](CONTRIBUTING.md)
+* [Code of Conduct](code-of-conduct.md)
 
 ### Additional Standard Notices
 Please refer to [CDC's Template Repository](https://github.com/CDCgov/template)
