@@ -60,7 +60,7 @@ To deploy this pipeline to your own Azure environment, follow these steps.
          quick-start.ps1
 
   1. If you did not install the GitHub CLI, follow [these steps](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) to set the secrets output before proceeding.
-  1. Setup a storage account for Terraform state by running the GitHub Action at this URL:  
+  1. Set up a storage account for Terraform state by running the GitHub Action at this URL:  
   https://github.com/myuser/phdi-azure/actions/workflows/terraformSetup.yaml
   1. Create an environment named `dev` in your repository at this URL:  
   https://github.com/myuser/phdi-azure/settings/environments/new
