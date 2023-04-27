@@ -80,15 +80,15 @@ The PHDI Building Blocks containerized web services are deployed in Azure as Azu
 
 The pipeline deployed by the Starter kit processes data as it is received in real time. We achieve this event-driven behavior by using an Azure Function to “listen” for new data to be uploaded. Azure Functions are Azure's version of serverless functions, similar to Lambda in Amazon Web Services (AWS). Serverless functions provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. The `serverless-functions` directory contains the Python source code for this Azure Function.
 
-#### Pipeline Orchestration
+### Pipeline Orchestration
 
 Since the Building Blocks are designed to be composable users will likely want to chain several together into pipelines.  We use Microsofts Azure Data Factory (ADF) to define the process that requires the use of multiple Building Blocks. These pipelines can be configured using the ADF interface (web UI).
 
-#### Infrastructure as Code
+### Infrastructure as Code
 
 Every resource required to use the Building Blocks and pipelines implemented in this repository are defined using Terraform. This makes it simple for users to deploy all of the functionality provided in this repository to their own Azure environments. The Terraform code can be found in the [`terraform` directory](https://github.com/CDCgov/phdi-azure/tree/main/terraform).
 
-#### Continuous Integration and Continuous Deployment
+### Continuous Integration and Continuous Deployment
 
 In order to ensure high code quality and reliability we have implemented a Continuous Integration (CI) pipeline consisting of a suite of tests all new contributions must pass before they are merged into `main`. We have also built a Continuous Deployment (CD) pipeline that automatically deploys the code in the repository to linked Azure environments when changes are made. The combined CI/CD pipeline is implemented with GitHub Actions in the [`.github` directory](https://github.com/CDCgov/phdi-azure/tree/main/.github/workflows). 
 
