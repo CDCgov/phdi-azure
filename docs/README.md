@@ -38,9 +38,9 @@ PHDI is a sibling project to [PRIME ReportStream](https://reportstream.cdc.gov),
 To deploy this pipeline to your own Azure environment, follow these steps.
   
   Be sure to replace all instances of `myuser` in GitHub URLs with your user or organization name.
-  1. [Install the az CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
-  1. [Install the GitHub CLI](https://cli.github.com/manual/installation)
-  1. [Fork this repository](https://github.com/myuser/phdi-azure/fork) into your personal or organization account
+  1. [Install the az CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+  1. [Install the GitHub CLI](https://cli.github.com/manual/installation).
+  1. [Fork this repository](https://github.com/myuser/phdi-azure/fork) into your personal or organization account.
   1. Clone your newly forked repository to your local machine by running:
 
          git clone https://github.com/myuser/phdi-azure.git
