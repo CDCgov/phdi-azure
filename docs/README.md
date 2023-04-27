@@ -3,7 +3,7 @@
 - [Public Health Data Infrastructure Azure](#public-health-data-infrastructure-azure)
   - [Overview](#overview)
     - [Problem Scope](#problem-scope)
-  - [How to Deploy Our Starter Kit to Azure](#how-to-deploy-our-starter-kit-tozure)
+  - [How to Deploy Our Starter Kit to Azure](#how-to-deploy-our-starter-kit-to-azure)
   - [Main Components](#main-components)
       - [Azure Container Applications](#azure-container-applications)
       - [Serverless Funtions](#serverless-functions)
