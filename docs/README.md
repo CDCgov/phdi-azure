@@ -90,7 +90,7 @@ Every resource required to use the Building Blocks and pipelines implemented in 
 
 ### Continuous Integration and Continuous Deployment
 
-In order to ensure high code quality and reliability, we have implemented a Continuous Integration (CI) pipeline consisting of a suite of tests all new contributions must pass before they are merged into `main`. We have also built a Continuous Deployment (CD) pipeline that automatically deploys the code in the repository to linked Azure environments when changes are made. The combined CI/CD pipeline is implemented with GitHub Actions in the [`.github` directory](https://github.com/CDCgov/phdi-azure/tree/main/.github/workflows). More information on the CI/CD pipeline can be found in the [DevOps document](https://github.com/CDCgov/phdi-azure/blob/main/docs/devops.md)
+In order to ensure high code quality and reliability, we have implemented a Continuous Integration (CI) pipeline consisting of a suite of tests all new contributions must pass before they are merged into `main`. We have also built a Continuous Deployment (CD) pipeline that automatically deploys the code in the repository to linked Azure environments when changes are made. The combined CI/CD pipeline is implemented with GitHub Actions in the [`.github` directory](https://github.com/CDCgov/phdi-azure/tree/main/.github/workflows). More information on the CI/CD pipeline can be found in the [DevOps document](https://github.com/CDCgov/phdi-azure/blob/main/docs/devops.md).
 
 ## Additional Starter Kit Setup Guidance
 
