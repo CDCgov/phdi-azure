@@ -34,9 +34,16 @@ module "data_factory" {
   pipeline_runner_resource_id             = module.shared.pipeline_runner_resource_id
   fhir_upload_failures_container_name     = module.shared.fhir_upload_failures_container_name
   fhir_conversion_failures_container_name = module.shared.fhir_conversion_failures_container_name
+  delta_tables_container_name             = module.shared.delta_tables_container_name
   client_id                               = var.client_id
   eventhub_namespace_name                 = module.shared.eventhub_namespace_name
   eventhub_name                           = module.shared.eventhub_name
+  kafka_to_delta_app_password_secret_name = module.shared.kafka_to_delta_app_password_secret_name
+  kafka_to_delta_client_id                = module.shared.kafka_to_delta_client_id
+  key_vault_name                          = module.shared.key_vault_name
+  eventhub_connection_string_secret_name  = module.shared.eventhub_connection_string_secret_name
+  phi_storage_account_name                = module.shared.phi_storage_account_name
+  kafka_to_delta_tables_container_url     = module.shared.kafka_to_delta_tables_container_url
 }
 
 

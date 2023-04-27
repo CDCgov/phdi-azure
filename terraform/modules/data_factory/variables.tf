@@ -75,6 +75,16 @@ variable "fhir_upload_failures_container_name" {
   description = "Container name for failed FHIR uploads"
 }
 
+variable "delta_tables_container_name" {
+  type        = string
+  description = "Container name for delta table storage"
+}
+
+variable "phi_storage_account_name" {
+  type        = string
+  description = "PHI storage account name"
+}
+
 variable "validation_failures_container_name" {
   type        = string
   description = "Container name for failed validations"
@@ -98,4 +108,29 @@ variable "eventhub_namespace_name" {
 variable "eventhub_name" {
   type        = string
   description = "Event Hub Name"
+}
+
+variable "kafka_to_delta_app_password_secret_name" {
+  type        = string
+  description = "Kafka to Delta app password secret name"
+}
+
+variable "kafka_to_delta_client_id" {
+  type        = string
+  description = "Kafka to Delta app client id"
+}
+
+variable "key_vault_name" {
+  type        = string
+  description = "Key vault name"
+}
+
+variable "eventhub_connection_string_secret_name" {
+  type        = string
+  description = "eventhub_connection_string_secret_name"
+}
+
+variable "kafka_to_delta_tables_container_url" {
+  type        = string
+  description = "kafka_to_delta_tables_container_url"
 }

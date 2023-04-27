@@ -68,6 +68,11 @@ resource "azurerm_storage_container" "patient_data_container_name" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
+resource "azurerm_storage_container" "delta_tables_container_name" {
+  name                 = "delta-tables"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
 resource "azurerm_role_assignment" "phi_storage_contributor" {
   scope                = azurerm_storage_account.phi.id
   role_definition_name = "Storage Blob Data Contributor"
@@ -122,6 +127,19 @@ resource "azurerm_key_vault" "phdi_key_vault" {
       "Get",
     ]
   }
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = azurerm_synapse_workspace.phdi.identity.0.principal_id
+
+    key_permissions = [
+      "Get",
+    ]
+
+    secret_permissions = [
+      "Get",
+    ]
+  }
 }
 
 resource "random_uuid" "salt" {}
@@ -147,6 +165,27 @@ resource "azurerm_key_vault_secret" "smarty_auth_token" {
 resource "azurerm_key_vault_secret" "mpi_db_password" {
   name         = "mpi-db-password"
   value        = azurerm_postgresql_flexible_server.mpi.administrator_password
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+
+resource "azuread_application" "kafka_to_delta_app_registration" {
+  display_name = "Kafka-to-Delta-App-Registration"
+}
+
+resource "azuread_application_password" "kafka_to_delta_app_registration_password" {
+  application_object_id = azuread_application.kafka_to_delta_app_registration.object_id
+}
+
+resource "azurerm_key_vault_secret" "kafka_to_delta_app_password" {
+  name         = "Kafka-to-delta-app-password"
+  value        = azuread_application_password.kafka_to_delta_app_registration_password.value
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "eventhub_connection_string" {
+  name         = "Eventhub-connection-string"
+  value        = azurerm_eventhub_namespace.phdi.default_primary_connection_string
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
@@ -192,7 +231,8 @@ locals {
     "alerts",
     "message-parser",
     "validation",
-    "record-linkage"
+    "record-linkage",
+    "kafka-to-delta-table"
   ])
 }
 
