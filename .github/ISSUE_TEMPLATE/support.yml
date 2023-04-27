@@ -1,3 +1,6 @@
+remove references later https://github.com/stevemao/github-issue-templates/blob/master/.github/ISSUE_TEMPLATE/FEATURE-REQUEST.yml
+https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository
+
 name: Support
 description: File a support ticket to us improve our pipeline
 title: "[Support]: "
