@@ -17,7 +17,7 @@
     - [Privacy Standard Notice](#privacy-standard-notice)
     - [Contributing Standard Notice](#contributing-standard-notice)
     - [Records Management Standard Notice](#records-management-standard-notice)
-    - [Related documents](#related-documents)
+    - [Related Documents](#related-documents)
     - [Additional Standard Notices](#additional-standard-notices)
 
 **General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm).  GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise. 
@@ -143,7 +143,7 @@ This repository is not a source of government records, but is a copy to increase
 collaboration and collaborative potential. All government records will be
 published through the [CDC web site](http://www.cdc.gov).
 
-### Related documents
+### Related Documents
 
 * [Open Practices](open_practices.md)
 * [Rules of Behavior](rules_of_behavior.md)
