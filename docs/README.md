@@ -10,7 +10,7 @@
       - [Pipeline Orchestration](#pipeline-orchestration)
       - [Infrastructure as Code](#infrastructure-as-code)
       - [Continuous Integration and Continuous Deployment](#continuous-integration-and-continuous-deployment)
-    - [Additional Starter Kit Setup Guidance](#additional-starter-kit-setup-guidance)
+  - [Additional Starter Kit Setup Guidance](#additional-starter-kit-setup-guidance)
   - [Standard Notices](#standard-notices)
     - [Public Domain Standard Notice](#public-domain-standard-notice)
     - [License Standard Notice](#license-standard-notice)
