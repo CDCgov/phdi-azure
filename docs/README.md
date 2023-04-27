@@ -74,7 +74,7 @@ There are five major components to this repository.
 
 ### Azure Container Applications
 
-The PHDI Building Blocks containerized web services are deployed in Azure as Azure Container Applications (ACA). ACA is a fully managed serverless platform for deploying containers, similar to AWS Fargate and GCP Cloud Run. Since ACA is serverless, Azure abstracts all aspects of the underlying infrastructure for running and scaling these services. This allows us to simply provide ACA with the images for our containerized Building Blocks. When the Starter Kit deploys, these images are pulled from the public registry associated with the [CDCgov/phdi repository](https://github.com/CDCgov/phdi). You may access these images directly [here](https://github.com/orgs/CDCgov/packages?repo_name=phdi).
+The PHDI Building Blocks, expressed as containerized web services, are deployed in Azure as Azure Container Applications (ACA). ACA is a fully managed serverless platform for deploying containers, similar to AWS Fargate and GCP Cloud Run. Since ACA is serverless, Azure abstracts all aspects of the underlying infrastructure for running and scaling these services. This allows us to simply provide ACA with the images for our containerized Building Blocks. When the Starter Kit deploys, these images are pulled from the public registry associated with the [CDCgov/phdi repository](https://github.com/CDCgov/phdi). You may access these images directly [here](https://github.com/orgs/CDCgov/packages?repo_name=phdi).
 
 ### Serverless Functions
 
