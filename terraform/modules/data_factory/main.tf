@@ -104,21 +104,6 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
   depends_on = [null_resource.adf_credential]
 }
 
-
-##### Pipeline metrics dashboard #####
-
-resource "azurerm_portal_dashboard" "pipeline_metrics" {
-  name                = "pipeline-metrics-${terraform.workspace}"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  tags = {
-    source = "terraform"
-  }
-
-  dashboard_properties = jsonencode(local.pipeline-metrics-dashboard-config.properties)
-}
-
-
 resource "azurerm_data_factory_pipeline" "phdi_kafka_to_delta_table_pipeline" {
   name            = "phdi-${terraform.workspace}-kafka-to-delta-table-pipeline"
   data_factory_id = azurerm_data_factory.phdi_data_factory.id
@@ -151,4 +136,17 @@ resource "azurerm_data_factory_trigger_schedule" "phdi_kafka_to_delta_table_pipe
 
   interval  = 1
   frequency = "Day"
+}
+
+##### Pipeline metrics dashboard #####
+
+resource "azurerm_portal_dashboard" "pipeline_metrics" {
+  name                = "Pipeline Metrics (${terraform.workspace})"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  tags = {
+    source = "terraform"
+  }
+
+  dashboard_properties = jsonencode(local.pipeline-metrics-dashboard-config.properties)
 }
