@@ -6,7 +6,7 @@
   - [How to Deploy Our Starter Kit to Azure](#how-to-deploy-our-starter-kit-to-azure)
   - [Main Components](#main-components)
       - [Azure Container Applications](#azure-container-applications)
-      - [Serverless Funtions](#serverless-functions)
+      - [Serverless Functions](#serverless-functions)
       - [Pipeline Orchestration](#pipeline-orchestration)
       - [Infrastructure as Code](#infrastructure-as-code)
       - [Continuous Integration and Continuous Deployment](#continuous-integration-and-continuous-deployment)
