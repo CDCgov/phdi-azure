@@ -595,3 +595,9 @@ EOF
     filename = "config.txt"
   }
 }
+
+resource "azurerm_role_assignment" "synapse_blob_contributor" {
+  scope                = azurerm_storage_account.phi.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_synapse_workspace.phdi.identity[0].principal_id
+}
