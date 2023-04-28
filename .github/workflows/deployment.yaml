@@ -187,6 +187,14 @@ jobs:
             fi
           done
 
+      - name: Run MPI migrations
+        env:
+          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+        run: |
+          DEFAULT_DOMAIN=$(az containerapp env show --name $TF_ENV --query properties.defaultDomain -o tsv)
+          RECORD_LINKAGE_TOKEN=$(az account get-access-token —resource api://phi-$TF_ENV-record-linkage)
+          curl -X GET --header “Authorization: Bearer $RECORD_LINKAGE_TOKEN” “https://phdi-$TF_ENV-record-linkage.$DEFAULT_DOMAIN/run-mpi-migrations”
+
       - name: Deploy Synapse notebooks
         env:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
