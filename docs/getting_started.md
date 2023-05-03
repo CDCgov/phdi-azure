@@ -146,26 +146,4 @@ To begin using terraform:
 
 ## Continuous Integration and Continuous Deployment (CI/CD)
 
-We have implemented CI/CD pipelines with [GitHub Actions](https://docs.github.com/en/actions) orchestrated by [GitHub Workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) found in the `phdi-azure/.github/` directory.
-
-### Continuous Integration (CI)
-
-The entire CI pipeline can be found in `phdi-azure/.github/test.yaml`. It runs every time a Pull Request is opened and whenever additional changes are pushed to a branch. Currently, the following steps are included in the CI pipeline:
-
-1. Identify all directories containing an Azure Function.
-2. Run the unit tests for each Azure Function.
-3. Check that all Python code complies with Black and Flake8.
-4. Check that all Terraform code is formatted properly.
-
-### Continuous Deployment (CD)
-
-A separate CD pipeline is configured for each Azure environment we deploy to. Each of these pipelines is defined in a YAML file starting with "deploy" in the `workflows/` directory (e.g. `phdi-azure/.github/deployment.yaml`). Generally, these pipelines run every time code is merged into the `main` branch of the repository. However, additional dependencies can be specified. For example, a successful deployment to a development environment could be required before deploying to a production environment. When these pipelines run Terraform looks for differences between the infrastructure that is specified on a given branch of this repository and what is currently deployed to a given environment in the Azure resource group. If differences are detected, they are resolved by making changes to Azure resources to bring them alignment with the repository. In order to grant the GitHub repository permission to make these changes, follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions) to authenticate it with Azure.
-
-### Table of CI/CD Pipelines
-
-| Pipeline Name | Purpose | Trigger | Notes |
-| ------------- | ------- | ------- | ----- |
-| testPython | Run unit and linting tests on all Python source code in the repository, primarily the `read-source-data` Azure Function. | All pull request actions, pushes to `main`, and manually. | Unit test with Pytest. Linting with Black and Flake8. |
-| terraformChecks | Ensure all Terraform code is valid and properly linted. | All pull request actions if they involve changes in `terraform/`, and manually. | `terraform fmt` for linting and `terraform validate` for validation. |
-| deployment | Deploy the starter kit from a branch to a given environment. | Pushes to `main` and manually. | Pushes to `main` trigger a deploy to the `dev` environment. This behavior can be changed as desired. |
-| terraformSetup | Create a storage account for storing the state of every environment deployed in the Azure resource group. | Manual | This workflow should only be run once for initial setup. |
+For more details on the CI/CD processes available in this starter kit, see the [DevOps](https://github.com/CDCgov/phdi-azure/blob/main/docs/devops.md) page.
