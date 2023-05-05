@@ -50,7 +50,7 @@ body:
 - type: textarea
   id: resources
   attributes:
-    label: Provide any additional information include log files or screenshots here.
+    label: Provide any additional information including log files or screenshots here.
     description: You can attach images or log files by clicking this area to highlight it and then dragging files in.
     placeholder: Please make sure your attachments do NOT include PHI.
   validations:
