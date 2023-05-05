@@ -2,7 +2,6 @@ name: Support
 description: File a support ticket to raise a question you have or a problem you're uncountering
 title: "[Support]: "
 labels: ["support"]
-assignees: ''
 body:
   - type: textarea
     id: problem
