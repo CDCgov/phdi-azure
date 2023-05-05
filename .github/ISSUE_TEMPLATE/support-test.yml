@@ -19,20 +19,3 @@ body:
     placeholder: This error impacts ~30% of eCR messages.  
   validations:
     required: false
- - type: textarea
-attributes:
-  label: Steps To Reproduce
-  description: List steps to reproduce the behavior.
-  placeholder: |
-    1. In this environment...
-    2. With this config...
-    3. Run '...'
-    4. See error... 
-  - type: textarea
-  id: intended-outcome
-  attributes:
-    label: Intended outcome
-    description: Describe a clear and concise description of what you expected to happen.
-    placeholder: I expected the eCR message to successfully pass validation despite not having information in the "City" field.
-  validations:
-    required: false
