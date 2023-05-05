@@ -24,6 +24,9 @@ body:
   attributes:
     label: Steps to Reproduce
     description: List steps to reproduce the problem.
-    placeholder: Step 1
+    value: |
+      1.
+      2.
+      3.
   validations:
     required: false
