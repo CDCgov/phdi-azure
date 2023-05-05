@@ -24,10 +24,6 @@ body:
    attributes:
      label: Steps To Reproduce
      description: List steps to reproduce the behavior.
-     placeholder:
-       1. In this environment...
-       2. With this config...
-       3. Run '...'
-       4. See error... 
+     placeholder: test
      validations:
        required: false
