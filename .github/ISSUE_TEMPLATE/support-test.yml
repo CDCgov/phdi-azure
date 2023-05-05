@@ -19,11 +19,3 @@ body:
     placeholder: This error impacts ~30% of eCR messages.  
   validations:
     required: false
- - type: textarea
-   id: steps
-   attributes:
-     label: Steps To Reproduce
-     description: List steps to reproduce the behavior.
-     placeholder: test
-     validations:
-       required: false
