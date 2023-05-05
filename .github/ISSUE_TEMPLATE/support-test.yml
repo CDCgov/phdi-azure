@@ -38,21 +38,6 @@ body:
     placeholder: I expected the eCR message to successfully pass validation despite not having information in the "City" field.
   validations:
     required: false
-- type: textarea
-attributes:
-  label: desktop
-  description: |
-    examples:
-      - **OS**: Ubuntu 20.04
-      - **Node**: 13.14.0
-      - **npm**: 7.6.3
-  value: |
-      - OS:
-      - Node:
-      - npm:
-  render: markdown
-validations:
-  required: false 
 - type: dropdown
   id: browsers
   attributes:
