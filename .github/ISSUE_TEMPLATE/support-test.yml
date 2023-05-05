@@ -2,3 +2,12 @@ name: Support
 description: File a support ticket to raise a question you have or a problem you're encountering.
 title: "[Support]: "
 labels: ["support"]
+body:
+- type: textarea
+  id: problem
+  attributes:
+    label: Problem
+    description:  Provide a clear and concise description of what the problem is or what question you have, including the associated pipeline id and the impacted pipeline activities if possible.
+    placeholder: I noticed an error with pipeline run id "9cf47678-e546-11ed-9b86-00155d9996ff" at the "validation_if" activity. The validation failed due to missing information in the 'City' field despite it being an optional field.
+  validations:
+    required: true
