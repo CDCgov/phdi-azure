@@ -55,3 +55,11 @@ body:
     placeholder: Please make sure your attachments do NOT include PHI.
   validations:
     required: false
+- type: checkboxes
+  id: PHI
+  attributes:
+    label: Review for PHI
+    description: Confirm that no PHI will be included in this ticket.
+    options:
+      - label: I have reviewed the information in this ticket and can confirm that no PHI has been included.
+        required: true
