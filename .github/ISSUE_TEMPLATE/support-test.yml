@@ -38,13 +38,21 @@ body:
     placeholder: I expected the eCR message to successfully pass validation despite not having information in the "City" field.
   validations:
     required: false
-- type: dropdown
-  id: browsers
+- type: textarea
+  id: desktop
   attributes:
-    label: What browsers are you seeing the problem on?
-    multiple: true
-    options:
-      - Firefox
-      - Chrome
-      - Safari
-      - Microsoft Edge
+    label: Desktop
+    description: Provide information about the OS, Browser, and Version.
+    value: |
+      OS: [e.g., iOS]
+      Browser: [e.g., Chrome, Safari]
+      Version [e.g., 22]
+- type: textarea
+  attributes:
+    label: Anything else?
+    description: |
+      Links? References? Anything that will give us more context about the issue you are encountering!
+
+      Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+  validations:
+    required: false
