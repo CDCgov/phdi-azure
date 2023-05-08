@@ -575,7 +575,7 @@ resource "azurerm_synapse_spark_pool" "phdi" {
   name                 = "${terraform.workspace}pool"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   node_size_family     = "MemoryOptimized"
-  node_size            = "Small"
+  node_size            = "Medium"
   cache_size           = 100
   spark_version        = 3.3
 
