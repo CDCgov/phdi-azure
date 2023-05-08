@@ -22,7 +22,7 @@ body:
 - type: markdown
   attributes:
     value: |
-      **Note: Please add a severity label of 1 (critical), 2 (major), or 3 (minor) to this ticket prior to submitting.** Examples can be found on the [Atlassian Severity Levels site](https://www.atlassian.com/incident-management/kpis/severity-levels). 
+      ###Note: Please add a severity label of 1 (critical), 2 (major), or 3 (minor) to this ticket prior to submitting. Examples can be found on the [Atlassian Severity Levels site](https://www.atlassian.com/incident-management/kpis/severity-levels). 
 - type: textarea
   id: steps
   attributes:
