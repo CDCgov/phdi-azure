@@ -8,7 +8,7 @@
             - [Ingestion Pipeline](#ingestion-pipeline)
             - [Tabulation Service](#tabulation-service)
         - [Additional References](#additional-references)
-    - [Implementing the PHDI Azure Pipelines](#implementing-the-phdi-azure-pipelines)
+    - [Implementing the PHDI Starter Kit in Azure](#implementing-the-phdi-starter-kit-in-azure)
         - [User Requirements](#user-requirements)
         - [Step 1: Ensure You Have Collected Values for Geocoding Variables](#step-1-ensure-you-have-collected-values-for-geocoding-variables)
         - [Step 2: Run the Quick Start Script in Azure Cloud Shell](#step-2-run-the-quick-start-script-in-azure-cloud-shell)
