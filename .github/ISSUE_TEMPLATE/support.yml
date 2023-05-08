@@ -19,6 +19,10 @@ body:
     placeholder: This error impacts ~30% of eCR messages.  
   validations:
     required: false
+- type: markdown
+  attributes:
+    value: |
+      **Note: Please add a severity label of 1 (critical), 2 (major), or 3 (minor) to this ticket prior to submitting.** Examples can be found on the [Atlassian Severity Levels site](https://www.atlassian.com/incident-management/kpis/severity-levels). 
 - type: textarea
   id: steps
   attributes:
@@ -55,10 +59,6 @@ body:
     placeholder: Please make sure your attachments do NOT include PHI.
   validations:
     required: false
-- type: markdown
-  attributes:
-    value: |
-      Note: Please add a severity label of 1 (critical), 2 (major), or 3 (minor) to this ticket prior to submitting. Examples can be found on the [Atlassian Severity Levels site](https://www.atlassian.com/incident-management/kpis/severity-levels). 
 - type: checkboxes
   id: PHI
   attributes:
