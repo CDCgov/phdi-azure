@@ -62,7 +62,7 @@ If you are planning to use an organization account, you must be able to authoriz
 
 If you do not meet these criteria, contact the owner of your organization's Azure subscription and/or GitHub organization.
 
-### Step 1: Ensure You Have Collected Values for Geocoding Variable
+### Step 1: Ensure You Have Collected Values for Geocoding Variables
 
 Exiting the Quick Start Script partway through is not recommended, so please have all values on hand when you run the script.
 
