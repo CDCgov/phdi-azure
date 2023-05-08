@@ -87,7 +87,7 @@ Create storage for your Cloud Shell:
 When your shell is ready to receive commands, it will look like this:
 ![azure-cloud-shell-ready](./images/azure-cloud-shell-ready.png)
 
-To download and run the quick start script, run the following command in Cloud Shell:
+To download and run the Quick Start Script, run the following command in Cloud Shell:
 ```bash
 git clone https://github.com/CDCgov/phdi-azure.git && cd phdi-azure && ./quick-start.sh
 ```
@@ -97,6 +97,6 @@ When the script is ready for your input, it will look like this:
   
 Press enter to begin the script.
 
-If you plan to deploy to an existing resource group in your Azure environment, have the resource group name ready and provide it to the quick start script when prompted.
+If you plan to deploy to an existing resource group in your Azure environment, have the resource group name ready and provide it to the Quick Start Script when prompted.
 
 The script will take around 20-30 minutes to run.
