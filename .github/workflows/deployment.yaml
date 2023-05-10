@@ -225,9 +225,9 @@ jobs:
           if ! az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet Pipeline"; then
             az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet Pipeline" --file @../../scripts/Synapse/parquetPipelineConfig.json
           fi
-          cat ../../scripts/Synapse/parquetPipelineTriggerConfig.json | envsubst > ../../scripts/Synapse/parquetPipelineTriggerConfig.json
+          cat ../../scripts/Synapse/parquetPipelineTriggerConfig.json | envsubst > ../../scripts/Synapse/parquetPipelineTriggerConfigSubstituted.json
           if ! az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet file upload"; then
-            az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet file upload" --file @../../scripts/Synapse/parquetPipelineTriggerConfig.json
+            az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet file upload" --file @../../scripts/Synapse/parquetPipelineTriggerConfigSubstituted.json
           fi
 
   end-to-end:
