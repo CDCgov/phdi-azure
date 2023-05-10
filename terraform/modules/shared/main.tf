@@ -238,7 +238,7 @@ locals {
 
 data "docker_registry_image" "ghcr_data" {
   for_each = local.images
-  name     = "ghcr.io/cdcgov/phdi/${each.key}:main"
+  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.2"
 }
 
 resource "docker_image" "ghcr_image" {
@@ -575,7 +575,7 @@ resource "azurerm_synapse_spark_pool" "phdi" {
   name                 = "${terraform.workspace}pool"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   node_size_family     = "MemoryOptimized"
-  node_size            = "Small"
+  node_size            = "Medium"
   cache_size           = 100
   spark_version        = 3.3
 
@@ -594,4 +594,10 @@ spark.shuffle.spill                true
 EOF
     filename = "config.txt"
   }
+}
+
+resource "azurerm_role_assignment" "synapse_blob_contributor" {
+  scope                = azurerm_storage_account.phi.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_synapse_workspace.phdi.identity[0].principal_id
 }
