@@ -16,8 +16,8 @@ permissions:
   contents: read
   packages: write
 jobs:
-  deployment:
-    name: Deploy to Azure
+  terraform:
+    name: Run Terraform
     runs-on: ubuntu-latest
     environment: main
     defaults:
@@ -108,7 +108,27 @@ jobs:
             -replace="module.shared.docker_tag.tag_for_azure[\"validation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"record-linkage\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"kafka-to-delta-table\"]"
+      
+  azure-cli:
+    name: Run Azure CLI steps
+    needs: terraform
+    runs-on: ubuntu-latest
+    environment: main
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform/implementation
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v3
 
+      - name: "Azure login"
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+      
       - name: Setup Python Environment
         uses: actions/setup-python@v4
         with:
@@ -122,8 +142,8 @@ jobs:
 
       - name: Get publish profile
         env:
-          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
           echo 'PUBLISH_PROFILE<<EOF' >> $GITHUB_ENV
           az functionapp deployment list-publishing-profiles --name $TF_ENV-read-source-data-$SHORT_CID --xml >> $GITHUB_ENV
@@ -132,8 +152,8 @@ jobs:
       - name: "Run Azure Functions Action"
         uses: Azure/functions-action@v1
         env:
-          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         with:
           app-name: "$TF_ENV-read-source-data-$SHORT_CID"
           package: serverless-functions
@@ -143,8 +163,8 @@ jobs:
         env:
           SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
           az eventgrid event-subscription create \
             --name phdi${TF_ENV}phi${SHORT_CID}Sub \
@@ -157,7 +177,7 @@ jobs:
       - name: Add authentication to container apps
         env:
           TENANT_ID: ${{ secrets.TENANT_ID }}
-          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
         run: |
           az extension add --name containerapp
           DEFAULT_DOMAIN=$(az containerapp env show --name $TF_ENV --query properties.defaultDomain -o tsv)
@@ -189,8 +209,8 @@ jobs:
 
       - name: Deploy Synapse notebooks
         env:
-          TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
-          SHORT_CID: ${{ steps.set-environment.outputs.short_cid }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
           if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI"; then
             az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI" --file @../../scripts/Synapse/convertParquetMPI.ipynb
@@ -199,11 +219,25 @@ jobs:
             az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MCI" --file @../../scripts/Synapse/convertParquetMCI.ipynb
           fi
 
+      - name: Deploy Synapse pipeline and trigger
+        env:
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
+        run: |
+          if ! az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet Pipeline"; then
+            az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet Pipeline" --file @../../scripts/Synapse/parquetPipelineConfig.json
+          fi
+          if ! az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet file upload"; then
+            az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet file upload" --file @../../scripts/Synapse/parquetPipelineTriggerConfig.json
+          fi
+
   end-to-end:
     name: End-to-end tests
-    needs: deployment
-    if: ${{ needs.deployment.outputs.tf_env == 'dev' }}
+    needs: 
+      - terraform
+      - azure-cli
+    if: ${{ needs.terraform.outputs.tf_env == 'dev' }}
     uses: ./.github/workflows/end-to-end.yaml
     with:
-      environment: ${{ needs.deployment.outputs.tf_env }}
+      environment: ${{ needs.terraform.outputs.tf_env }}
     secrets: inherit

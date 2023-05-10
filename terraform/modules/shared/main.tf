@@ -572,7 +572,7 @@ resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
 }
 
 resource "azurerm_synapse_spark_pool" "phdi" {
-  name                 = "${terraform.workspace}pool"
+  name                 = "sparkpool"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Medium"
