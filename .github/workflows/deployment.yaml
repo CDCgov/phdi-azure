@@ -85,11 +85,6 @@ jobs:
           )" >> $GITHUB_OUTPUT
           echo "short_cid=${CLIENT_ID:0:8}" >> $GITHUB_OUTPUT
 
-      - name: Cache Docker images
-        uses: ScribeMD/docker-cache@0.2.7
-        with:
-          key: docker-${{ runner.os }}-${{ hashFiles('**/LICENSE') }}
-
       - name: terraform
         env:
           ARM_CLIENT_ID: ${{ secrets.CLIENT_ID }}
@@ -145,6 +140,7 @@ jobs:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
+          az config set defaults.location=$LOCATION defaults.group=$RESOURCE_GROUP_NAME
           echo 'PUBLISH_PROFILE<<EOF' >> $GITHUB_ENV
           az functionapp deployment list-publishing-profiles --name $TF_ENV-read-source-data-$SHORT_CID --xml >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
