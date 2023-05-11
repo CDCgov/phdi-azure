@@ -1,1 +1,19 @@
-{"covid_test_types": ["covid-19 test", "covid-19 antigen test", "covid-19 pcr test", "sars-cov-2 test", "sars-cov-2 antigen test", "sars-cov-2 genomic sequence test", "sars-cov-2 pcr test"], "covid_positive_results": ["positive", "detected", "detection of sars-cov-2 antigen in a clinical or post-mortem by any method", "detection of sars-cov-2 genomic sequence by any method", "detection of sars-cov-2 nucleic acid in a clinical or post-mortem specimen by any method", "Detection of sars-cov-2 organism or substance in a clinical specimen"], "covid_conditions": ["disease caused by severe acute respiratory syndrome coronavirus 2 (disorder)", "covid", "coronavirus", "sars-cov-2", "severe acute respiratory syndrome coronavirus 2"]}
+{
+    "covid_test_types": [
+        "covid-19 test",
+        "covid-19 antigen test",
+        "covid-19 pcr test",
+        "sars-cov-2 test",
+        "sars-cov-2 antigen test",
+        "sars-cov-2 genomic sequence test",
+        "sars-cov-2 pcr test"
+    ],
+    "covid_positive_results": [
+        "positive",
+        "detected",
+        "detection of sars-cov-2 antigen in a clinical or post-mortem by any method",
+        "detection of sars-cov-2 genomic sequence by any method",
+        "detection of sars-cov-2 nucleic acid in a clinical or post-mortem specimen by any method",
+        "Detection of sars-cov-2 organism or substance in a clinical specimen"
+    ]
+}
