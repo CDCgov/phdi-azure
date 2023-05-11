@@ -1,5 +1,5 @@
 {
-    "covid_test_types": [
+    "covid_test_type_codes": [
         "covid-19 test",
         "covid-19 antigen test",
         "covid-19 pcr test",
