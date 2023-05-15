@@ -49,7 +49,7 @@ body:
 - type: textarea
   id: desktop
   attributes:
-    label: Desktop
+    label: Desktop information
     description: Provide information about the OS, Browser, and Version.
     value: |
       OS [e.g., iOS]:
