@@ -7,7 +7,7 @@ body:
   id: problem
   attributes:
     label: Problem
-    description: Provide a clear and concise description of what the problem is, including the associated pipeline id and the impacted pipeline activities if possible.
+    description: Provide a clear and concise description of what the problem is, including the associated pipeline ids and the impacted pipeline activities if possible.
     placeholder: I noticed an error with pipeline run id "9cf47678-e546-11ed-9b86-00155d9996ff" at the "validation_if" activity. The validation failed due to missing information in the 'City' field despite this being an optional field.
   validations:
     required: true
