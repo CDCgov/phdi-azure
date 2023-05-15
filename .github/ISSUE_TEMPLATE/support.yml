@@ -67,7 +67,7 @@ body:
   id: PHI
   attributes:
     label: Review ticket for PHI
-    description: Confirm there is no PHI in the information provided, including attachments such as screenshots or log files.
+    description: Confirm there is no Protected Health Information (PHI) in the information provided, including attachments such as screenshots or log files.
     options:
       - label: I have reviewed the information in this ticket and can confirm that no PHI has been included.
         required: true
