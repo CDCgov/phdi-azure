@@ -66,9 +66,6 @@ output "record_linkage_container_url" {
   value = "https://phdi-${terraform.workspace}-record-linkage.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
-output "kafka_to_delta_tables_container_url" {
-  value = "https://phdi-${terraform.workspace}-kafka-to-delta-table.${azurerm_container_app_environment.phdi.default_domain}"
-}
 
 # TODO: Uncomment when tabulation is implemented
 # output "tabulation_container_url" {
@@ -80,26 +77,6 @@ output "kafka_to_delta_tables_container_url" {
 #   value = "https://phdi-${terraform.workspace}-alerts.${azurerm_container_app_environment.phdi.default_domain}"
 # }
 
-output "eventhub_namespace_name" {
-  value = azurerm_eventhub_namespace.phdi.name
-}
-
-output "eventhub_name" {
-  value = azurerm_eventhub.phdi.name
-}
-
-output "kafka_to_delta_app_password_secret_name" {
-  value = azurerm_key_vault_secret.kafka_to_delta_app_password.name
-}
-
-output "kafka_to_delta_client_id" {
-  value = azuread_application.kafka_to_delta_app_registration.id
-}
-
 output "key_vault_name" {
   value = azurerm_key_vault.phdi_key_vault.name
-}
-
-output "eventhub_connection_string_secret_name" {
-  value = azurerm_key_vault_secret.eventhub_connection_string.name
 }
