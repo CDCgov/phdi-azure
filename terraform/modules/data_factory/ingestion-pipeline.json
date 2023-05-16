@@ -420,7 +420,7 @@
                     "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"blob\": @{activity('message_parser').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${delta_tables_container_name}\",\n    \"file_name\": \"raw_data/@{concat(substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
+                        "value": "{\n    \"blob\": @{activity('message_parser').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${delta_tables_container_name}\",\n    \"file_name\": \"raw_data/@{concat(pipeline().RunId, '.json')}\"\n}",
                         "type": "Expression"
                     },
                     "authentication": {
