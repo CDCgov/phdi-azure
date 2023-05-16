@@ -17,7 +17,7 @@ permissions:
   packages: write
 jobs:
   deployment:
-    name: "Deploy to Azure ${{github.event.inputs.environment}}"
+    name: "Deploy to Azure (${{github.event.inputs.environment}})"
     runs-on: ubuntu-latest
     environment: main
     defaults:
