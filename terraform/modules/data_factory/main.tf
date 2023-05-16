@@ -72,8 +72,6 @@ locals {
     fhir_upload_failures_container_name     = var.fhir_upload_failures_container_name,
     fhir_conversion_failures_container_name = var.fhir_conversion_failures_container_name,
     record_linkage_container_url            = var.record_linkage_container_url,
-    eventhub_namespace_name                 = var.eventhub_namespace_name,
-    eventhub_name                           = var.eventhub_name,
     delta_tables_container_name             = var.delta_tables_container_name
   }))
   pipeline-metrics-dashboard-config = jsondecode(templatefile("../modules/data_factory/pipeline-metrics-dashboard.json", {
