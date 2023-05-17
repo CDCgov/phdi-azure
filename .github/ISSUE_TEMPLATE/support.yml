@@ -7,22 +7,26 @@ body:
   id: problem
   attributes:
     label: Problem
-    description: Provide a clear and concise description of what the problem is or what question you have, including the associated pipeline id and the impacted pipeline activities if possible.
-    placeholder: I noticed an error with pipeline run id "9cf47678-e546-11ed-9b86-00155d9996ff" at the "validation_if" activity. The validation failed due to missing information in the 'City' field despite it being an optional field.
+    description: Provide a clear and concise description of what the problem is, including the associated pipeline ids and the impacted pipeline activities if possible.
+    placeholder: I noticed an error with pipeline run id "9cf47678-e546-11ed-9b86-00155d9996ff" at the "validation_if" activity. The validation failed due to missing information in the 'City' field despite this being an optional field.
   validations:
     required: true
+- type: markdown
+  attributes:
+    value: |
+      #### Note: Please create a separate support ticket for each type of error you encounter. 
 - type: textarea
   id: impact
   attributes:
     label: Impact
     description: If applicable, describe the impact this problem is causing to your program or organization.
-    placeholder: This error impacts ~30% of eCR messages.  
+    placeholder: This error impacts ~30% of eCR messages. I would consider this problem to be severity level 2 since it prevents the processing of a significant amount of eCR messages.   
   validations:
     required: false
 - type: markdown
   attributes:
     value: |
-      #### Note: Please add a severity label of 1 (critical), 2 (major), or 3 (minor) to this ticket prior to submitting. Examples can be found on the [Atlassian Severity Levels site](https://www.atlassian.com/incident-management/kpis/severity-levels). 
+      #### Note: Please suggest a severity label of 1 (critical), 2 (major), or 3 (minor) to this ticket prior to submitting. Descriptions and examples of each severity level can be found on the [Atlassian Severity Levels site](https://www.atlassian.com/incident-management/kpis/severity-levels). 
 - type: textarea
   id: steps
   attributes:
@@ -45,25 +49,25 @@ body:
 - type: textarea
   id: desktop
   attributes:
-    label: Desktop
+    label: Desktop information
     description: Provide information about the OS, Browser, and Version.
     value: |
-      OS: [e.g., iOS]
-      Browser: [e.g., Chrome, Safari]
-      Version [e.g., 22]
+      OS [e.g., iOS]:
+      Browser [e.g., Chrome, Safari]:
+      Version [e.g., 22]:
 - type: textarea
-  id: resources
+  id: attachments
   attributes:
-    label: Provide any additional information including log files or screenshots here.
-    description: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    label: Attachments
+    description: You can attach screenshots or log files by clicking this area to highlight it and then dragging files in.
     placeholder: Please make sure your attachments do NOT include PHI.
   validations:
     required: false
 - type: checkboxes
   id: PHI
   attributes:
-    label: Review ticket for PHI
-    description: Confirm there is no PHI in the entered text or attachments, including screenshots.
+    label: PHI Review
+    description: Confirm there is no Protected Health Information (PHI) in the information provided, including attachments such as screenshots or log files.
     options:
       - label: I have reviewed the information in this ticket and can confirm that no PHI has been included.
         required: true

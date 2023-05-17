@@ -17,7 +17,7 @@ permissions:
   packages: write
 jobs:
   terraform:
-    name: Run Terraform
+    name: Run Terraform (${{github.event.inputs.environment}})"
     runs-on: ubuntu-latest
     environment: main
     defaults:
@@ -179,7 +179,7 @@ jobs:
         run: |
           az extension add --name containerapp
           DEFAULT_DOMAIN=$(az containerapp env show --name $TF_ENV --query properties.defaultDomain -o tsv)
-          for SERVICE in fhir-converter ingestion alerts tabulation validation message-parser record-linkage kafka-to-delta-table; do
+          for SERVICE in fhir-converter ingestion alerts tabulation validation message-parser record-linkage; do
             if [[ $(az containerapp auth show --name phdi-$TF_ENV-$SERVICE) == "{}" ]]; then
               if [[ $(az ad app list | grep -c phdi-$TF_ENV-$SERVICE) -gt 0 ]]; then
                 APP_ID=$(az ad app list --display-name phdi-$TF_ENV-$SERVICE --query [].appId -o tsv)
