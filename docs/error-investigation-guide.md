@@ -12,12 +12,12 @@ This guide provides an overview of basic pipeline failure troubleshooting in Mic
 has an account with full access to their Azure environment and basic familiarity with some Azure concepts. Full
 Azure docs can be found [here.](https://learn.microsoft.com/en-us/azure/?product=popular)
 
-##Azure Data Factory Studio
+## Azure Data Factory Studio
 Our primary window into what's happening in our pipelines is the Azure Data Factory Studio. It provides a GUI
 allowing management, monitoring, and editing of pipelines in a resource group without having to redeploy. This tool is 
 where most of our Azure troubleshooting will take place, though it can be a bit tough to find.
 
-###Getting to the ADF Studio
+### Getting to the ADF Studio
 Start by navigating to Azure and logging in to your account. Once you've done that
 follow the steps below.
 ![investigation-guide-1.png](./images/investigation-guide-1.png)
@@ -32,7 +32,7 @@ on if we're primarily troubleshooting pipeline run failures or pipeline configur
 The radar icon marked #1 opens a pipeline monitoring tool while the pencil at #2 opens an interface
 allowing pipeline config edits. Let's look at monitoring first.
 
-###Monitoring your pipeline runs and diagnosing issues
+### Monitoring your pipeline runs and diagnosing issues
 Clicking the radar button takes us to the following informative page.
 ![investigation-guide-5.png](./images/investigation-guide-5.png)
 Here we can see and sort all pipeline runs. The status column gives us
@@ -49,7 +49,7 @@ reason, Azure decided they should only appear on hover or click of the failed st
 on the right will contain the most readably formatted version of the failure error you can find, and inputs from the left
 blue icon can be checked against expected values.
 
-###Troubleshooting pipeline configuration issues
+### Troubleshooting pipeline configuration issues
 Pipeline configuration problems can be somewhat trickier to track down, and generally use a combination of the ADF studio
 monitoring page we explored in the last section, and the Author page found through the aforementioned pencil icon. Let's
 go there now.
