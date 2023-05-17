@@ -68,9 +68,9 @@ resource "azurerm_storage_container" "patient_data_container_name" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
-resource "azurerm_storage_container" "delta_tables_container_name" {
+resource "azurerm_storage_data_lake_gen2_filesystem" "delta_tables_container_name" {
   name                 = "delta-tables"
-  storage_account_name = azurerm_storage_account.phi.name
+  storage_account_id = azurerm_storage_account.phi.id
 }
 
 resource "azurerm_role_assignment" "phi_storage_contributor" {
@@ -494,7 +494,7 @@ resource "azurerm_synapse_workspace" "phdi" {
   name                                 = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
   resource_group_name                  = var.resource_group_name
   location                             = var.location
-  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.source_data.id
+  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem."delta-tables".id
   sql_administrator_login              = "sqladminuser"
   sql_administrator_login_password     = random_password.synapse_sql_password.result
 
