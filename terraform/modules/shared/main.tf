@@ -68,7 +68,7 @@ resource "azurerm_storage_container" "patient_data_container_name" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
-resource "azurerm_storage_data_lake_gen2_filesystem" "delta_tables_container_name" {
+resource "azurerm_storage_data_lake_gen2_filesystem" "delta-tables" {
   name                 = "delta-tables"
   storage_account_id = azurerm_storage_account.phi.id
 }

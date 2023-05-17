@@ -38,10 +38,6 @@ output "fhir_conversion_failures_container_name" {
   value = azurerm_storage_container.fhir_conversion_failures_container_name.name
 }
 
-output "delta_tables_container_name" {
-  value = azurerm_storage_container.delta_tables_container_name.name
-}
-
 output "phi_storage_account_name" {
   value = azurerm_storage_account.phi.name
 }
