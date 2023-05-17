@@ -216,7 +216,7 @@ locals {
 
 data "docker_registry_image" "ghcr_data" {
   for_each = local.images
-  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.3"
+  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.4"
 }
 
 resource "docker_image" "ghcr_image" {
@@ -514,7 +514,7 @@ resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
 }
 
 resource "azurerm_synapse_spark_pool" "phdi" {
-  name                 = "${terraform.workspace}pool"
+  name                 = "sparkpool"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Medium"
