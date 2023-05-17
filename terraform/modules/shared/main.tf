@@ -216,7 +216,7 @@ locals {
 
 data "docker_registry_image" "ghcr_data" {
   for_each = local.images
-  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.2"
+  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.3"
 }
 
 resource "docker_image" "ghcr_image" {
