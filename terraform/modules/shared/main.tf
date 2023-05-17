@@ -168,27 +168,6 @@ resource "azurerm_key_vault_secret" "mpi_db_password" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
-
-resource "azuread_application" "kafka_to_delta_app_registration" {
-  display_name = "Kafka-to-Delta-App-Registration"
-}
-
-resource "azuread_application_password" "kafka_to_delta_app_registration_password" {
-  application_object_id = azuread_application.kafka_to_delta_app_registration.object_id
-}
-
-resource "azurerm_key_vault_secret" "kafka_to_delta_app_password" {
-  name         = "Kafka-to-delta-app-password"
-  value        = azuread_application_password.kafka_to_delta_app_registration_password.value
-  key_vault_id = azurerm_key_vault.phdi_key_vault.id
-}
-
-resource "azurerm_key_vault_secret" "eventhub_connection_string" {
-  name         = "Eventhub-connection-string"
-  value        = azurerm_eventhub_namespace.phdi.default_primary_connection_string
-  key_vault_id = azurerm_key_vault.phdi_key_vault.id
-}
-
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
@@ -232,7 +211,6 @@ locals {
     "message-parser",
     "validation",
     "record-linkage",
-    "kafka-to-delta-table"
   ])
 }
 
@@ -494,42 +472,6 @@ resource "azurerm_communication_service" "communication_service" {
   resource_group_name = var.resource_group_name
   data_location       = "United States"
 
-}
-
-
-##### Event Hub #####
-
-resource "azurerm_eventhub_namespace" "phdi" {
-  name                = "phdi${terraform.workspace}evhns${substr(var.client_id, 0, 8)}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard"
-  capacity            = 1
-
-  tags = {
-    environment = terraform.workspace
-    managed-by  = "terraform"
-  }
-}
-
-resource "azurerm_eventhub" "phdi" {
-  name                = "phdi${terraform.workspace}evh${substr(var.client_id, 0, 8)}"
-  namespace_name      = azurerm_eventhub_namespace.phdi.name
-  resource_group_name = var.resource_group_name
-  partition_count     = 2
-  message_retention   = 1
-}
-
-resource "azurerm_role_assignment" "event_hub_contributor" {
-  scope                = azurerm_eventhub_namespace.phdi.id
-  role_definition_name = "Azure Event Hubs Data Owner"
-  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
-}
-
-resource "azurerm_role_assignment" "service_bus_contributor" {
-  scope                = azurerm_eventhub_namespace.phdi.id
-  role_definition_name = "Azure Service Bus Data Owner"
-  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
 

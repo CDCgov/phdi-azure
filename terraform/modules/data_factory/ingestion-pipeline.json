@@ -397,8 +397,8 @@
                 }
             },
             {
-                "name": "post_to_eventhub",
-                "description": "Post the output of the message_parser activity to an Azure Event Hub.",
+                "name": "post_to_storage_container",
+                "description": "Write message parser JSON to storage.",
                 "type": "WebActivity",
                 "dependsOn": [
                     {
@@ -417,17 +417,14 @@
                 },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "https://${eventhub_namespace_name}.servicebus.windows.net/${eventhub_name}/messages",
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
-                        "value": "@{activity('message_parser').output}",
+                        "value": "{\n    \"blob\": @{activity('message_parser').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${delta_tables_container_name}\",\n    \"file_name\": \"raw_data/@{concat(pipeline().RunId, '.json')}\"\n}",
                         "type": "Expression"
                     },
-                    "headers": {
-                        "Content-Type": "application/atom+xml;type=entry;charset=utf-8"
-                    },
                     "authentication": {
-                        "resource": "https://${eventhub_namespace_name}.servicebus.windows.net",
+                        "resource": "api://phdi-${environment}-ingestion",
                         "credential": {
                             "referenceName": "pipeline-runner-credential",
                             "type": "CredentialReference"

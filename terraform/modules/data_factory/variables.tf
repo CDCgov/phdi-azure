@@ -33,6 +33,7 @@ variable "record_linkage_container_url" {
   description = "URL of the record linkage container"
 }
 
+
 # TODO: Uncomment when tabulation is implemented
 # variable "tabulation_container_url" {
 #   type        = string
@@ -100,37 +101,7 @@ variable "client_id" {
   description = "Client ID"
 }
 
-variable "eventhub_namespace_name" {
-  type        = string
-  description = "Event Hub Namespace Name"
-}
-
-variable "eventhub_name" {
-  type        = string
-  description = "Event Hub Name"
-}
-
-variable "kafka_to_delta_app_password_secret_name" {
-  type        = string
-  description = "Kafka to Delta app password secret name"
-}
-
-variable "kafka_to_delta_client_id" {
-  type        = string
-  description = "Kafka to Delta app client id"
-}
-
 variable "key_vault_name" {
   type        = string
   description = "Key vault name"
-}
-
-variable "eventhub_connection_string_secret_name" {
-  type        = string
-  description = "eventhub_connection_string_secret_name"
-}
-
-variable "kafka_to_delta_tables_container_url" {
-  type        = string
-  description = "kafka_to_delta_tables_container_url"
 }
