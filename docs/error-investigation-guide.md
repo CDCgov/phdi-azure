@@ -6,6 +6,7 @@
       - [Getting to the Studio](#getting-to-the-studio)
       - [Monitoring your pipeline runs and diagnosing issues](#monitoring-your-pipeline-runs-and-diagnosing-issues)
       - [Troubleshooting pipeline configuration issues](#troubleshooting-pipeline-configuration-issues)
+    - [Observing Pipeline Failure Trends using the Dashboard](#observing-pipeline-failure-trends-using-the-dashboard)
 
 ## Overview
 This guide provides an overview of basic pipeline failure troubleshooting in Microsoft Azure. It assumes a user
@@ -70,7 +71,22 @@ credentials. Clicking a particular field will allow you to make changes or, in s
 For example this edit view for the body field is both more readable and where we can actively adjust these values.
 ![investigation-guide-11.png](./images/investigation-guide-11.png)
 Two final important notes for the Author section of ADF Studio: First, orange box 1 highlights a pair of curly braces you can click to see the source code of a particular
-step in the pipeline. While you can't edit from this view, it does put all of the info for a step in front of you in a format
-similar to the Terraform config files you might be looking at in your IDE. Second, orange box 2 highlights the publish button.
+step in the pipeline. While you can't edit from this view, it does put all the info for a step in front of you in a format
+similar to the Terraform config files you might be comparing to in your IDE. Second, orange box 2 highlights the publish button.
 Any changes you make in the author tool are only a draft until you click here, at which point they are put into effect immediately.
 BE CAREFUL. The author tool is powerful and you can very easily **Break Things** in your pipeline.
+
+## Observing Pipeline Failure Trends Using the Dashboard
+Our deployment script also automatically sets up a monitoring dashboard in Azure giving visibility into pipeline pass/fail
+trends over time. To access this use the following directions.
+![investigation-guide-11.png](./images/investigation-guide-12.png)
+From the Azure homepage, search for "shared dashboards" in the search bar. Click the corresponding option in the dropdown.
+![investigation-guide-11.png](./images/investigation-guide-13.png)
+Select your resource group from the list.
+![investigation-guide-11.png](./images/investigation-guide-14.png)
+Click the small blue "Go to dashboard" link.
+![investigation-guide-11.png](./images/investigation-guide-15.png)
+Here we have several graphs showing whole pipeline passes, whole pipeline fails, and three graphs showing failures of
+specific steps (Convert to FHIR, Upload FHIR bundle, and Geocode). Using the filters above the graphs we can adjust date
+ranges to observe failure trends over time. This is useful for pinpointing a date when a bug was introduced etc. More info
+on creating and editing dashboards can be found [here](https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards).
