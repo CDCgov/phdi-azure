@@ -1,9 +1,9 @@
 # Azure Error Investigation Guide
 
-- [Azure Error Investigation Guide](#phdi-azure-implementation-guide)
+- [Azure Error Investigation Guide](#azure-error-investigation-guide)
     - [Overview](#overview)
     - [Azure Data Factory Studio](#azure-data-factory-studio)
-      - [Getting to the Studio](#getting-to-the-studio)
+      - [Getting to the Studio](#getting-to-the-adf-studio)
       - [Monitoring your pipeline runs and diagnosing issues](#monitoring-your-pipeline-runs-and-diagnosing-issues)
       - [Troubleshooting pipeline configuration issues](#troubleshooting-pipeline-configuration-issues)
     - [Observing Pipeline Failure Trends using the Dashboard](#observing-pipeline-failure-trends-using-the-dashboard)
