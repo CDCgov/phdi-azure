@@ -68,7 +68,7 @@ This how-to guide is divided into 3 sections:
 1. In the left sidebar, click on the the 'Monitor' tab (radar icon) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
 1. Click into your pipeline run, which will have the form `phdi-{environment}-ingestion`. If you see multiple pipline runs with this name, select the  pipeline with the most recent run start time.
 
-     > **Note**: this pipeline may still have an `In progress` status.
+     > **Note**: this pipeline may still have an `In progress` status. You can click the 'refresh' button to view the pipeline run in its most updated status.
 ![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png) 
 
 1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline and a table with information about each activity. We should now see that the ingestion pipeline has processed one message successfully.![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
