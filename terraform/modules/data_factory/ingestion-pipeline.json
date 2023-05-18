@@ -383,7 +383,8 @@
               "dependsOn": [],
               "userProperties": [],
               "typeProperties": {
-                "message": "Message type not ECR"
+                "message": "Message type not ECR",
+                "errorCode": "417"
               }
             }
           ]
