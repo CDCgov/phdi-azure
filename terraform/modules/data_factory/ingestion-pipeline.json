@@ -397,41 +397,41 @@
                 }
             },
             {
-                "name": "post_to_storage_container",
-                "description": "Write message parser JSON to storage.",
-                "type": "WebActivity",
-                "dependsOn": [
-                    {
-                        "activity": "message_parser",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"blob\": @{activity('message_parser').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${delta_tables_container_name}\",\n    \"file_name\": \"raw_data/@{concat(pipeline().RunId, '.json')}\"\n}",
-                        "type": "Expression"
-                    },
-                    "authentication": {
-                        "resource": "api://phdi-${environment}-ingestion",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
-                        },
-                        "type": "UserAssignedManagedIdentity"
-                    }
+              "name": "post_to_storage_container",
+              "description": "Write message parser JSON to storage.",
+              "type": "WebActivity",
+              "dependsOn": [
+                {
+                  "activity": "message_parser",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
                 }
+              ],
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "userProperties": [],
+              "typeProperties": {
+                "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                "method": "POST",
+                "body": {
+                  "value": "{\n    \"blob\": @{activity('message_parser').output.parsed_values},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${delta_tables_container_name}\",\n    \"file_name\": \"raw_data/@{concat(pipeline().RunId, '.json')}\"\n}",
+                  "type": "Expression"
+                },
+                "authentication": {
+                  "resource": "api://phdi-${environment}-ingestion",
+                  "credential": {
+                    "referenceName": "pipeline-runner-credential",
+                    "type": "CredentialReference"
+                  },
+                  "type": "UserAssignedManagedIdentity"
+                }
+              }
             },
             {
                 "name": "upload_fhir_bundle",
