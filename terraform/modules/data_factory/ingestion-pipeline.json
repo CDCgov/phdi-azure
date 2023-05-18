@@ -381,14 +381,6 @@
               "name": "message_parser",
               "description": "Extract desired fields from a given healthcare message.",
               "type": "WebActivity",
-              "dependsOn": [
-                {
-                  "activity": "case_type_ecr_if_condition",
-                  "dependencyConditions": [
-                    "Succeeded"
-                  ]
-                }
-              ],
               "policy": {
                 "timeout": "0.12:00:00",
                 "retry": 0,
