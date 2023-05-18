@@ -168,6 +168,12 @@ resource "azurerm_key_vault_secret" "mpi_db_password" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
+resource "azurerm_key_vault_secret" "mpi_db_password" {
+  name         = "phi-storage-account-name"
+  value        = azurerm_storage_account.phi.name
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
