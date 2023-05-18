@@ -378,13 +378,12 @@
           },
           "ifFalseActivities": [
             {
-              "name": "Fail1",
+              "name": "Not ECR",
               "type": "Fail",
               "dependsOn": [],
               "userProperties": [],
               "typeProperties": {
-                "message": "Validation failure, logging to validation failure storage.",
-                "errorCode": "422"
+                "message": "Message type not ECR"
               }
             }
           ]
