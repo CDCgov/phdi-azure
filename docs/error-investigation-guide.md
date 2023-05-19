@@ -22,7 +22,7 @@ where most of our Azure troubleshooting will take place, though it can be a bit 
 Start by navigating to Azure and logging in to your account. Once you've done that
 follow the steps below.
 ![investigation-guide-1.png](./images/investigation-guide-1.png)
-From the Azure homepage, click data factories under Azure Services.
+From the Azure homepage, search at the top for data factories and select it from the dropdown.
 ![investigation-guide-2.png](./images/investigation-guide-2.png)
 Select the Data Factory that contains the pipeline you want to troubleshoot.
 ![investigation-guide-3.png](./images/investigation-guide-3.png)
