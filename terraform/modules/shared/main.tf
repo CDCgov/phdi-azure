@@ -68,9 +68,9 @@ resource "azurerm_storage_container" "patient_data_container_name" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
-resource "azurerm_storage_container" "delta_tables_container_name" {
-  name                 = "delta-tables"
-  storage_account_name = azurerm_storage_account.phi.name
+resource "azurerm_storage_data_lake_gen2_filesystem" "delta-tables" {
+  name               = "delta-tables"
+  storage_account_id = azurerm_storage_account.phi.id
 }
 
 resource "azurerm_role_assignment" "phi_storage_contributor" {
@@ -165,6 +165,12 @@ resource "azurerm_key_vault_secret" "smarty_auth_token" {
 resource "azurerm_key_vault_secret" "mpi_db_password" {
   name         = "mpi-db-password"
   value        = azurerm_postgresql_flexible_server.mpi.administrator_password
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "phi_storage_account_name" {
+  name         = "phi-storage-account-name"
+  value        = azurerm_storage_account.phi.name
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
@@ -494,7 +500,7 @@ resource "azurerm_synapse_workspace" "phdi" {
   name                                 = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
   resource_group_name                  = var.resource_group_name
   location                             = var.location
-  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.source_data.id
+  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.delta-tables.id
   sql_administrator_login              = "sqladminuser"
   sql_administrator_login_password     = random_password.synapse_sql_password.result
 
