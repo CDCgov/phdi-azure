@@ -174,6 +174,23 @@ resource "azurerm_key_vault_secret" "phi_storage_account_name" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
+resource "azuread_application_password" "github_app" {
+  application_object_id = data.azuread_application.github_app.object_id
+  display_name          = "github-app-client-secret"
+}
+
+resource "azurerm_key_vault_secret" "github_app_client_id" {
+  name         = "github-app-client-id"
+  value        = data.azuread_application.github_app.application_id
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "github_app_client_secret" {
+  name         = "github-app-client-secret"
+  value        = azuread_application_password.github_app.value
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
@@ -520,12 +537,15 @@ resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
 }
 
 resource "azurerm_synapse_spark_pool" "phdi" {
-  name                 = "sparkpool"
-  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
-  node_size_family     = "MemoryOptimized"
-  node_size            = "Medium"
-  cache_size           = 100
-  spark_version        = 3.3
+  name                                = "sparkpool"
+  synapse_workspace_id                = azurerm_synapse_workspace.phdi.id
+  node_size_family                    = "MemoryOptimized"
+  node_size                           = "Small"
+  cache_size                          = 100
+  spark_version                       = 3.3
+  dynamic_executor_allocation_enabled = true
+  min_executors                       = 1
+  max_executors                       = 2
 
   auto_scale {
     max_node_count = 50
