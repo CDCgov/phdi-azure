@@ -210,13 +210,15 @@ jobs:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
-          if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI"; then
-            az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI" --file @../../scripts/Synapse/convertParquetMPI.ipynb
-          fi
-          if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MCI"; then
-            az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MCI" --file @../../scripts/Synapse/convertParquetMCI.ipynb
-          fi
-
+          for FILE in ../../scripts/Synapse/*
+          do
+            if [[ $FILE == *.ipynb ]]; then
+              FILENAME="$(basename $FILE .ipynb)"
+              if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME; then
+                az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --file @$FILE
+              fi
+            fi
+          done
       - name: Deploy Synapse pipeline and trigger
         env:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
