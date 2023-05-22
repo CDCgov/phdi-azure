@@ -39,7 +39,7 @@ output "fhir_conversion_failures_container_name" {
 }
 
 output "delta_tables_container_name" {
-  value = azurerm_storage_container.delta_tables_container_name.name
+  value = azurerm_storage_data_lake_gen2_filesystem.delta-tables.name
 }
 
 output "phi_storage_account_name" {
