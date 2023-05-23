@@ -209,8 +209,8 @@ jobs:
         env:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
-          STORAGE_ACCOUNT: phdi${TF_ENV}phdi${SHORT_CID}
         run: |
+          export STORAGE_ACCOUNT=phdi${TF_ENV}phdi${SHORT_CID}
           echo $STORAGE_ACCOUNT
           if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI"; then
             az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MPI" --file @../../scripts/Synapse/convertParquetMPI.ipynb
