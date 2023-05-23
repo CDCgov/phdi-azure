@@ -216,6 +216,11 @@ jobs:
           if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MCI"; then
             az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Convert Parquet MCI" --file @../../scripts/Synapse/convertParquetMCI.ipynb
           fi
+          if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update eCR Data Store"; then
+            STORAGE_ACCOUNT=phdi${TF_ENV}phdi${SHORT_CID}
+            cat ../../scripts/Synapse/updateECRDataStore.ipynb | envsubst > ../../scripts/Synapse/updateECRDataStoreSubstituted.ipynb
+            az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update eCR Data Store" --file @../../scripts/Synapse/updateECRDataStoreSubstituted.ipynb
+          fi
 
       - name: Deploy Synapse pipeline and trigger
         env:
