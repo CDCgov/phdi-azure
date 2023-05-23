@@ -215,7 +215,8 @@ jobs:
             if [[ $FILE == *.ipynb ]]; then
               FILENAME="$(basename $FILE .ipynb)"
               if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME; then
-                az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --file @$FILE
+                cat "../../scripts/Synapse/${FILENAME}.ipynb" | envsubst > "../../scripts/Synapse/${FILENAME}Substituted.ipynb"
+                az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --file "@../../scripts/Synapse/${FILENAME}Substituted.ipynb"
               fi
             fi
           done
