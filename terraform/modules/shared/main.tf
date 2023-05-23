@@ -569,3 +569,4 @@ resource "azurerm_role_assignment" "synapse_blob_contributor" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_synapse_workspace.phdi.identity[0].principal_id
 }
+
