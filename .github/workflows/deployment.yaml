@@ -103,10 +103,10 @@ jobs:
             -replace="module.shared.docker_tag.tag_for_azure[\"tabulation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"validation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"record-linkage\"]"
-          terraform output -raw record_linkage_container_url
-          record_linkage_container_url=$(terraform output -raw record_linkage_container_url)
+          terraform output -json > terraform_outputs.json
+          record_linkage_container_url=$(jq -r '.record_linkage_container_url.value' terraform_outputs.json)
           echo $record_linkage_container_url
-          echo "record_linkage_container_url=$(terraform output -raw record_linkage_container_url)" >> $GITHUB_OUTPUT
+          echo "record_linkage_container_url=$record_linkage_container_url" >> $GITHUB_OUTPUT
           
       
   azure-cli:
