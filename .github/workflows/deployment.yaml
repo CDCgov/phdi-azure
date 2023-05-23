@@ -102,7 +102,7 @@ jobs:
             -replace="module.shared.docker_tag.tag_for_azure[\"message-parser\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"tabulation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"validation\"]" \
-            -replace="module.shared.docker_tag.tag_for_azure[\"record-linkage\"]" \
+            -replace="module.shared.docker_tag.tag_for_azure[\"record-linkage\"]"
           echo "record_linkage_container_url=$(terraform output record_linkage_container_url -raw)" >> $GITHUB_OUTPUT
       
   azure-cli:
