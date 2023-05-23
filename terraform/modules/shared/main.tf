@@ -174,16 +174,9 @@ resource "azurerm_key_vault_secret" "phi_storage_account_name" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
-resource "time_rotating" "phdi" {
-  rotation_days = 180
-}
-
 resource "azuread_application_password" "github_app" {
   application_object_id = data.azuread_application.github_app.object_id
   display_name          = "github-app-client-secret"
-  rotate_when_changed = {
-    expiry = time_rotating.phdi.rotation_rfc3339
-  }
 }
 
 resource "azurerm_key_vault_secret" "github_app_client_id" {
