@@ -103,14 +103,13 @@ jobs:
             -replace="module.shared.docker_tag.tag_for_azure[\"tabulation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"validation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"record-linkage\"]"
-          record_linkage_container_url=$(terraform output -raw record_linkage_container_url | awk -F '::' '{print $1}')
-          echo "this is the raw version + awk"
+          record_linkage_container_url=$(terraform output -raw record_linkage_container_url)
           echo $record_linkage_container_url
-          echo "----------"
-          container_url=$(terraform output -json record_linkage_container_url | jq -r '.value')
-          echo "this is the json version + jq"
-          echo $container_url
-      
+          echo $(#record_linkage_container_url)
+          echo $record_linkage_container_url | grep -o 'https://.*' | awk '{print $1}'
+
+          
+
   azure-cli:
     name: Run Azure CLI steps
     needs: terraform
