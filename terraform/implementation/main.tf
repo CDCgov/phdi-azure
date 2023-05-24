@@ -54,3 +54,7 @@ module "read_source_data" {
   wait_time                 = 10
   sleep_time                = 1
 }
+
+output "record_linkage_container_url" {
+  value = module.shared.record_linkage_container_url
+}

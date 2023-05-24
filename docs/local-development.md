@@ -11,6 +11,7 @@
       - [Running Azure Functions Locally](#running-azure-functions-locally)
       - [Azure Function Unit Testing](#azure-function-unit-testing)
       - [Pushing to Github](#pushing-to-github)
+      - [Connecting Terraform to Azure](#connecting-terraform-to-azure)
 
 ## Local Development Environment
 
@@ -135,3 +136,52 @@ As mentioned in [Azure Function Directory Structure](#azure-function-directory-s
 #### Pushing to Github
 
 To get access to push to Github, ask to get maintainer access to the repo for your Github account.
+
+#### Connecting Terraform to Azure
+
+This repository contains Terraform configurations for deploying infrastructure on Azure. Follow the steps below to set up and connect Terraform to your Azure account.
+
+Make sure you have the following installed.
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+- [Homebrew](https://brew.sh/) package manager (for macOS users)
+
+1. Navigate to the Terraform implementation directory:
+
+   ```shell
+   cd your-repository/terraform/implementation
+
+2. Install Azure CLI using Homebrew (macOS):
+
+    ```shell
+    brew update && brew install azure-cli
+3. Install Terraform CLI using Homebrew:
+
+    ```shell
+    brew tap hashicorp/tap
+    brew install hashicorp/tap/terraform
+
+4. Log in to Azure:
+    ```shell
+    az login
+
+This command will open a browser window where you can complete the Azure login process. Once authenticated, you can close the browser and return to the terminal.
+
+5. Connect Terraform to Azure:
+    ```shell
+    terraform init -backend-config=backend.tfvars
+
+This command initializes Terraform and configures the backend using the provided backend.tfvars file.
+
+##### Usage
+Now that you have connected Terraform to Azure, you can start using Terraform commands to manage your infrastructure. Some common commands include:
+
+- terraform plan: Generates an execution plan for changes to be applied.
+- terraform apply: Applies the changes to create or update the resources.
+- terraform destroy: Destroys the infrastructure defined in the Terraform configuration.
+- terraform workspace list: Lists the available workspaces.
+- terraform workspace select {workspace name}: Select a workspace to operate in.
+
+Refer to the official [Terraform documentation](https://www.terraform.io/docs/cli/commands/index.html) for more details on using Terraform commands.
+
+
