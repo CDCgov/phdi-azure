@@ -141,18 +141,14 @@ To get access to push to Github, ask to get maintainer access to the repo for yo
 
 This repository contains Terraform configurations for deploying infrastructure on Azure. Follow the steps below to set up and connect Terraform to your Azure account.
 
-##### Prerequisites
-
-- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed
-- [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli) installed
+Make sure you have the following installed.
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 - [Homebrew](https://brew.sh/) package manager (for macOS users)
 
-##### Getting Started
-
-1. Clone this repository and navigate to the Terraform implementation directory:
+1. Navigate to the Terraform implementation directory:
 
    ```shell
-   git clone https://github.com/your-username/your-repository.git
    cd your-repository/terraform/implementation
 
 2. Install Azure CLI using Homebrew (macOS):
