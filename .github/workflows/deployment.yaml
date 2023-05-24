@@ -108,8 +108,7 @@ jobs:
             grep -m1 -o "https://.*" | 
             sed "s/::debug::.*$//"
           )
-          echo $record_linkage_container_url >> $GITHUB_OUTPUT
-
+          echo $record_linkage_container_url
 
   azure-cli:
     name: Run Azure CLI steps
