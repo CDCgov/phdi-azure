@@ -212,7 +212,6 @@ jobs:
           TENANT_ID: ${{ secrets.TENANT_ID }}
           RECORD_LINKAGE_CONTAINER_URL: ${{ needs.terraform.outputs.record_linkage_container_url }}
         run: |
-          echo RECORD_LINKAGE_CONTAINER_URL: $RECORD_LINKAGE_CONTAINER_URL
           export STORAGE_ACCOUNT=phdi${TF_ENV}phdi${SHORT_CID}
           export KEY_VAULT=${TF_ENV}vault${SHORT_CID}
           for FILE in ../../scripts/Synapse/*
