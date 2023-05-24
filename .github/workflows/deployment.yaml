@@ -211,6 +211,8 @@ jobs:
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
           export STORAGE_ACCOUNT=phdi${TF_ENV}phdi${SHORT_CID}
+          export KEY_VAULT=${TF_ENV}vault${SHORT_CID}
+          export MPI_DB_HOST=phdi${TF_ENV}mpi${SHORT_CID}.postgres.database.azure.com
           for FILE in ../../scripts/Synapse/*
           do
             if [[ $FILE == *.ipynb ]]; then
