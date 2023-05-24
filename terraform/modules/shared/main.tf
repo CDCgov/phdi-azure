@@ -174,23 +174,6 @@ resource "azurerm_key_vault_secret" "phi_storage_account_name" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
-resource "azuread_application_password" "github_app" {
-  application_object_id = data.azuread_application.github_app.object_id
-  display_name          = "github-app-client-secret"
-}
-
-resource "azurerm_key_vault_secret" "github_app_client_id" {
-  name         = "github-app-client-id"
-  value        = data.azuread_application.github_app.application_id
-  key_vault_id = azurerm_key_vault.phdi_key_vault.id
-}
-
-resource "azurerm_key_vault_secret" "github_app_client_secret" {
-  name         = "github-app-client-secret"
-  value        = azuread_application_password.github_app.value
-  key_vault_id = azurerm_key_vault.phdi_key_vault.id
-}
-
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
@@ -570,3 +553,22 @@ resource "azurerm_role_assignment" "synapse_blob_contributor" {
   principal_id         = azurerm_synapse_workspace.phdi.identity[0].principal_id
 }
 
+resource "azuread_application" "synapse_app" {
+  display_name = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
+}
+
+resource "azuread_application_password" "synapse_app_password" {
+  application_object_id = azuread_application.synapse_app.object_id
+}
+
+resource "azurerm_key_vault_secret" "synapse_client_secret" {
+  name         = "synapse-client-secret"
+  value        = azuread_application_password.synapse_app_password.value
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "synapse_client_id" {
+  name         = "synapse-client-id"
+  value        = azuread_application.synapse_app.application_id
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
