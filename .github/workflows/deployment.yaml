@@ -109,6 +109,7 @@ jobs:
             sed "s/::debug::.*$//"
           )
           echo $record_linkage_container_url
+          echo "record_linkage_container_url=${record_linkage_container_url}" >> $GITHUB_OUTPUT
 
   azure-cli:
     name: Run Azure CLI steps
