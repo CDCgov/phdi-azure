@@ -554,7 +554,7 @@ resource "azurerm_role_assignment" "synapse_blob_contributor" {
 }
 
 resource "azuread_application" "synapse_app" {
-  display_name = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
+  display_name = "phdi-${terraform.workspace}-synapse-${substr(var.client_id, 0, 8)}"
 }
 
 resource "azuread_application_password" "synapse_app_password" {
