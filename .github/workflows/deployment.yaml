@@ -210,6 +210,7 @@ jobs:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
+          export STORAGE_ACCOUNT=phdi${TF_ENV}phdi${SHORT_CID}
           for FILE in ../../scripts/Synapse/*
           do
             if [[ $FILE == *.ipynb ]]; then
@@ -220,6 +221,7 @@ jobs:
               fi
             fi
           done
+
       - name: Deploy Synapse pipeline and trigger
         env:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
