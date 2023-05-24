@@ -48,6 +48,14 @@ resource "azurerm_storage_blob" "elr" {
   source_content         = ""
 }
 
+resource "azurerm_storage_blob" "covid-identification-config" {
+  name                   = "covid_identification_config.json"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.delta-tables.name
+  type                   = "Block"
+  source_content         = file("../../scripts/Synapse/config/covid_identification_config.json")
+}
+
 resource "azurerm_storage_container" "fhir_conversion_failures_container_name" {
   name                 = "fhir-conversion-failures"
   storage_account_name = azurerm_storage_account.phi.name
