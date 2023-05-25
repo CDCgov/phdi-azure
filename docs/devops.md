@@ -36,3 +36,45 @@ It's important to keep your repository up-to-date with version changes from the 
 To update, visit the [main phdi repository](https://github.com/CDCgov/phdi) and copy the [latest version number](https://github.com/CDCgov/phdi/releases). Update the container image tag in [`main.tf`](https://github.com/CDCgov/phdi-azure/blob/main/terraform/modules/shared/main.tf#L201-L201).
 
 We recommend doing this update at least monthly, and deploying every time an update is made.
+
+## Tearing Down an Environment
+
+To tear down an environment in Azure and clean up all associated resources, follow the steps outlined below:
+
+### 1. Connect Local to Azure and Configure Terraform
+
+To begin, make sure you have connected your local development environment to Azure and properly configured Terraform. Refer to the "Local Development" readme for instructions on setting up your local environment.
+
+### 2. Access the Azure Portal
+
+Visit the Azure portal (https://portal.azure.com) and sign in with your Azure credentials.
+
+### 3. Select the Resource Group
+
+Locate and select the resource group that contains the environment you want to tear down. Resource groups serve as logical containers for grouping related resources.
+![resource-group.png](./images/resource-group.png)
+
+
+### 4. Filter and Delete the Workspace
+
+Within the selected resource group, apply the appropriate filters to identify the workspace you wish to delete. Once you have located the target workspace, select it and choose the "Delete" option. Confirm the deletion when prompted.
+![filter-to-workspace.png](./images/filter-to-workspace.png)
+
+### 5. Review Terraform States
+
+Next, open your command-line interface (CLI) and navigate to the directory where your Terraform configuration files are stored. Run the command `terraform state list` to display a list of all the Terraform states associated with the environment.
+
+### 6. Remove Terraform States
+
+To remove each Terraform state individually, execute the command `terraform state rm {name of state}` in the CLI. If you want to remove multiple states at once, you can specify them using the format `terraform state rm {name}.{name}`.
+
+### 7. Purge Key Vault
+
+Navigate to the Azure Key Vault service in the Azure portal. Within the Key Vault management interface, locate and select "Manage deleted vaults" in the menu. Choose the appropriate subscription, and then purge the key vault associated with the workspace you are tearing down.
+![manage-deleted-vaults.png](./images/manage-deleted-vaults.png)
+
+### 8. Environment Teardown Complete
+
+Once you have followed all the steps outlined above, you have successfully torn down the environment and cleaned up all relevant resources. You are now free to re-deploy or make any necessary changes to the environment as needed.
+
+Please note that tearing down an environment permanently removes all associated resources, and this action cannot be undone. Ensure that you have backed up any important data or configurations before proceeding with the teardown process.
