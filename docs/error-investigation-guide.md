@@ -51,18 +51,21 @@ Clicking the radar button takes us to the following informative page.
 
 ![investigation-guide-5.png](./images/investigation-guide-5.png)
 <figcaption align = "left">Here we can see and sort all pipeline runs. The status column gives us
-at-a-glance feedback for if we've had any issues. It's also where we'll get a read on whether we have an issue
-with individual runs or a problem with the pipeline as a whole. Lone failures indicate a likely issue with the specific
+at-a-glance feedback for if we've had any issues with runs. It's also where we'll get a read on whether we have a problem
+with an individual run, a batch of messages, or a problem with the pipeline as a whole. Lone failures indicate a likely issue with the specific
 file uploaded for that run. Many successive failures, especially if all fail on a particular step in the pipeline, likely indicate a pipeline
 configuration issue or a problem in a building block. Orange box #1 is an example of a failed pipeline run. This is also the first place where we can see some error
 messaging by clicking the small blue icon by the word "Failed". However, I don't recommend 
-troubleshooting from here as the error formatting is poor and we're lacking important context.
-Clicking the link in orange box #2 takes us to a much more detailed view of the failed run.
+troubleshooting from here as the error formatting is poor and we're lacking important context. One important thing you can
+learn on this page is the name of the file associated with each run. In orange box #2 there's an @ in square brackets which
+can be clicked to see the parameters fed into the pipeline for that particular run, once of which is the name of the uploaded file.
+To get even more debugging info for a run, click the blue pipeline name link on the left, orange box #3. This takes us to a much more detailed and useful
+view of the failed run.
 </figcaption>
 <hr/>
 
 ![investigation-guide-6.png](./images/investigation-guide-6.png)
-<figcaption align = "left"><b>This is the most useful page for beginning a diagnosis of a failed pipeline run.</b> We have full context showing us exactly
+<figcaption align = "left"><b>This run details page is the most useful place for diagnosing the cause of a failure.</b> We have full context showing us exactly
 which steps succeeded or failed, and, most importantly, inputs and outputs of the failed step. The inputs/outputs are shown
 by clicking the small blue icons highlighted in the orange box. However, you won't see these icons on initial page load because, for some
 reason, Azure decided they should only appear on hover or click of the failed step in the lower list. The blue output icon
