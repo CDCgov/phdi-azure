@@ -48,6 +48,14 @@ resource "azurerm_storage_blob" "elr" {
   source_content         = ""
 }
 
+resource "azurerm_storage_blob" "covid-identification-config" {
+  name                   = "covid_identification_config.json"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.delta-tables.name
+  type                   = "Block"
+  source_content         = file("../../scripts/Synapse/config/covid_identification_config.json")
+}
+
 resource "azurerm_storage_container" "fhir_conversion_failures_container_name" {
   name                 = "fhir-conversion-failures"
   storage_account_name = azurerm_storage_account.phi.name
@@ -171,6 +179,12 @@ resource "azurerm_key_vault_secret" "mpi_db_password" {
 resource "azurerm_key_vault_secret" "phi_storage_account_name" {
   name         = "phi-storage-account-name"
   value        = azurerm_storage_account.phi.name
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "record_linkage_url" {
+  name         = "record-linkage-url"
+  value        = "https://phdi-${terraform.workspace}-record-linkage.${azurerm_container_app_environment.phdi.default_domain}"
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
