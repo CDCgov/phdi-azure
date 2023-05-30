@@ -36,14 +36,8 @@ module "data_factory" {
   fhir_conversion_failures_container_name = module.shared.fhir_conversion_failures_container_name
   delta_tables_container_name             = module.shared.delta_tables_container_name
   client_id                               = var.client_id
-  eventhub_namespace_name                 = module.shared.eventhub_namespace_name
-  eventhub_name                           = module.shared.eventhub_name
-  kafka_to_delta_app_password_secret_name = module.shared.kafka_to_delta_app_password_secret_name
-  kafka_to_delta_client_id                = module.shared.kafka_to_delta_client_id
   key_vault_name                          = module.shared.key_vault_name
-  eventhub_connection_string_secret_name  = module.shared.eventhub_connection_string_secret_name
   phi_storage_account_name                = module.shared.phi_storage_account_name
-  kafka_to_delta_tables_container_url     = module.shared.kafka_to_delta_tables_container_url
 }
 
 
@@ -59,4 +53,8 @@ module "read_source_data" {
   client_id                 = var.client_id
   wait_time                 = 10
   sleep_time                = 1
+}
+
+output "record_linkage_container_url" {
+  value = module.shared.record_linkage_container_url
 }
