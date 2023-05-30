@@ -108,11 +108,13 @@ When a new version of PHDI is availble, the version used by `phdi-azure` can be 
 
 #### Upgrade Steps
 
-1. Open the `terraform/modules/shared/main.tf` in a text editor of your choice.
+1. Create a new branch for the upgrade.
 
-2. Within the file, search for the code block that starts with `data "docker_registry_image" "ghcr_data" {`.
+2. Open the `terraform/modules/shared/main.tf` in a text editor of your choice.
 
-3. In the `name` field of the code block, you will find the current version number specified. Modify the version number to the desired new version.
+3. Within the file, search for the code block that starts with `data "docker_registry_image" "ghcr_data" {`.
+
+4. In the `name` field of the code block, you will find the current version number specified. Modify the version number to the desired new version.
 
    Example:
    ```hcl
@@ -130,8 +132,10 @@ When a new version of PHDI is availble, the version used by `phdi-azure` can be 
    }
    ```
 
-4. Save the `main.tf` file after making the necessary modifications.
+5. Save the `main.tf` file after making the necessary modifications.
 
-5. Commit and push the updated `main.tf` file to your repository to ensure the changes are applied.
+6. Commit and push the branch to your repository.
 
-6. Re deploy the application.
+7. Open a new PR for your branch to `main`.
+
+6. After merging your PR, `dev` will be automatically deployed. Other environments can be deployed via github actions
