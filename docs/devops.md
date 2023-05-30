@@ -78,3 +78,43 @@ Navigate to the Azure Key Vault service in the Azure portal. Within the Key Vaul
 Once you have followed all the steps outlined above, you have successfully torn down the environment and cleaned up all relevant resources. You are now free to re-deploy or make any necessary changes to the environment as needed.
 
 Please note that tearing down an environment permanently removes all associated resources, and this action cannot be undone. Ensure that you have backed up any important data or configurations before proceeding with the teardown process.
+
+## Maintenance
+
+### Upgrading the PHDI Version
+
+When a new version of PHDI is availble, the version used by `phdi-azure` can be updated by doing the following steps.
+
+#### Upgrade Steps
+
+1. Create a new branch for the upgrade.
+
+2. Open the `terraform/modules/shared/main.tf` in a text editor of your choice.
+
+3. Within the file, search for the code block that starts with `data "docker_registry_image" "ghcr_data" {`.
+
+4. In the `name` field of the code block, you will find the current version number specified. Modify the version number to the desired new version.
+
+   Example:
+   ```hcl
+   data "docker_registry_image" "ghcr_data" {
+     for_each = local.images
+     name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.5"
+   }
+   ```
+
+   Change the version number to the desired new version:
+   ```hcl
+   data "docker_registry_image" "ghcr_data" {
+     for_each = local.images
+     name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.6"
+   }
+   ```
+
+5. Save the `main.tf` file after making the necessary modifications.
+
+6. Commit and push the branch to your repository.
+
+7. Open a new PR for your branch to `main`.
+
+8. After merging your PR, `dev` will be automatically deployed from the `main` branch. Other environments can be deployed with the updated `main` via github actions.
