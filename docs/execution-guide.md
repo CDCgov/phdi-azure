@@ -2,7 +2,7 @@
 
 ## Set Up: User requirements
 First, please confirm that you meet the following user requirements:
-1. Access to an Azure resource group where the starter kit has been deployed. Access must include the following roles:
+1. Access to an Azure resource group where the starter kit has been deployed and the following roles:
     - `Storage Blob Data Contributor` on the PHI storage account
     - `FHIR Data Contributor` on the FHIR server
 2. All of the files in the [sample-data/](../sample-data/) directory have been downloaded to your computer.
@@ -16,7 +16,7 @@ If you do not have sufficient access, please contact your organization's Azure a
 
 ## How to Use: Run an Hl7v2 vaccination message through the pipeline 
 ### Example: VXU Sample Message 
-The `sample-data/` directory contains some dummy unsoliciated vaccination record update (VXU) messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The Patient Identifier Segment (PID) of this message (shown below) contains some dirty data:
+The `sample-data/` directory contains dummy unsoliciated vaccination record update (VXU) messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The Patient Identifier Segment (PID) of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
 2. The patient's phone number is not in a standard format.
 3. The patient's address is non-standard and has not been geocoded.
