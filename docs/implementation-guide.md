@@ -100,3 +100,38 @@ Press enter to begin the script.
 If you plan to deploy to an existing resource group in your Azure environment, have the resource group name ready and provide it to the Quick Start Script when prompted.
 
 The script will take around 20-30 minutes to run.
+
+
+### Upgrading the PHDI Version
+
+When a new version of PHDI is availble, the version used by `phdi-azure` can be updated by doing the following steps.
+
+#### Upgrade Steps
+
+1. Open the `terraform/modules/shared/main.tf` in a text editor of your choice.
+
+2. Within the file, search for the code block that starts with `data "docker_registry_image" "ghcr_data" {`.
+
+3. In the `name` field of the code block, you will find the current version number specified. Modify the version number to the desired new version.
+
+   Example:
+   ```hcl
+   data "docker_registry_image" "ghcr_data" {
+     for_each = local.images
+     name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.5"
+   }
+   ```
+
+   Change the version number to the desired new version:
+   ```hcl
+   data "docker_registry_image" "ghcr_data" {
+     for_each = local.images
+     name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.6"
+   }
+   ```
+
+4. Save the `main.tf` file after making the necessary modifications.
+
+5. Commit and push the updated `main.tf` file to your repository to ensure the changes are applied.
+
+6. Re deploy the application.
