@@ -138,4 +138,4 @@ When a new version of PHDI is availble, the version used by `phdi-azure` can be 
 
 7. Open a new PR for your branch to `main`.
 
-6. After merging your PR, `dev` will be automatically deployed. Other environments can be deployed via github actions
+8. After merging your PR, `dev` will be automatically deployed. Other environments can be deployed via github actions
