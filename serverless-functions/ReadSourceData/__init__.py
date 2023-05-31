@@ -111,7 +111,7 @@ def main(event: func.EventGridEvent) -> None:
                     "for a longer period of time, increase the value of the WAIT_TIME" 
                     "environment variable (default: 10 seconds). To allow processing of"
                     "eICRs to continue without a reportability response, set the "
-                    "REQUIRE_RR environment variable to 'false'."
+                    "REQUIRE_RR environment variable to 'false' (default: 'true')."
                 )
                 raise Exception(missing_rr_message)
             else:
@@ -123,7 +123,8 @@ def main(event: func.EventGridEvent) -> None:
                     "longer period of time, increase the value of the WAIT_TIME "
                     "environment variable (default: 10 seconds). To prevent further "
                     "processing of eICRs to continue without a reportability response, "
-                    "set the REQUIRE_RR environment variable to 'false'."
+                    "set the REQUIRE_RR environment variable to 'true' " 
+                    "(default: 'true')."
                 )
                 logging.warning(missing_rr_message)
             return
