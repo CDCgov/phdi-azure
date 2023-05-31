@@ -193,6 +193,7 @@ def test_get_reportability_response_failure():
     )
 
 
+@mock.patch("ReadSourceData.DataFactoryManagementClient")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.AzureCloudContainerConnection")
@@ -204,8 +205,17 @@ def test_missing_rr_when_not_required(
     patched_cloud_container_connection,
     patched_azure_cred_manager,
     patched_os,
+    patched_adf_management_client,
 ):
-    patched_os.environ = {"WAIT_TIME": 0.1, "SLEEP_TIME": 0.05, "REQUIRE_RR": "false"}
+    patched_os.environ = {
+        "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
+        "RESOURCE_GROUP_NAME": "some-resource-group",
+        "FACTORY_NAME": "some-adf",
+        "PIPELINE_NAME": "some-pipeline",
+        "WAIT_TIME": 0.1,
+        "SLEEP_TIME": 0.05,
+        "REQUIRE_RR": "false",
+    }
     patched_azure_cred_manager.return_value.get_credentials.return_value = (
         "some-credentials"
     )
@@ -215,6 +225,12 @@ def test_missing_rr_when_not_required(
     )
 
     patched_get_reportability_response.return_value = ""
+
+    good_response = mock.Mock()
+    good_response.status_code = 200
+    adf_client = mock.MagicMock()
+    adf_client.pipelines.create_run.return_value = good_response
+    patched_adf_management_client.return_value = adf_client
 
     event = mock.MagicMock()
     event.get_json.return_value = {
@@ -242,6 +258,7 @@ def test_missing_rr_when_not_required(
 
     read_source_data(event)
     patched_logging.warning.assert_called_with(warning_message)
+    adf_client.pipelines.create_run.assert_called()
 
 
 @mock.patch("ReadSourceData.os")
