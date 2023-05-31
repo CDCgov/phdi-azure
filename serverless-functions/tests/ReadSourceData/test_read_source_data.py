@@ -193,19 +193,87 @@ def test_get_reportability_response_failure():
     )
 
 
+@mock.patch("ReadSourceData.DataFactoryManagementClient")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.AzureCloudContainerConnection")
 @mock.patch("ReadSourceData.get_reportability_response")
 @mock.patch("ReadSourceData.logging")
-def test_handle_ecr_with_no_rr(
+def test_missing_rr_when_not_required(
+    patched_logging,
+    patched_get_reportability_response,
+    patched_cloud_container_connection,
+    patched_azure_cred_manager,
+    patched_os,
+    patched_adf_management_client,
+):
+    patched_os.environ = {
+        "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
+        "RESOURCE_GROUP_NAME": "some-resource-group",
+        "FACTORY_NAME": "some-adf",
+        "PIPELINE_NAME": "some-pipeline",
+        "WAIT_TIME": 0.1,
+        "SLEEP_TIME": 0.05,
+        "REQUIRE_RR": "false",
+    }
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    patched_cloud_container_connection.return_value.download_object.return_value = (
+        "some-message"
+    )
+
+    patched_get_reportability_response.return_value = ""
+
+    good_response = mock.Mock()
+    good_response.status_code = 200
+    adf_client = mock.MagicMock()
+    adf_client.pipelines.create_run.return_value = good_response
+    patched_adf_management_client.return_value = adf_client
+
+    event = mock.MagicMock()
+    event.get_json.return_value = {
+        "url": (
+            "https://phdidevphi87b9f133.blob.core.windows.net/"
+            "source-data/ecr/12345eICR.xml"
+        )
+    }
+
+    blob = mock.MagicMock()
+    blob.name = "source-data/ecr/12345eICR.xml"
+    blob.read.return_value = b"some-blob-contents"
+    wait_time = patched_os.environ["WAIT_TIME"]
+    warning_message = (
+        "A reportability response could not be found for filename "
+        f"{blob.name} after searching for {wait_time} "
+        "seconds. The ingestion pipeline was triggered for this eICR "
+        "without inclusion of the reportability response. To search for a "
+        "longer period of time, increase the value of the WAIT_TIME "
+        "environment variable (default: 10 seconds). To prevent further "
+        "processing of eICRs to continue without a reportability response, "
+        "set the REQUIRE_RR environment variable to 'true' "
+        "(default: 'true')."
+    )
+
+    read_source_data(event)
+    patched_logging.warning.assert_called_with(warning_message)
+    adf_client.pipelines.create_run.assert_called()
+
+
+@mock.patch("ReadSourceData.os")
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.AzureCloudContainerConnection")
+@mock.patch("ReadSourceData.get_reportability_response")
+@mock.patch("ReadSourceData.logging")
+def test_missing_rr_when_required(
     patched_logging,
     patched_get_reportability_response,
     patched_cloud_container_connection,
     patched_azure_cred_manager,
     patched_os,
 ):
-    patched_os.environ = {"WAIT_TIME": 0.1, "SLEEP_TIME": 0.05}
+    patched_os.environ = {"WAIT_TIME": 0.1, "SLEEP_TIME": 0.05, "REQUIRE_RR": "true"}
     patched_azure_cred_manager.return_value.get_credentials.return_value = (
         "some-credentials"
     )
@@ -227,15 +295,68 @@ def test_handle_ecr_with_no_rr(
     blob = mock.MagicMock()
     blob.name = "source-data/ecr/12345eICR.xml"
     blob.read.return_value = b"some-blob-contents"
+    wait_time = patched_os.environ["WAIT_TIME"]
+    error_message = (
+        "A reportability response could not be found for filename "
+        f"{blob.name} after searching for {wait_time} "
+        "seconds. The ingestion pipeline was not triggered. To search "
+        "for a longer period of time, increase the value of the WAIT_TIME "
+        "environment variable (default: 10 seconds). To allow processing of"
+        " eICRs to continue without a reportability response, set the "
+        "REQUIRE_RR environment variable to 'false' (default: 'true')."
+    )
+    with pytest.raises(Exception) as error:
+        read_source_data(event)
+        patched_logging.error.assert_called_with(error_message)
+        assert str(error) == (error_message)
 
-    warning_message = (
-        "The ingestion pipeline was not triggered for this eCR, "
-        "because a reportability response was not found for filename "
-        f"{blob.name}."
+
+@mock.patch("ReadSourceData.os")
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.AzureCloudContainerConnection")
+@mock.patch("ReadSourceData.get_reportability_response")
+@mock.patch("ReadSourceData.logging")
+def test_bad_value_for_required_RR(
+    patched_logging,
+    patched_get_reportability_response,
+    patched_cloud_container_connection,
+    patched_azure_cred_manager,
+    patched_os,
+):
+    patched_os.environ = {
+        "WAIT_TIME": 0.1,
+        "SLEEP_TIME": 0.05,
+        "REQUIRE_RR": "some-bad-value",
+    }
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
     )
 
-    read_source_data(event)
-    patched_logging.warning.assert_called_with(warning_message)
+    patched_cloud_container_connection.return_value.download_object.return_value = (
+        "some-message"
+    )
+
+    patched_get_reportability_response.return_value = ""
+
+    event = mock.MagicMock()
+    event.get_json.return_value = {
+        "url": (
+            "https://phdidevphi87b9f133.blob.core.windows.net/"
+            "source-data/ecr/12345eICR.xml"
+        )
+    }
+
+    blob = mock.MagicMock()
+    blob.name = "source-data/ecr/12345eICR.xml"
+    blob.read.return_value = b"some-blob-contents"
+    error_message = (
+        "The environment variable REQUIRE_RR must be set to either 'true' "
+        "or 'false'."
+    )
+    with pytest.raises(Exception) as error:
+        read_source_data(event)
+        patched_logging.error.assert_called_with(error_message)
+        assert str(error) == (error_message)
 
 
 def test_add_rr_to_ecr():

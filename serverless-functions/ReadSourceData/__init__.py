@@ -90,15 +90,49 @@ def main(event: func.EventGridEvent) -> None:
             )
 
         if reportability_response == "":
-            logging.warning(
-                "The ingestion pipeline was not triggered for this eCR, because a "
-                "reportability response was not found for filename "
-                f"{container_name}/{filename}."
-            )
-            return
+            # If no RR is found, check if we should continue processing the eICR and
+            # trigger the pipeline.
+            require_rr = os.environ.get("REQUIRE_RR", "true").lower()
+            if require_rr == "true":
+                require_rr = True
+            elif require_rr == "false":
+                require_rr = False
+            else:
+                error_message = (
+                    "The environment variable REQUIRE_RR must be set to either 'true' "
+                    "or 'false'."
+                )
+                logging.error(error_message)
+                raise Exception(error_message)
 
-        # Extract RR fields and put them in the ecr
-        ecr = rr_to_ecr(reportability_response, ecr)
+            if require_rr:
+                missing_rr_message = (
+                    "A reportability response could not be found for filename "
+                    f"{container_name}/{filename} after searching for {wait_time} "
+                    "seconds. The ingestion pipeline was not triggered. To search "
+                    "for a longer period of time, increase the value of the WAIT_TIME "
+                    "environment variable (default: 10 seconds). To allow processing of"
+                    " eICRs to continue without a reportability response, set the "
+                    "REQUIRE_RR environment variable to 'false' (default: 'true')."
+                )
+                logging.error(missing_rr_message)
+                raise Exception(missing_rr_message)
+            else:
+                missing_rr_message = (
+                    "A reportability response could not be found for filename "
+                    f"{container_name}/{filename} after searching for {wait_time} "
+                    "seconds. The ingestion pipeline was triggered for this eICR "
+                    "without inclusion of the reportability response. To search for a "
+                    "longer period of time, increase the value of the WAIT_TIME "
+                    "environment variable (default: 10 seconds). To prevent further "
+                    "processing of eICRs to continue without a reportability response, "
+                    "set the REQUIRE_RR environment variable to 'true' "
+                    "(default: 'true')."
+                )
+                logging.warning(missing_rr_message)
+        else:
+            # Extract RR fields and put them in the ecr
+            ecr = rr_to_ecr(reportability_response, ecr)
 
         messages = [ecr]
 
