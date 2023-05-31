@@ -139,3 +139,29 @@ Here we have several graphs showing whole pipeline passes, whole pipeline fails,
 specific steps (Convert to FHIR, Upload FHIR bundle, and Geocode). Using the filters above the graphs we can adjust date
 ranges to observe failure trends over time. This is useful for pinpointing a date when a bug was introduced etc. More info
 on creating and editing dashboards can be found [here](https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards).
+
+## Read Source Data
+Read source data is a serverless function that we use to manage files uploaded to trigger the pipeline.
+
+### How it works
+Read Source Data can be found in the `phdi-azure` repo at `phdi-azure/serverless-functions/ReadSourceData`. The main file to be concerned with is `__init__.py`. 
+
+This is a serverless function that is uploaded to azure and is triggered by event grid. It is currently configured so that when a file is uploaded to the container `source-data` it is run. Files are uploaded to various folders within `source-data`, currently supported are `elr, vxu, and ecr`. Depending on which folder (`elr, vxu, and ecr`) a file is uploaded, will determine the type of processing done on the file.
+
+### Troubleshooting
+1. The first thing to check is that a file was uploaded to the correct container. Files should be uploaded to `source-data/(elr|vxu|ecr)`. 
+
+Also verify that `ecr` files have their associated `RR` files. 
+
+2. Check logs
+
+Logs can be found by navigating to azure portal, select the resource group `phdi`. Then filter to `function app`. The app should be called `{environment}-read-source-data-{id}`.
+
+From the overview page, you can view aggregations of `readSourceData` runs and if they've failed or not.
+
+In the side bar, selecting `Functions` and then `ReadSourceData` and then `Monitor` will show you the various runs of the function.
+
+From here you can select various runs. If a run has failed, a red error message will be shown in the `Success` column. Selecting these runs will show you logs from that run. 
+
+Here you can review logs for specific error messages about runs, and address the problems from there. 
+
