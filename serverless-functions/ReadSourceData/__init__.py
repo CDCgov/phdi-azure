@@ -113,6 +113,7 @@ def main(event: func.EventGridEvent) -> None:
                     " eICRs to continue without a reportability response, set the "
                     "REQUIRE_RR environment variable to 'false' (default: 'true')."
                 )
+                logging.error(missing_rr_message)
                 raise Exception(missing_rr_message)
             else:
                 missing_rr_message = (

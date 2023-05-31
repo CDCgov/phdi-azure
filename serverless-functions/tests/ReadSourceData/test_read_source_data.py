@@ -243,7 +243,56 @@ def test_missing_rr_when_not_required(
     read_source_data(event)
     patched_logging.warning.assert_called_with(warning_message)
 
+@mock.patch("ReadSourceData.os")
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.AzureCloudContainerConnection")
+@mock.patch("ReadSourceData.get_reportability_response")
+@mock.patch("ReadSourceData.logging")
+def test_missing_rr_when_required(
+    patched_logging,
+    patched_get_reportability_response,
+    patched_cloud_container_connection,
+    patched_azure_cred_manager,
+    patched_os,
+):
+    patched_os.environ = {"WAIT_TIME": 0.1, "SLEEP_TIME": 0.05, "REQUIRE_RR": "true"}
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
 
+    patched_cloud_container_connection.return_value.download_object.return_value = (
+        "some-message"
+    )
+
+    patched_get_reportability_response.return_value = ""
+
+    event = mock.MagicMock()
+    event.get_json.return_value = {
+        "url": (
+            "https://phdidevphi87b9f133.blob.core.windows.net/"
+            "source-data/ecr/12345eICR.xml"
+        )
+    }
+
+    blob = mock.MagicMock()
+    blob.name = "source-data/ecr/12345eICR.xml"
+    blob.read.return_value = b"some-blob-contents"
+    wait_time = patched_os.environ["WAIT_TIME"]
+    error_message = (
+                    "A reportability response could not be found for filename "
+                    f"{blob.name} after searching for {wait_time} "  
+                    "seconds. The ingestion pipeline was not triggered. To search "
+                    "for a longer period of time, increase the value of the WAIT_TIME " 
+                    "environment variable (default: 10 seconds). To allow processing of"
+                    " eICRs to continue without a reportability response, set the "
+                    "REQUIRE_RR environment variable to 'false' (default: 'true')."
+                )
+    with pytest.raises(Exception) as error:
+        read_source_data(event)
+        patched_logging.error.assert_called_with(error_message)
+        assert str(error) == (error_message)
+
+    
 def test_add_rr_to_ecr():
     with open("./tests/ReadSourceData/CDA_RR.xml", "r") as f:
         rr = f.read()
