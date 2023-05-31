@@ -294,6 +294,54 @@ def test_missing_rr_when_required(
         assert str(error) == (error_message)
 
 
+@mock.patch("ReadSourceData.os")
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("ReadSourceData.AzureCloudContainerConnection")
+@mock.patch("ReadSourceData.get_reportability_response")
+@mock.patch("ReadSourceData.logging")
+def test_bad_value_for_required_RR(
+    patched_logging,
+    patched_get_reportability_response,
+    patched_cloud_container_connection,
+    patched_azure_cred_manager,
+    patched_os,
+):
+    patched_os.environ = {
+        "WAIT_TIME": 0.1,
+        "SLEEP_TIME": 0.05,
+        "REQUIRE_RR": "some-bad-value",
+    }
+    patched_azure_cred_manager.return_value.get_credentials.return_value = (
+        "some-credentials"
+    )
+
+    patched_cloud_container_connection.return_value.download_object.return_value = (
+        "some-message"
+    )
+
+    patched_get_reportability_response.return_value = ""
+
+    event = mock.MagicMock()
+    event.get_json.return_value = {
+        "url": (
+            "https://phdidevphi87b9f133.blob.core.windows.net/"
+            "source-data/ecr/12345eICR.xml"
+        )
+    }
+
+    blob = mock.MagicMock()
+    blob.name = "source-data/ecr/12345eICR.xml"
+    blob.read.return_value = b"some-blob-contents"
+    error_message = (
+        "The environment variable REQUIRE_RR must be set to either 'true' "
+        "or 'false'."
+    )
+    with pytest.raises(Exception) as error:
+        read_source_data(event)
+        patched_logging.error.assert_called_with(error_message)
+        assert str(error) == (error_message)
+
+
 def test_add_rr_to_ecr():
     with open("./tests/ReadSourceData/CDA_RR.xml", "r") as f:
         rr = f.read()

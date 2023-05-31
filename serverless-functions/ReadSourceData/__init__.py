@@ -98,10 +98,12 @@ def main(event: func.EventGridEvent) -> None:
             elif require_rr == "false":
                 require_rr = False
             else:
-                raise Exception(
+                error_message = (
                     "The environment variable REQUIRE_RR must be set to either 'true' "
                     "or 'false'."
                 )
+                logging.error(error_message)
+                raise Exception(error_message)
 
             if require_rr:
                 missing_rr_message = (
