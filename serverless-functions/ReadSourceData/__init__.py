@@ -130,7 +130,6 @@ def main(event: func.EventGridEvent) -> None:
                     "(default: 'true')."
                 )
                 logging.warning(missing_rr_message)
-            return
 
         # Extract RR fields and put them in the ecr
         ecr = rr_to_ecr(reportability_response, ecr)
