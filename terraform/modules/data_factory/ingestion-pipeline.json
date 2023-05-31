@@ -51,12 +51,12 @@
           },
           "ifFalseActivities": [
             {
-              "name": "Fail1",
+              "name": "message validation failure",
               "type": "Fail",
               "dependsOn": [],
               "userProperties": [],
               "typeProperties": {
-                "message": "Validation failure, logging to validation failure storage.",
+                "message": "@{activity('validate_message').output}",
                 "errorCode": "422"
               }
             }
