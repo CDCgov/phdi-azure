@@ -107,10 +107,10 @@ def main(event: func.EventGridEvent) -> None:
                 missing_rr_message = (
                     "A reportability response could not be found for filename "
                     f"{container_name}/{filename} after searching for {wait_time} "  
-                    "seconds. The ingestion pipeline was not triggered. To search"
-                    "for a longer period of time, increase the value of the WAIT_TIME" 
+                    "seconds. The ingestion pipeline was not triggered. To search "
+                    "for a longer period of time, increase the value of the WAIT_TIME " 
                     "environment variable (default: 10 seconds). To allow processing of"
-                    "eICRs to continue without a reportability response, set the "
+                    " eICRs to continue without a reportability response, set the "
                     "REQUIRE_RR environment variable to 'false' (default: 'true')."
                 )
                 raise Exception(missing_rr_message)

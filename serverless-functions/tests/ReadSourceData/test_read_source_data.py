@@ -198,14 +198,14 @@ def test_get_reportability_response_failure():
 @mock.patch("ReadSourceData.AzureCloudContainerConnection")
 @mock.patch("ReadSourceData.get_reportability_response")
 @mock.patch("ReadSourceData.logging")
-def test_handle_ecr_with_no_rr(
+def test_missing_rr_when_not_required(
     patched_logging,
     patched_get_reportability_response,
     patched_cloud_container_connection,
     patched_azure_cred_manager,
     patched_os,
 ):
-    patched_os.environ = {"WAIT_TIME": 0.1, "SLEEP_TIME": 0.05}
+    patched_os.environ = {"WAIT_TIME": 0.1, "SLEEP_TIME": 0.05, "REQUIRE_RR": "false"}
     patched_azure_cred_manager.return_value.get_credentials.return_value = (
         "some-credentials"
     )
@@ -227,12 +227,18 @@ def test_handle_ecr_with_no_rr(
     blob = mock.MagicMock()
     blob.name = "source-data/ecr/12345eICR.xml"
     blob.read.return_value = b"some-blob-contents"
-
+    wait_time = patched_os.environ["WAIT_TIME"]
     warning_message = (
-        "The ingestion pipeline was not triggered for this eCR, "
-        "because a reportability response was not found for filename "
-        f"{blob.name}."
-    )
+                    "A reportability response could not be found for filename "
+                    f"{blob.name} after searching for {wait_time} "  
+                    "seconds. The ingestion pipeline was triggered for this eICR "
+                    "without inclusion of the reportability response. To search for a "
+                    "longer period of time, increase the value of the WAIT_TIME "
+                    "environment variable (default: 10 seconds). To prevent further "
+                    "processing of eICRs to continue without a reportability response, "
+                    "set the REQUIRE_RR environment variable to 'true' " 
+                    "(default: 'true')."
+                )
 
     read_source_data(event)
     patched_logging.warning.assert_called_with(warning_message)
