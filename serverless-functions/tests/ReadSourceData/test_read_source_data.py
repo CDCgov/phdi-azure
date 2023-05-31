@@ -229,19 +229,20 @@ def test_missing_rr_when_not_required(
     blob.read.return_value = b"some-blob-contents"
     wait_time = patched_os.environ["WAIT_TIME"]
     warning_message = (
-                    "A reportability response could not be found for filename "
-                    f"{blob.name} after searching for {wait_time} "  
-                    "seconds. The ingestion pipeline was triggered for this eICR "
-                    "without inclusion of the reportability response. To search for a "
-                    "longer period of time, increase the value of the WAIT_TIME "
-                    "environment variable (default: 10 seconds). To prevent further "
-                    "processing of eICRs to continue without a reportability response, "
-                    "set the REQUIRE_RR environment variable to 'true' " 
-                    "(default: 'true')."
-                )
+        "A reportability response could not be found for filename "
+        f"{blob.name} after searching for {wait_time} "
+        "seconds. The ingestion pipeline was triggered for this eICR "
+        "without inclusion of the reportability response. To search for a "
+        "longer period of time, increase the value of the WAIT_TIME "
+        "environment variable (default: 10 seconds). To prevent further "
+        "processing of eICRs to continue without a reportability response, "
+        "set the REQUIRE_RR environment variable to 'true' "
+        "(default: 'true')."
+    )
 
     read_source_data(event)
     patched_logging.warning.assert_called_with(warning_message)
+
 
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.AzureCredentialManager")
@@ -279,20 +280,20 @@ def test_missing_rr_when_required(
     blob.read.return_value = b"some-blob-contents"
     wait_time = patched_os.environ["WAIT_TIME"]
     error_message = (
-                    "A reportability response could not be found for filename "
-                    f"{blob.name} after searching for {wait_time} "  
-                    "seconds. The ingestion pipeline was not triggered. To search "
-                    "for a longer period of time, increase the value of the WAIT_TIME " 
-                    "environment variable (default: 10 seconds). To allow processing of"
-                    " eICRs to continue without a reportability response, set the "
-                    "REQUIRE_RR environment variable to 'false' (default: 'true')."
-                )
+        "A reportability response could not be found for filename "
+        f"{blob.name} after searching for {wait_time} "
+        "seconds. The ingestion pipeline was not triggered. To search "
+        "for a longer period of time, increase the value of the WAIT_TIME "
+        "environment variable (default: 10 seconds). To allow processing of"
+        " eICRs to continue without a reportability response, set the "
+        "REQUIRE_RR environment variable to 'false' (default: 'true')."
+    )
     with pytest.raises(Exception) as error:
         read_source_data(event)
         patched_logging.error.assert_called_with(error_message)
         assert str(error) == (error_message)
 
-    
+
 def test_add_rr_to_ecr():
     with open("./tests/ReadSourceData/CDA_RR.xml", "r") as f:
         rr = f.read()
