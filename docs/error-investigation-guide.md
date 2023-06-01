@@ -164,7 +164,6 @@ The following is a table with all environment variables that affect readSourceDa
 | RESOURCE_GROUP_NAME                   | The name of the resource group in which to create the resources.                   |
 | FACTORY_NAME                          | The name of the PHDI ADF resource.                                                 |
 | PIPELINE_NAME                         | The name of the ingestion pipeline in ADF.                                         |
-                                                                |
 
 ### Troubleshooting
 1. The first thing to check is that a file was uploaded to the correct container. Files should be uploaded to `source-data/(elr|vxu|ecr)`. 
