@@ -141,7 +141,7 @@ ranges to observe failure trends over time. This is useful for pinpointing a dat
 on creating and editing dashboards can be found [here](https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards).
 
 ## Read Source Data
-Read source data is a serverless function that we use to manage files uploaded to trigger the pipeline.
+Read source data is a serverless function that we use to trigger the pipeline whenever new data is uploaded. It is responsible for making the starter kit event-driven, meaning that data is processed through the pipeline in real-time as it is received.
 
 ### How it works
 Read Source Data can be found in the `phdi-azure` repo at `phdi-azure/serverless-functions/ReadSourceData`. The main file to be concerned with is `__init__.py`. 
