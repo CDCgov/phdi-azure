@@ -147,7 +147,11 @@ Read source data is a serverless function that we use to trigger the pipeline wh
 The source code for Read Source Data can be found in the `phdi-azure` repo at `phdi-azure/serverless-functions/ReadSourceData`. The main file to be concerned with is `__init__.py`. 
 
 
-This is a serverless function that is uploaded to azure and is triggered by event grid. It is currently configured so that when a file is uploaded to the container `source-data` it is run. Files are uploaded to various folders within `source-data`, currently supported are `elr, vxu, and ecr`. Depending on which folder (`elr, vxu, and ecr`) a file is uploaded, will determine the type of processing done on the file.
+Azure Event Grid is used to trigger ReadSourceData whenever new files are created in the `source-data` container in the `phi` storage account. As currently configured, when a new file is created in any of the `elr, vxu, and ecr` directories within `source-data` ReadSourceData will read the contents and trigger the pipeline. In addition to trigger the pipeline ReadSourceData servers 3 important pre-processing functions.
+1. Based on the directory where new data is uploaded it determines the appropriate template for the FHIR converter to use when converting the incoming data to FHIR.
+2. If a batch Hl7v2 message is uploaded to `elr, or vxu` ReadSourceData will de-batch the message and trigger the pipeline once for each individual message.
+3. When an eICR file is uploaded to `ecr` ReadSourceData will attempt to find the corresponding reportability response (RR). If a one can be found the contents from the eICR and RR are merged into a single XML document and sent off to the pipeline for conversion to FHIR and downstream processing. By default if a corresponding RR cannot be found ReadSourceData will raise and exception and fail. However, if you would like to allow processing of eICRs without their RRs you may set the `REQUIRE_RR` environment variable to `false`.
+It is important to ensure that data is uploaded to the appropriate subdirectory to ensure that ReadSourceData handles the incoming messages appropriately and provides the correct information to the pipeline for appropriate conversion to FHIR. 
 
 ### Troubleshooting
 1. The first thing to check is that a file was uploaded to the correct container. Files should be uploaded to `source-data/(elr|vxu|ecr)`. 
