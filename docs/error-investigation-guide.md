@@ -144,7 +144,8 @@ on creating and editing dashboards can be found [here](https://learn.microsoft.c
 Read source data is a serverless function that we use to trigger the pipeline whenever new data is uploaded. It is responsible for making the starter kit event-driven, meaning that data is processed through the pipeline in real-time as it is received.
 
 ### How it works
-Read Source Data can be found in the `phdi-azure` repo at `phdi-azure/serverless-functions/ReadSourceData`. The main file to be concerned with is `__init__.py`. 
+The source code for Read Source Data can be found in the `phdi-azure` repo at `phdi-azure/serverless-functions/ReadSourceData`. The main file to be concerned with is `__init__.py`. 
+
 
 This is a serverless function that is uploaded to azure and is triggered by event grid. It is currently configured so that when a file is uploaded to the container `source-data` it is run. Files are uploaded to various folders within `source-data`, currently supported are `elr, vxu, and ecr`. Depending on which folder (`elr, vxu, and ecr`) a file is uploaded, will determine the type of processing done on the file.
 
