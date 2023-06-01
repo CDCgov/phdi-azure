@@ -125,15 +125,18 @@ When a new version of PHDI is availble, the version used by `phdi-azure` can be 
 - Log into Azure `az login`
  - This will open a web page allowing you to login.
 
-### Command line flags
-- `-g`,`--resourcegroup` Name of resource group
-- `-n`,`--name` Name of container app
-- `--offset` Time offset of the query range, in ##d##h format. default value: 6h
 ### Commands
 - Activity logs for the entire resource group
   - `az monitor activity-log list -g {resource group name} --offset {1h, 2d, etc}`
+  - Flags
+    - `-g`,`--resourcegroup` Name of resource group
+    - `--tail` Number of past logs to print. (0-300)
 - Logs for a specific app
   - `az containerapp logs show -g {resource group name} -n {name of container app} --offset {1h, 2d, etc}`
+  - Flags
+    - `-g`,`--resourcegroup` Name of resource group
+    - `-n`,`--name` Name of container app
+    - `--offset` Time offset of the query range, in ##d##h format. default value: 6h
 
 ### Resources
 - [Activity log](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/activity-log?tabs=powershell)
