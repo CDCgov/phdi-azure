@@ -140,18 +140,31 @@ specific steps (Convert to FHIR, Upload FHIR bundle, and Geocode). Using the fil
 ranges to observe failure trends over time. This is useful for pinpointing a date when a bug was introduced etc. More info
 on creating and editing dashboards can be found [here](https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboards).
 
-## Read Source Data
-Read source data is a serverless function that we use to trigger the pipeline whenever new data is uploaded. It is responsible for making the starter kit event-driven, meaning that data is processed through the pipeline in real-time as it is received.
+## readSourceData
+readSourceData is a serverless function that we use to trigger the pipeline whenever new data is uploaded. It is responsible for making the starter kit event-driven, meaning that data is processed through the pipeline in real-time as it is received.
 
 ### How it works
-The source code for Read Source Data can be found in the `phdi-azure` repo at `phdi-azure/serverless-functions/ReadSourceData`. The main file to be concerned with is `__init__.py`. 
+The source code for readSourceData can be found in the `phdi-azure` repo at `phdi-azure/serverless-functions/readSourceData`. The main file to be concerned with is `__init__.py`. 
 
 
-Azure Event Grid is used to trigger ReadSourceData whenever new files are created in the `source-data` container in the `phi` storage account. As currently configured, when a new file is created in any of the `elr, vxu, and ecr` directories within `source-data` ReadSourceData will read the contents and trigger the pipeline. In addition to trigger the pipeline ReadSourceData servers 3 important pre-processing functions.
+Azure Event Grid is used to trigger readSourceData whenever new files are created in the `source-data` container in the `phi` storage account. As currently configured, when a new file is created in any of the `elr, vxu, and ecr` directories within `source-data` readSourceData will read the contents and trigger the pipeline. In addition to trigger the pipeline readSourceData servers 3 important pre-processing functions.
 1. Based on the directory where new data is uploaded it determines the appropriate template for the FHIR converter to use when converting the incoming data to FHIR.
-2. If a batch Hl7v2 message is uploaded to `elr, or vxu` ReadSourceData will de-batch the message and trigger the pipeline once for each individual message.
-3. When an eICR file is uploaded to `ecr` ReadSourceData will attempt to find the corresponding reportability response (RR). If a one can be found the contents from the eICR and RR are merged into a single XML document and sent off to the pipeline for conversion to FHIR and downstream processing. By default if a corresponding RR cannot be found ReadSourceData will raise and exception and fail. However, if you would like to allow processing of eICRs without their RRs you may set the `REQUIRE_RR` environment variable to `false`.
-It is important to ensure that data is uploaded to the appropriate subdirectory to ensure that ReadSourceData handles the incoming messages appropriately and provides the correct information to the pipeline for appropriate conversion to FHIR. 
+2. If a batch Hl7v2 message is uploaded to `elr, or vxu` readSourceData will de-batch the message and trigger the pipeline once for each individual message.
+3. When an eICR file is uploaded to `ecr` readSourceData will attempt to find the corresponding reportability response (RR). If a one can be found the contents from the eICR and RR are merged into a single XML document and sent off to the pipeline for conversion to FHIR and downstream processing. By default if a corresponding RR cannot be found readSourceData will raise and exception and fail. However, if you would like to allow processing of eICRs without their RRs you may set the `REQUIRE_RR` environment variable to `false`.
+It is important to ensure that data is uploaded to the appropriate subdirectory to ensure that readSourceData handles the incoming messages appropriately and provides the correct information to the pipeline for appropriate conversion to FHIR.
+
+### Environment Variables
+The following is a table with all environment variables that affect readSourceData and what each one does in this context.
+
+| Name                                  | Description                                                                        |
+|---------------------------------------|------------------------------------------------------------------------------------|
+| WAIT_TIME                             | How long the app will poll for ecr related RR data. Default: 10 seconds            |
+| SLEEP_TIME                            | The time the RR function will sleep before checking for RR data. Default: 1 second |
+| AZURE_SUBSCRIPTION_ID                 | The Azure subscription ID.                                                         |
+| RESOURCE_GROUP_NAME                   | The name of the resource group in which to create the resources.                   |
+| FACTORY_NAME                          | The name of the PHDI ADF resource.                                                 |
+| PIPELINE_NAME                         | The name of the ingestion pipeline in ADF.                                         |
+                                                                |
 
 ### Troubleshooting
 1. The first thing to check is that a file was uploaded to the correct container. Files should be uploaded to `source-data/(elr|vxu|ecr)`. 
@@ -160,11 +173,11 @@ Also verify that `ecr` files have their associated `RR` files.
 
 2. Check logs
 
-Logs can be found by navigating to azure portal, select the resource group `phdi`. Then filter to `function app`. The app should be called `{environment}-read-source-data-{id}`.
+Logs can be found by navigating to azure portal, select the resource group where your app is deployed. Then filter to `function app`. The app should be called `{environment}-read-source-data-{id}`.
 
 From the overview page, you can view aggregations of `readSourceData` runs and if they've failed or not.
 
-In the side bar, selecting `Functions` and then `ReadSourceData` and then `Monitor` will show you the various runs of the function.
+In the side bar, selecting `Functions` and then `readSourceData` and then `Monitor` will show you the various runs of the function.
 
 From here you can select various runs. If a run has failed, a red error message will be shown in the `Success` column. Selecting these runs will show you logs from that run. 
 
