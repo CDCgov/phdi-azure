@@ -1,5 +1,14 @@
 # DevOps
 
+This doc offers detailed information about the features of the starter kit related to DevOps.
+
+- [Continuous Integration and Continuous Deployment (CI/CD)](#continuous-integration-and-continuous-deployment-cicd)
+  - [Continuous Integration (CI)](#continuous-integration-ci)
+  - [Continuous Deployment (CD)](#continuous-deployment-cd)
+  - [Table of CI/CD Pipelines](#table-of-cicd-pipelines)
+- [Environments](#environments)
+- [New Releases](#new-releases)
+- [Tearing Down An Environment](#tearing-down-an-environment)
 ## Continuous Integration and Continuous Deployment (CI/CD)
 
 We have implemented CI/CD pipelines with [GitHub Actions](https://docs.github.com/en/actions) orchestrated by [GitHub Workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) found in the `phdi-azure/.github/` directory.
@@ -18,6 +27,17 @@ After merging, an end-to-end test is run against the `main` branch. This test ca
 ### Continuous Deployment (CD)
 
 Our deployment pipeline is defined in the YAML file `phdi-azure/.github/workflows/deployment.yaml`. Generally, this pipeline runs every time code is merged into the `main` branch of the repository, deploying to the `dev` environment. The pipeline can also be triggered manually to deploy to other environments, and a successful deployment to a development environment could be required before deploying to a production environment. When the pipeline runs, Terraform looks for differences between the infrastructure that is specified on a given branch of this repository and what is currently deployed to a given environment in the Azure resource group. If differences are detected, they are resolved by making changes to Azure resources to bring them alignment with the repository. In order to grant the GitHub repository permission to make these changes, follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions) to authenticate it with Azure.
+
+### Environments
+
+The deployment pipeline is capable of deploying the starter kit to any number of environments. This allows users to flexibly configure however many distinct instances of the starter kit they need (dev, test, staging, prod, etc.). Currently all environments are deployed within a single Azure resource group. The environment name is included in the names of individual resources to distinguish which environment they belong to. If the starter kit is initially deployed by following the [Implementation Guide](implementation-guide.md), as recommended, it will only have a `dev` environment. To create additional environments follow the steps below:
+1. Navigate to `Settings` on your version of the `phdi-azure` repository in GitHub.
+2. Click on `Environments` in the side bar.
+3. Click on `New Environment` in the top right.
+![make-new-env-1](./images/make-new-env-1.png)
+4. Enter the name of your new environment and click `Configure environment`.
+![make-new-env-2](./images/make-new-env-2.png)
+
 
 ### Table of CI/CD Pipelines
 
