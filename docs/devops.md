@@ -11,7 +11,6 @@ This doc offers detailed information about the features of the starter kit relat
 - [Repository Secrets](#repository-secrets)
   - [Table of Repository Secrets](#table-of-repository-secrets)
   - [Creating and Editing Secrets](#creating-and-editing-secrets)
-- [New Releases](#new-releases)
 - [Tearing Down An Environment](#tearing-down-an-environment)
 - [Upgrading the PHDI Version](#upgrading-the-phdi-version)
   - [Upgrade Steps](#upgrade-steps)
@@ -100,13 +99,6 @@ For security purposes GitHub does not allow the values of secrets to be read onc
 ![edit-secrets](./images/edit-secrets.png)
 
 From here new secrets can be created by clicking on the green `New repository secret` button in the top right. Values for existing secrets may be edited by clicking on the edit icons the right of individual secrets.
-
-## New Releases
-It's important to keep your repository up-to-date with version changes from the main `phdi` repository. Even if you're not using new features of the services, staying up to date is a security best practice.
-
-To update, visit the [main phdi repository](https://github.com/CDCgov/phdi) and copy the [latest version number](https://github.com/CDCgov/phdi/releases). Update the container image tag in [`main.tf`](https://github.com/CDCgov/phdi-azure/blob/main/terraform/modules/shared/main.tf#L201-L201).
-
-We recommend doing this update at least monthly, and deploying every time an update is made.
 
 ## Tearing Down an Environment
 
