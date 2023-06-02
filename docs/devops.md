@@ -7,8 +7,11 @@ This doc offers detailed information about the features of the starter kit relat
   - [Continuous Deployment (CD)](#continuous-deployment-cd)
   - [Table of CI/CD Pipelines](#table-of-cicd-pipelines)
 - [Environments](#environments)
+- [Repository Secrets](#repository-secrets)
+- [Deployments](#deployments)
 - [New Releases](#new-releases)
 - [Tearing Down An Environment](#tearing-down-an-environment)
+
 ## Continuous Integration and Continuous Deployment (CI/CD)
 
 We have implemented CI/CD pipelines with [GitHub Actions](https://docs.github.com/en/actions) orchestrated by [GitHub Workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) found in the `phdi-azure/.github/` directory.
@@ -28,7 +31,19 @@ After merging, an end-to-end test is run against the `main` branch. This test ca
 
 Our deployment pipeline is defined in the YAML file `phdi-azure/.github/workflows/deployment.yaml`. Generally, this pipeline runs every time code is merged into the `main` branch of the repository, deploying to the `dev` environment. The pipeline can also be triggered manually to deploy to other environments, and a successful deployment to a development environment could be required before deploying to a production environment. When the pipeline runs, Terraform looks for differences between the infrastructure that is specified on a given branch of this repository and what is currently deployed to a given environment in the Azure resource group. If differences are detected, they are resolved by making changes to Azure resources to bring them alignment with the repository. In order to grant the GitHub repository permission to make these changes, follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#github-actions) to authenticate it with Azure.
 
-### Environments
+### Table of CI/CD Pipelines
+
+| Pipeline Name   | Purpose                                                                                                                  | Trigger                                                                         | Notes                                                                                                                       |
+|-----------------|--------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| testPython      | Run unit and linting tests on all Python source code in the repository, primarily the `read-source-data` Azure Function. | All pull request actions, pushes to `main`, and manually.                       | Unit test with Pytest. Linting with Black and Flake8.                                                                       |
+| terraformChecks | Ensure all Terraform code is valid and properly linted.                                                                  | All pull request actions if they involve changes in `terraform/`, and manually. | `terraform fmt` for linting and `terraform validate` for validation.                                                        |
+| deployment      | Deploy the starter kit from a branch to a given environment.                                                             | Pushes to `main` and manually.                                                  | Pushes to `main` trigger a deploy to the `dev` environment. This behavior can be changed as desired.                        |
+| terraformSetup  | Create a storage account for storing the state of every environment deployed in the Azure resource group.                | Manual                                                                          | This workflow should only be run once for initial setup.                                                                    |
+| end-to-end      | Run end-to-end tests to ensure the pipeline functions as expected within Azure.                                          | Pushes to `main`, or manually.                                                  | Verify the pipeline records the correct number of successes and failures and that data can be queried from the FHIR server. |
+| destroy         | Destroy an environment within Azure.                                                                                     | Manual                                                                          | Destroys a given Terraform environment.                                                                                     |
+
+
+## Environments
 
 The deployment pipeline is capable of deploying the starter kit to any number of environments. This allows users to flexibly configure however many distinct instances of the starter kit they need (dev, test, staging, prod, etc.). Currently all environments are deployed within a single Azure resource group. The environment name is included in the names of individual resources to distinguish which environment they belong to. If the starter kit is initially deployed by following the [Implementation Guide](implementation-guide.md), as recommended, it will only have a `dev` environment. To create additional environments follow the steps below:
 1. Navigate to `Settings` on your version of the `phdi-azure` repository in GitHub.
@@ -40,7 +55,7 @@ The deployment pipeline is capable of deploying the starter kit to any number of
 
 After following these steps to initialize a new environment see the [Deployments](#deployments) sections below for guidance on how to deploy the starter kit to it.
 
-### Deployments
+## Deployments
 
 As mentioned in [Continuous Deployment (CD)](#continuous-deployment-cd) the deployment process for the starter kit is completely automated. By default any time code is merged into the `main` branch of the repository a deployment to the `dev` environment is automatically triggered. Deployments may also be triggered manually from any branch to any environment. This allows for easy deployment to development environments to during initial development and testing of new features. Additionally, after successful testing of `main` in a development environment, changes can easily be promoted to higher level environments (e.g. testing, production). To manually trigger a deployment follow the steps below.
 
@@ -53,16 +68,16 @@ As mentioned in [Continuous Deployment (CD)](#continuous-deployment-cd) the depl
 6. Click the green `Run workflow` button.
 ![trigger-deployment-2](./images/trigger-deployment-2.png)
 
-### Table of CI/CD Pipelines
+## Repository Secrets
 
-| Pipeline Name   | Purpose                                                                                                                  | Trigger                                                                         | Notes                                                                                                                       |
-|-----------------|--------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| testPython      | Run unit and linting tests on all Python source code in the repository, primarily the `read-source-data` Azure Function. | All pull request actions, pushes to `main`, and manually.                       | Unit test with Pytest. Linting with Black and Flake8.                                                                       |
-| terraformChecks | Ensure all Terraform code is valid and properly linted.                                                                  | All pull request actions if they involve changes in `terraform/`, and manually. | `terraform fmt` for linting and `terraform validate` for validation.                                                        |
-| deployment      | Deploy the starter kit from a branch to a given environment.                                                             | Pushes to `main` and manually.                                                  | Pushes to `main` trigger a deploy to the `dev` environment. This behavior can be changed as desired.                        |
-| terraformSetup  | Create a storage account for storing the state of every environment deployed in the Azure resource group.                | Manual                                                                          | This workflow should only be run once for initial setup.                                                                    |
-| end-to-end      | Run end-to-end tests to ensure the pipeline functions as expected within Azure.                                          | Pushes to `main`, or manually.                                                  | Verify the pipeline records the correct number of successes and failures and that data can be queried from the FHIR server. |
-| destroy         | Destroy an environment within Azure.                                                                                     | Manual                                                                          | Destroys a given Terraform environment.                                                                                     |
+The quick start script is run to initially deploy the starter kit several GitHub repository secrets are created. The secrets are effectively environment variables used across all starter kit environment that provide important configuration. The table below describes all of these secrets.
+
+### Table of Repository Secrets
+| Name | Purpose |
+|------|---------|
+| CLIENT_ID | The ID of the Azure service principle used to run deployments to Azure. |
+
+
 
 ## New Releases
 It's important to keep your repository up-to-date with version changes from the main `phdi` repository. Even if you're not using new features of the services, staying up to date is a security best practice.
