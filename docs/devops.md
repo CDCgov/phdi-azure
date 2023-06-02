@@ -76,6 +76,14 @@ The quick start script is run to initially deploy the starter kit several GitHub
 | Name | Purpose |
 |------|---------|
 | CLIENT_ID | The ID of the Azure service principle used to run deployments to Azure. |
+| LOCATION | The Azure [location](https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies) defining where Azure resource are created. |
+| OBJECT_ID | The object ID of the Azure service principle use to run deployments to Azure. |
+| RESOURCE_GROUP_NAME | The name of the Azure resource group where all starter kit Azure resources are created. |
+| SMARTY_AUTH_ID | The authentication ID for the Smarty geocoding provider. The quick start script prompts users to provide this value. |
+| SMARTY_AUTH_TOKEN | The authentication token for the Smarty geocoding provider. The quick start script prompts users to provide this value. |
+| SMARTY_LICENSE_TYPE | The type of license being used for the Smarty geocoding service. The quick start script prompts users to provide this value. |
+| SUBSCRIPTION_ID | The ID of the Azure subscription where the starter kit is deployed. |
+| TENANT_ID | The ID of the the Azure tenant where the starter kit is deployed. |
 
 
 
