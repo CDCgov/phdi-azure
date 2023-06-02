@@ -7,8 +7,10 @@ This doc offers detailed information about the features of the starter kit relat
   - [Continuous Deployment (CD)](#continuous-deployment-cd)
   - [Table of CI/CD Pipelines](#table-of-cicd-pipelines)
 - [Environments](#environments)
-- [Repository Secrets](#repository-secrets)
 - [Deployments](#deployments)
+- [Repository Secrets](#repository-secrets)
+  - [Table of Repository Secrets](#table-of-repository-secrets)
+  - [Creating and Editing Secrets](#creating-and-editing-secrets)
 - [New Releases](#new-releases)
 - [Tearing Down An Environment](#tearing-down-an-environment)
 
@@ -70,7 +72,7 @@ As mentioned in [Continuous Deployment (CD)](#continuous-deployment-cd) the depl
 
 ## Repository Secrets
 
-The quick start script is run to initially deploy the starter kit several GitHub repository secrets are created. The secrets are effectively environment variables used across all starter kit environment that provide important configuration. The table below describes all of these secrets.
+The quick start script is run to initially deploy the starter kit several GitHub repository secrets are created. The secrets are effectively environment variables used across all starter kit environment that provide important configuration. Some of these secrets like `SMARTY_AUTH_ID`, `SMARTY_AUTH_TOKEN` and `SMARTY_LICENSE_TYPE` are read by Terraform and set as environment variables on the Azure Container Applications during deployments. The table below describes all of these secrets. 
 
 ### Table of Repository Secrets
 | Name | Purpose |
@@ -85,7 +87,17 @@ The quick start script is run to initially deploy the starter kit several GitHub
 | SUBSCRIPTION_ID | The ID of the Azure subscription where the starter kit is deployed. |
 | TENANT_ID | The ID of the the Azure tenant where the starter kit is deployed. |
 
+### Creating and Editing Secrets
 
+For security purposes GitHub does not allow the values of secrets to be read once they have been set. However, new values can be provided by those with administrator access to the repository. To see which secrets exists in the starter kit repository, create new secrets, or edit the values of existing secrets follow these steps:
+
+1. Navigate to `Settings` on your version of the `phdi-azure` repository in GitHub.
+2. Click on `Secrets and variables` in the side bar on the left.
+3. Select `Actions`.
+
+![edit-secrets](./images/edit-secrets.png)
+
+From here new secrets can be created by clicking on the green `New repository secret` button in the top right. Values for existing secrets may be edited by clicking on the edit icons the right of individual secrets.
 
 ## New Releases
 It's important to keep your repository up-to-date with version changes from the main `phdi` repository. Even if you're not using new features of the services, staying up to date is a security best practice.
