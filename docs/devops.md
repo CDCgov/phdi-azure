@@ -13,6 +13,8 @@ This doc offers detailed information about the features of the starter kit relat
   - [Creating and Editing Secrets](#creating-and-editing-secrets)
 - [New Releases](#new-releases)
 - [Tearing Down An Environment](#tearing-down-an-environment)
+- [Upgrading the PHDI Version](#upgrading-the-phdi-version)
+  - [Upgrade Steps](#upgrade-steps)
 
 ## Continuous Integration and Continuous Deployment (CI/CD)
 
@@ -148,13 +150,15 @@ Once you have followed all the steps outlined above, you have successfully torn 
 
 Please note that tearing down an environment permanently removes all associated resources, and this action cannot be undone. Ensure that you have backed up any important data or configurations before proceeding with the teardown process.
 
-## Maintenance
+## Upgrading the PHDI Version
 
-### Upgrading the PHDI Version
+It's important to keep your repository up-to-date with version changes from the main `phdi` repository. Even if you're not using new features of the services, staying up to date is a security best practice. We recommend doing this update at least monthly, and deploying every time an update is made.
 
-When a new version of PHDI is availble, the version used by `phdi-azure` can be updated by doing the following steps.
+To update, visit the [main phdi repository](https://github.com/CDCgov/phdi) and copy the [latest version number](https://github.com/CDCgov/phdi/releases). Update the container image tag in [`main.tf`](https://github.com/CDCgov/phdi-azure/blob/main/terraform/modules/shared/main.tf#L201-L201).
 
-#### Upgrade Steps
+When a new version of PHDI is available, the version used by `phdi-azure` can be updated by following the process outlined below.
+
+### Upgrade Steps
 
 1. Create a new branch for the upgrade.
 
