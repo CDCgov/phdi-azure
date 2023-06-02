@@ -51,7 +51,7 @@
           },
           "ifFalseActivities": [
             {
-              "name": "message validation failure",
+              "name": "message_validation_failure",
               "type": "Fail",
               "dependsOn": [],
               "userProperties": [],
