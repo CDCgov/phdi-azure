@@ -38,6 +38,12 @@ The deployment pipeline is capable of deploying the starter kit to any number of
 4. Enter the name of your new environment and click `Configure environment`.
 ![make-new-env-2](./images/make-new-env-2.png)
 
+After following these steps to initialize a new environment see the [Deployments](#deployments) sections below for guidance on how to deploy the starter kit to it.
+
+### Deployments
+
+
+
 
 ### Table of CI/CD Pipelines
 
