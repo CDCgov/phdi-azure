@@ -118,28 +118,3 @@ When a new version of PHDI is availble, the version used by `phdi-azure` can be 
 7. Open a new PR for your branch to `main`.
 
 8. After merging your PR, `dev` will be automatically deployed from the `main` branch. Other environments can be deployed with the updated `main` via github actions.
-
-## CLI Logs
-### Prerequisites
-- In order to view logs with the CLI, you will need to have the [azure CLI installed](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) on your system. 
-- Log into Azure `az login`
- - This will open a web page allowing you to login.
-
-### Commands
-- Activity logs for the entire resource group
-  - `az monitor activity-log list -g {resource group name} --offset {1h, 2d, etc}`
-  - Flags
-    - `-g`,`--resourcegroup` Name of resource group
-    - `--tail` Number of past logs to print. (0-300)
-- Logs for a specific app container, revision, or replica. Note: this only works on running containers. Running the command will spin up a new container.
-  - `az containerapp logs show -g {resource group name} -n {name of container app} --offset {1h, 2d, etc}`
-  - Flags
-    - `-g`,`--resourcegroup` Name of resource group
-    - `-n`,`--name` Name of container app
-    - `--offset` Time offset of the query range, in ##d##h format. default value: 6h
-    - `--follow` Follow logs in real time. Accepts `true, false`
-
-### Resources
-- [Activity log](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/activity-log?tabs=powershell)
-- [Conatiner app logs](https://learn.microsoft.com/en-us/cli/azure/containerapp/logs?view=azure-cli-latest#az-containerapp-logs-show)
-
