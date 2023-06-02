@@ -42,8 +42,16 @@ After following these steps to initialize a new environment see the [Deployments
 
 ### Deployments
 
+As mentioned in [Continuous Deployment (CD)](#continuous-deployment-cd) the deployment process for the starter kit is completely automated. By default any time code is merged into the `main` branch of the repository a deployment to the `dev` environment is automatically triggered. Deployments may also be triggered manually from any branch to any environment. This allows for easy deployment to development environments to during initial development and testing of new features. Additionally, after successful testing of `main` in a development environment, changes can easily be promoted to higher level environments (e.g. testing, production). To manually trigger a deployment follow the steps below.
 
-
+1. Navigate to `Actions` on your version of the `phdi-azure` repository in GitHub.
+2. Select the `Deployment` workflow from the menu of the left.
+![trigger-deployment-1](./images/trigger-deployment-1.png)
+3. Open the `Run workflow` menu in the top right.
+4. Select the branch you would like to deploy from.
+5. Select the environment you would like to deploy to.
+6. Click the green `Run workflow` button.
+![trigger-deployment-2](./images/trigger-deployment-2.png)
 
 ### Table of CI/CD Pipelines
 
