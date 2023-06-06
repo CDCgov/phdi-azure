@@ -14,7 +14,7 @@ permissions:
   packages: write
 jobs:
   destroy:
-    name: Destroy environment
+    name: Destroy (${{github.event.inputs.environment}}) environment
     runs-on: ubuntu-latest
     environment: main
     defaults:
@@ -45,6 +45,7 @@ jobs:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           SMARTY_AUTH_ID: ${{ secrets.SMARTY_AUTH_ID }}
           SMARTY_AUTH_TOKEN: ${{ secrets.SMARTY_AUTH_TOKEN }}
+          SMARTY_LICENSE_TYPE: ${{ secrets.SMARTY_LICENSE_TYPE }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           OBJECT_ID: ${{ secrets.OBJECT_ID }}
           GHCR_USERNAME: ${{ github.actor }}

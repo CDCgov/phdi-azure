@@ -17,7 +17,7 @@ permissions:
   packages: write
 jobs:
   terraform:
-    name: Run Terraform (${{github.event.inputs.environment}})"
+    name: Run Terraform (${{github.event.inputs.environment}})
     runs-on: ubuntu-latest
     environment: main
     defaults:
