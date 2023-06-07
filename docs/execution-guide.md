@@ -71,7 +71,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 <details>
     <summary><h4>Part 3: View pipeline run in Azure Data Factory</h4></summary>
 
-Congrats! You've run a VXU message through the pipeline. Now you can view the pipeline run and each of its activities to confirm everything ran successfully without errors.
+Congrats! You've run a VXU message through the pipeline. Now you can view the pipeline run to confirm that it ran successfully without errors.
 1. To check that the pipeline has executed, go to the search bar in the header, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
@@ -81,7 +81,7 @@ Congrats! You've run a VXU message through the pipeline. Now you can view the pi
      > **Note**: this pipeline may still have an `In progress` status. You can click the 'refresh' button to view the pipeline run in its most updated status.
 ![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png) 
 
-1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline and a table with information about each activity. We should now see that the ingestion pipeline has processed one message successfully.![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
+1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline and a table with information about each activity. We should now see by the green checkmarks and `succeeded` statuses next to each activity that the ingestion pipeline has processed one message successfully.![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
 
      > **Note**: You can click the 'refresh' button to view the pipeline run activities in their most recent status. 
 </details>
