@@ -14,7 +14,7 @@ If your organization has not yet implemented the pipeline, please follow the ste
 If you do not have sufficient access, please contact your organization's Azure administrator.
 
 
-## How to Use: Run an Hl7v2 vaccination message through the pipeline 
+## How to Use: Run a Hl7v2 vaccination message through the pipeline
 ### Example: VXU Sample Message 
 <details>
     <summary>View example of unsoliciated vaccination record update (VXU) message</summary>
@@ -111,7 +111,8 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 1. Finally, copy and paste the below command into the terminal and hit enter. This pretty-prints the JSON response showing that John Doe was found in the VXU message. After you're done reviewing the response, press `q` on your keyboard to exit out of the jq tool and return to the terminal. <pre>echo $RESPONSE | jq | less</pre> 
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 </details>    
-    
+
+## How to Use: Run a different VXU message with expected errors through the pipeline and troubleshoot
 ### Run another VXU message through the pipeline
 <details>
     <summary>View and run examples of other VXU messages</summary>
