@@ -116,9 +116,6 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 
 ## Additional Examples: Run batch VXU messaages and VXU messages with expected errors and troubleshoot
 ### Run another VXU message through the pipeline
-<details>
-    <summary>View and run examples of other VXU messages</summary>
-
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what a pipeline run with an expected error or a batch message will look like. 
 1. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat the steps in the ["Upload and run data through the pipeline" section](#upload-and-run-data-through-the-pipeline)! 
 1. Then repeat the steps in the ["Viewing the pipeline run" section](#viewing-the-pipeline-run).
@@ -131,12 +128,9 @@ The table below describes the contents and expected ingestion pipeline behavior 
 |VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
 |VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
 |VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
-</details>
     
-### Viewing pipeline failures in Azure Data Factory
-
 <details>
-    <summary>Troubleshooting steps to view pipeline failures in Azure Data Factory</summary>
+    <summary><h4>Troubleshooting steps to view pipeline failures in Azure Data Factory</h4></summary>
 
 When a pipeline run ends in failure, Azure Data Factory makes it easy to see the error that caused the failure.
 
