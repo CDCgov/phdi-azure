@@ -15,6 +15,12 @@ If you do not have sufficient access, please contact your organization's Azure a
 
 
 ## How to Use: Run a Hl7v2 vaccination message through the pipeline
+This guide is divided into 4 parts:
+1. Accessing your Azure account 
+2. Uploading and running data through the pipline
+3. Monitoring pipeline activities in Azure Data Factory
+4. Viewing cleaning and enriched data in the FHIR server
+
 ### View example of VXU Sample Message 
 <details>
     <summary>Example of unsoliciated vaccination record update (VXU) message with dirty data</summary>
@@ -37,7 +43,7 @@ PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M1
 If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice.
 </details>
     
-### Step 1: Access your Azure Portal account 
+### Part 1: Access your Azure Portal account 
 <details>
     <summary>Steps to access Azure account and resource group</summary>
     
@@ -46,7 +52,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 </details>   
 
-### Step 2: Upload and run data through the pipeline
+### Part 2: Upload and run data through the pipeline
 <details>
     <summary>Steps to access storage account and run VXU data through the pipeline in Azure Portal</summary>
 
@@ -64,7 +70,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
      > **Note**: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
 </details>
     
-### Step 3: Viewing the pipeline run
+### Part 3: Viewing the pipeline run
 
 <details>
     <summary>Steps to view pipeline run and activities in Azure Data Factory Studio</summary>
@@ -83,7 +89,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
      > **Note**: You can click the 'refresh' button to view the pipeline run activities in their most recent status. 
 </details>
     
-### Step 4: View data in the FHIR server
+### Part 4: View data in the FHIR server
 <details>
     <summary>Steps to view cleaned and enriched data in the FHIR server using Cloud Shell</summary>
 
@@ -112,7 +118,7 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 </details>    
 
-## Try running batch VXU messaages and VXU messages with expected errors to practice troubleshooting
+## Additional Examples: Run batch VXU messaages and VXU messages with expected errors and troubleshoot
 ### Run another VXU message through the pipeline
 <details>
     <summary>View and run examples of other VXU messages</summary>
