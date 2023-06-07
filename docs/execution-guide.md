@@ -60,7 +60,7 @@ This how-to guide is divided into 3 sections:
 
 ### Viewing the pipeline run
 
-1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the Azure Portal, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
+1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the header, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
 1. In the left sidebar, click on the the 'Monitor' tab (radar icon) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
@@ -70,6 +70,8 @@ This how-to guide is divided into 3 sections:
 ![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png) 
 
 1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline and a table with information about each activity. We should now see that the ingestion pipeline has processed one message successfully.![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
+
+     > **Note**: You can click the 'refresh' button to view the pipeline run activities in their most recent status. 
 
 ### View data in the FHIR server
 1. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another tab and go to [https://shell.azure.com](https://shell.azure.com).
