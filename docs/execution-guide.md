@@ -114,7 +114,7 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
 </details>    
 
-### Additional Examples: Run batch VXU messaages and VXU messages with expected errors and troubleshoot
+## Additional Examples: Run batch VXU messaages and VXU messages with expected errors and troubleshoot
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what a pipeline run with an expected error or a batch message will look like. If the pipeline run has an error,then following the troubleshooting steps below.
 
 | Test File | File Contents | Expected Outcome |
