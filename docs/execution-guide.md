@@ -23,7 +23,7 @@ If you do not have sufficient access, please contact your organization's Azure a
 4. Viewing cleaned and enriched data in the FHIR server
 
 <details>
-    <summary><h4>View example of unsoliciated vaccination record update (VXU) message with dirty data</h4></summary>
+    <summary><h4>View sample Hl7v2 vaccination message with dirty data</h4></summary>
     
 The `sample-data/` directory contains dummy unsoliciated vaccination record update (VXU) messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The Patient Identifier Segment (PID) of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
