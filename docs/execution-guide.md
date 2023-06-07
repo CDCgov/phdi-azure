@@ -16,7 +16,7 @@ If you do not have sufficient access, please contact your organization's Azure a
 
 ## How to Use: Run an Hl7v2 vaccination message through the pipeline
 
-<b>This guide is divided into 4 parts:</b>
+<b>This how to guide is divided into 4 parts:</b>
 1. Accessing your Azure account 
 2. Uploading and running data through the pipline
 3. Monitoring pipeline activities in Azure Data Factory
