@@ -40,10 +40,8 @@ This how-to guide is divided into 3 sections:
 3. Viewing data in the FHIR server
 
 ### Access your Azure account 
-> **Note**: If this is your first time running data through the pipeline, we recommend having this guide and the Azure portal open side-by-side.  
-
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
-1. Make sure you're logged into the account that has access to the Azure resource group you have used so far. To check, go to the "Azure services" heading and click on `Resource groups`.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
+1. Go to the "Azure services" heading and click on `Resource groups`.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
 1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 
 ### Upload and run data through the pipeline
