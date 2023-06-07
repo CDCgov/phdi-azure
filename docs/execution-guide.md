@@ -47,11 +47,11 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 </details>   
 
 ### Upload and run data through the pipeline
-> **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
-
 <details>
     <summary>Steps to access storage account and run VXU data through the pipeline in Azure Portal</summary>
 
+> **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
+    
 1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click into the `Filter for any field...` search bar and type in `Storage account`.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click into the `PHI` storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
 1. Go to the left sidebar and under the `Data storage` header, click `Containers`. ![azure-containers](./images/azure-containers.png)
