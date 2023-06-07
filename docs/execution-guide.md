@@ -71,7 +71,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 <details>
     <summary><h4>Part 3: View pipeline run in Azure Data Factory</h4></summary>
 
-Congrats! You've run a VXU message through the pipeline. Now you can view the pipeline run and each activity within the pipeline run to confirmed everything ran without errors.
+Congrats! You've run a VXU message through the pipeline. Now you can view the pipeline run and each of its activities to confirm everything ran successfully without errors.
 1. To check that the pipeline has executed, go to the search bar in the header, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
