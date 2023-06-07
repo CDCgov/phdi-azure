@@ -63,8 +63,8 @@ This how-to guide is divided into 3 sections:
 1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the header, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
-1. In the left sidebar, click on the the 'Monitor' tab (radar icon) to view the 'Pipeline runs'.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
-1. Click into your pipeline run, which will have the form `phdi-{environment}-ingestion`. If you see multiple pipline runs with this name, select the  pipeline with the most recent run start time.
+1. In the left sidebar, click on the the `Monitor` tab (radar icon) to view the pipeline runs.![azure-pipeline-select-monitor](./images/azure-pipeline-select-monitor.png)
+1. Click into your pipeline run, which will have the form `phdi-{environment}-ingestion`. If you see multiple pipline runs with this name, select the pipeline with the most recent run start time.
 
      > **Note**: this pipeline may still have an `In progress` status. You can click the 'refresh' button to view the pipeline run in its most updated status.
 ![azure-ingestion-single-execution](./images/azure-ingestion-single-execution.png) 
