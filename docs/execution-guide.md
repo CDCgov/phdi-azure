@@ -135,7 +135,7 @@ The table below describes the contents and expected ingestion pipeline behavior 
 
 When a pipeline run ends in failure, Azure Data Factory makes it easy to see the error that caused the failure.
 
-1. On the `Monitor` tab in Azure Data Factory Studio (the page we opened in part 3 of the ["How to Guide"](https://github.com/CDCgov/phdi-azure/blob/execution-guide-edits/docs/execution-guide.md#part-3-view-pipeline-run-in-azure-data-factory)), select the pipeline run that failed.
+1. On the `Monitor` tab in Azure Data Factory Studio (see part 3 of the ["How to Guide"]([https://github.com/CDCgov/phdi-azure/blob/execution-guide-edits/docs/execution-guide.md#part-3-view-pipeline-run-in-azure-data-factory](https://github.com/CDCgov/phdi-azure/blob/execution-guide-edits/docs/execution-guide.md#part-3-view-pipeline-run-in-azure-data-factory))), select the pipeline run that failed.
 ![azure-data-factory-failure](./images/azure-data-factory-failure.png)
 1. In this view, click the button next to "Failed" on any steps that failed in the "Activity Runs" section to view the relevant error.
 ![azure-data-factory-error-button](./images/azure-data-factory-error-button.png)
