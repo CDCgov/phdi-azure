@@ -119,10 +119,12 @@ For other FHIR API calls that you can make in the Cloud Shell, see documentation
 
 ## Additional Examples: Run single and batch VXU messages with expected errors and troubleshoot
 
+Detailed troubleshooting instructions can be found in the [Pipeline Troubleshooting Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/pipeline-troubleshooting-guide.md)
+
 <details>
     <summary><h4>View table containing expected outcomes of each sample VXU message</h4></summary>
     
-The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline to see what a pipeline run with an expected error or a batch message will look like. 
+The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline to see what a pipeline run with an expected error or a batch message will look like. Then use the [Pipeline Troubleshooting Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/pipeline-troubleshooting-guide.md) to troubleshoot any errors.
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
@@ -131,20 +133,4 @@ The table below describes the contents and expected ingestion pipeline behavior 
 |VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
 |VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
 |VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
-</details>
-    
-<details>
-    <summary><h4>Troubleshoot pipeline failures in Azure Data Factory</h4></summary>
-
-When a pipeline run ends in failure, Azure Data Factory makes it easy to see the error that caused the failure.
-
-1. Go the `Monitor` tab in Azure Data Factory Studio (see [Part 3: View pipeline run in Azure Data Factory"](https://github.com/CDCgov/phdi-azure/blob/execution-guide-edits/docs/execution-guide.md#part-3-view-pipeline-run-in-azure-data-factory)) and select the pipeline run that failed.
-![azure-data-factory-failure](./images/azure-data-factory-failure.png)
-1. In this view, click the button next to "Failed" on any steps that failed in the "Activity Runs" section to view the relevant error.
-![azure-data-factory-error-button](./images/azure-data-factory-error-button.png)
-1. The error message should provide the information you need to resolve the issue before reuploading the data for another pipeline run.
-![azure-data-factory-error-details](./images/azure-data-factory-error-details.png)
-
-For more detailed troubleshooting instructions, go to the [Pipeline Troubleshooting Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/pipeline-troubleshooting-guide.md)
- 
 </details>
