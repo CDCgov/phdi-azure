@@ -117,7 +117,7 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 ## Additional Examples: Run single and batch VXU messages with expected errors and troubleshoot
 
 <details>
-    <summary><h4>Table containing expected outcomes of each sample VXU message</h4></summary>
+    <summary><h4>View table containing expected outcomes of each sample VXU message</h4></summary>
     
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline to see what a pipeline run with an expected error or a batch message will look like. 
 
@@ -130,9 +130,8 @@ The table below describes the contents and expected ingestion pipeline behavior 
 |VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
 </details>
     
-If the pipeline run has an error, then follow the troubleshooting steps in the section below.
 <details>
-    <summary><h4>Troubleshooting steps to view pipeline failures in Azure Data Factory</h4></summary>
+    <summary><h4>Troubleshoot pipeline failures in Azure Data Factory</h4></summary>
 
 When a pipeline run ends in failure, Azure Data Factory makes it easy to see the error that caused the failure.
 
