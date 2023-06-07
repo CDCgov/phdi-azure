@@ -16,12 +16,11 @@ If you do not have sufficient access, please contact your organization's Azure a
 
 ## How to Use: Run Hl7v2 vaccination messages through the pipeline
 
-<b>This how to guide is divided into 5 parts:</b>
+<b>This how to guide is divided into 4 parts:</b>
 1. Accessing your Azure account 
 2. Uploading and running data through the pipline
 3. Monitoring pipeline activities in Azure Data Factory
 4. Viewing cleaned and enriched data in the FHIR server
-5. Run VXU messages with expected errors using parts 1-4 above and troubleshoot
 
 <details>
     <summary><h4>View sample Hl7v2 vaccination message with dirty data</h4></summary>
@@ -119,7 +118,7 @@ For other FHIR API calls that you can make in the Cloud Shell, see documentation
 </details>    
 
 <details>
-    <summary><h4>Additional Examples: Run single and batch VXU messages with expected errors and troubleshoot</h4></summary>
+    <summary><h3>Additional Examples: Run single and batch VXU messages with expected errors and troubleshoot</h3></summary>
 
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline to see what a pipeline run with an expected error or a batch message will look like. 
 
