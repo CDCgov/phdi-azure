@@ -42,18 +42,16 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 3. Monitoring pipeline activities in Azure Data Factory
 4. Viewing cleaning and enriched data in the FHIR server
 
-### Part 1: Access your Azure Portal account 
 <details>
-    <summary>Steps to access Azure account and resource group</summary>
+    <summary>Part 1: Access your Azure Portal account </summary>
     
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
 1. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
 1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 </details>   
 
-### Part 2: Upload and run data through the pipeline
 <details>
-    <summary>Steps to access storage account and run VXU data through the pipeline in Azure Portal</summary>
+    <summary>Part 2: Upload and run data through the pipeline</summary>
 
 > **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
     
@@ -69,10 +67,8 @@ If you would like, feel free to confirm that this is the case by inspecting the 
      > **Note**: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
 </details>
     
-### Part 3: Viewing the pipeline run
-
 <details>
-    <summary>Steps to view pipeline run and activities in Azure Data Factory Studio</summary>
+    <summary><h2>Part 3: View pipeline run in Azure Data Factory</h2></summary>
 
 1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the header, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
@@ -88,9 +84,8 @@ If you would like, feel free to confirm that this is the case by inspecting the 
      > **Note**: You can click the 'refresh' button to view the pipeline run activities in their most recent status. 
 </details>
     
-### Part 4: View data in the FHIR server
 <details>
-    <summary>Steps to view cleaned and enriched data in the FHIR server using Cloud Shell</summary>
+    <summary><b>Part 4: View cleaned and enriched data in the FHIR server using Cloud Shell</b></summary>
 
 1. Open another tab and go to [https://shell.azure.com](https://shell.azure.com).
      > **Instructions for first time users**: 
