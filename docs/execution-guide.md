@@ -16,6 +16,9 @@ If you do not have sufficient access, please contact your organization's Azure a
 
 ## How to Use: Run an Hl7v2 vaccination message through the pipeline 
 ### Example: VXU Sample Message 
+<details>
+    <summary>View example of unsoliciated vaccination record update (VXU) message</summary>
+    
 The `sample-data/` directory contains dummy unsoliciated vaccination record update (VXU) messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The Patient Identifier Segment (PID) of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
 2. The patient's phone number is not in a standard format.
@@ -32,7 +35,8 @@ PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M1
 ```
 
 If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice.
-
+</details>
+    
 ### Access your Azure Portal account 
 <details>
     <summary>Steps to access Azure account and resource group</summary>
@@ -109,6 +113,9 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 </details>    
     
 ### Run another VXU message through the pipeline
+<details>
+    <summary>View and run examples of other VXU messages</summary>
+
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what a pipeline run with an expected error or a batch message will look like. 
 1. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat the steps in the ["Upload and run data through the pipeline" section](#upload-and-run-data-through-the-pipeline)! 
 1. Then repeat the steps in the ["Viewing the pipeline run" section](#viewing-the-pipeline-run).
@@ -121,8 +128,12 @@ The table below describes the contents and expected ingestion pipeline behavior 
 |VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
 |VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
 |VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
-
+</details>
+    
 ### Viewing pipeline failures in ADF
+
+<details>
+    <summary>Steps to view pipeline failures in Azure Data Factory</summary>
 
 When a pipeline run ends in failure, Azure Data Factory makes it easy to see the error that caused the failure.
 
@@ -132,3 +143,4 @@ When a pipeline run ends in failure, Azure Data Factory makes it easy to see the
 ![azure-data-factory-error-button](./images/azure-data-factory-error-button.png)
 1. The error message should provide the information you need to resolve the issue before reuploading the data for another pipeline run.
 ![azure-data-factory-error-details](./images/azure-data-factory-error-details.png)
+</details>
