@@ -117,8 +117,7 @@ For other FHIR API calls that you can make in the Cloud Shell, see documentation
     
 </details>    
 
-<details>
-    <summary><h3>Additional Examples: Run single and batch VXU messages with expected errors and troubleshoot</h3></summary>
+## Additional Examples: Run single and batch VXU messages with expected errors and troubleshoot
 
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline to see what a pipeline run with an expected error or a batch message will look like. 
 
@@ -131,7 +130,6 @@ Detailed troubleshooting instructions can be found in the [Pipeline Troubleshoot
 |VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
 |VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
 |VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
-</details>
 
 ## Additional Resources
 [FHIR API Calls](https://github.com/CDCgov/phdi-azure/blob/main/docs/basic-guide-to-fhir-api-calls.md)
