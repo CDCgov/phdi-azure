@@ -15,9 +15,8 @@ If you do not have sufficient access, please contact your organization's Azure a
 
 
 ## How to Use: Run a Hl7v2 vaccination message through the pipeline
-### View example of VXU Sample Message 
 <details>
-    <summary>Example of unsoliciated vaccination record update (VXU) message with dirty data</summary>
+    <summary>View example of unsoliciated vaccination record update (VXU) message with dirty data</summary>
     
 The `sample-data/` directory contains dummy unsoliciated vaccination record update (VXU) messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The Patient Identifier Segment (PID) of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
