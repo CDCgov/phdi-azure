@@ -118,9 +118,10 @@ For other FHIR API calls that you can make in the Cloud Shell, see documentation
 </details>    
 
 ## Additional Examples: Run single and batch VXU messages with expected errors and troubleshoot
+
+The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline to see what a pipeline run with an expected error or a batch message will look like. 
+
 Detailed troubleshooting instructions can be found in the [Pipeline Troubleshooting Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/pipeline-troubleshooting-guide.md)
-    
-The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline to see what a pipeline run with an expected error or a batch message will look like. Then use the [Pipeline Troubleshooting Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/pipeline-troubleshooting-guide.md) to troubleshoot any errors.
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
