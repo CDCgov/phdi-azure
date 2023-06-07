@@ -41,14 +41,14 @@ This how-to guide is divided into 3 sections:
 
 ### Access your Azure account 
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
-1. Go to the "Azure services" heading and click on `Resource groups`.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
+1. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
 1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 
 ### Upload and run data through the pipeline
 > **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
 
-1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click into the `Filter for any field...` search box and type in `Storage account`.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
-1. Click into the PHI storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
+1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click into the `Filter for any field...` search bar and type in `Storage account`.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
+1. Click into the `PHI` storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
 1. Go to the left sidebar and under the `Data storage` header, click `Containers`. ![azure-containers](./images/azure-containers.png)
 1. Click into the `source-data` container.![azure-select-source-data-container](./images/azure-select-source-data-container.png)
 1. Then click into the `vxu` folder.![azure-select-vxu-folder](./images/azure-select-vxu-folder.png)
