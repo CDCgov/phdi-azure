@@ -14,7 +14,7 @@ If your organization has not yet implemented the pipeline, please follow the ste
 If you do not have sufficient access, please contact your organization's Azure administrator.
 
 
-## How to Use: Run an Hl7v2 vaccination message through the pipeline
+## How to Use: Run a successful Hl7v2 vaccination message through the pipeline
 
 <b>This how to guide is divided into 4 parts:</b>
 1. Accessing your Azure account 
