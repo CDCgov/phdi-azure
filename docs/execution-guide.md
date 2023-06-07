@@ -16,7 +16,7 @@ If you do not have sufficient access, please contact your organization's Azure a
 
 ## How to Use: Run a Hl7v2 vaccination message through the pipeline
 <details>
-    <summary><b>View example of unsoliciated vaccination record update (VXU) message with dirty data</b></summary>
+    <summary><h4>View example of unsoliciated vaccination record update (VXU) message with dirty data</h4></summary>
     
 The `sample-data/` directory contains dummy unsoliciated vaccination record update (VXU) messages that can be used to test the success and failure modes of the ingestion pipeline. To start, let's use `VXU_single_messy_demo.hl7` file that has a single VXU message. The Patient Identifier Segment (PID) of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
@@ -43,7 +43,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 4. Viewing cleaning and enriched data in the FHIR server
 
 <details>
-    <summary>Part 1: Access your Azure Portal account </summary>
+    <summary><h4>Part 1: Access your Azure Portal account</h4></summary>
     
 1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
 1. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
@@ -51,7 +51,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 </details>   
 
 <details>
-    <summary>Part 2: Upload and run data through the pipeline</summary>
+    <summary><h4>Part 2: Upload and run data through the pipeline</h4></summary>
 
 > **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
     
@@ -68,7 +68,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 </details>
     
 <details>
-    <summary><h2>Part 3: View pipeline run in Azure Data Factory</h2></summary>
+    <summary><h4>Part 3: View pipeline run in Azure Data Factory</h4></summary>
 
 1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the header, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
@@ -85,7 +85,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 </details>
     
 <details>
-    <summary><b>Part 4: View cleaned and enriched data in the FHIR server using Cloud Shell</b></summary>
+    <summary><h4>Part 4: View cleaned and enriched data in the FHIR server using Cloud Shell</h4></summary>
 
 1. Open another tab and go to [https://shell.azure.com](https://shell.azure.com).
      > **Instructions for first time users**: 
