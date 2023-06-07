@@ -37,7 +37,7 @@ PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M1
 If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice.
 </details>
     
-### Access your Azure Portal account 
+### Step 1: Access your Azure Portal account 
 <details>
     <summary>Steps to access Azure account and resource group</summary>
     
@@ -46,7 +46,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 </details>   
 
-### Upload and run data through the pipeline
+### Step 2: Upload and run data through the pipeline
 <details>
     <summary>Steps to access storage account and run VXU data through the pipeline in Azure Portal</summary>
 
@@ -64,7 +64,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
      > **Note**: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
 </details>
     
-### Viewing the pipeline run
+### Step 3: Viewing the pipeline run
 
 <details>
     <summary>Steps to view pipeline run and activities in Azure Data Factory Studio</summary>
@@ -83,7 +83,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
      > **Note**: You can click the 'refresh' button to view the pipeline run activities in their most recent status. 
 </details>
     
-### View data in the FHIR server
+### Step 4: View data in the FHIR server
 <details>
     <summary>Steps to view cleaned and enriched data in the FHIR server using Cloud Shell</summary>
 
