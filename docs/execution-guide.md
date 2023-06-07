@@ -21,6 +21,7 @@ If you do not have sufficient access, please contact your organization's Azure a
 2. Uploading and running data through the pipline
 3. Monitoring pipeline activities in Azure Data Factory
 4. Viewing cleaned and enriched data in the FHIR server
+5. Run VXU messages with expected errors using parts 1-4 above and troubleshoot
 
 <details>
     <summary><h4>View sample Hl7v2 vaccination message with dirty data</h4></summary>
