@@ -40,7 +40,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 1. Accessing your Azure account 
 2. Uploading and running data through the pipline
 3. Monitoring pipeline activities in Azure Data Factory
-4. Viewing cleaning and enriched data in the FHIR server
+4. Viewing cleaned and enriched data in the FHIR server
 
 <details>
     <summary><h4>Part 1: Access your Azure Portal account</h4></summary>
