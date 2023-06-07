@@ -117,16 +117,7 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 ## Additional Examples: Run batch VXU messaages and VXU messages with expected errors and troubleshoot
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline to see what a pipeline run with an expected error or a batch message will look like. 
 
-If the pipeline run has an error, then follow the troubleshooting steps below.
-
-| Test File | File Contents | Expected Outcome |
-| --------- | --------------| ---------------- |
-|VXU-V04-01_success_single.hl7| A single valid VXU message.|The ingestion pipeline will process a single message and upload it to the FHIR server.|
-|VXU-V04-02_failedConversion.hl7| A single invalid VXU message that cannot be converted to FHIR.| The ingestion process will fail during the initial conversion to FHIR step. Information about the failure is written to `failed_fhir_conversion\vxu\`.
-|VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
-|VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
-|VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
-    
+If the pipeline run has an error, then follow the troubleshooting steps in the section below.
 <details>
     <summary><h4>Troubleshooting steps to view pipeline failures in Azure Data Factory</h4></summary>
 
@@ -139,3 +130,13 @@ When a pipeline run ends in failure, Azure Data Factory makes it easy to see the
 1. The error message should provide the information you need to resolve the issue before reuploading the data for another pipeline run.
 ![azure-data-factory-error-details](./images/azure-data-factory-error-details.png)
 </details>
+
+
+| Test File | File Contents | Expected Outcome |
+| --------- | --------------| ---------------- |
+|VXU-V04-01_success_single.hl7| A single valid VXU message.|The ingestion pipeline will process a single message and upload it to the FHIR server.|
+|VXU-V04-02_failedConversion.hl7| A single invalid VXU message that cannot be converted to FHIR.| The ingestion process will fail during the initial conversion to FHIR step. Information about the failure is written to `failed_fhir_conversion\vxu\`.
+|VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
+|VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
+|VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
+
