@@ -115,10 +115,7 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 </details>    
 
 ### Additional Examples: Run batch VXU messaages and VXU messages with expected errors and troubleshoot
-The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what a pipeline run with an expected error or a batch message will look like. 
-1. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat the steps in the ["Upload and run data through the pipeline" section](#upload-and-run-data-through-the-pipeline)! 
-1. Then repeat the steps in the ["Viewing the pipeline run" section](#viewing-the-pipeline-run).
-1. If your pipeline run contains a failure, follow the steps in the ["Viewing pipeline failures in ADF" section](#viewing-pipeline-failures-in-adf) to see why the failure occurred.
+The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what a pipeline run with an expected error or a batch message will look like. If the pipeline run has an error,then following the troubleshooting steps below.
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
