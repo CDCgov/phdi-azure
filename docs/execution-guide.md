@@ -33,23 +33,20 @@ PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M1
 
 If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice.
 
-### Overview
-This how-to guide is divided into 3 sections:
-1. Accessing your Azure account
-2. Running data through the pipeline
-3. Viewing data in the FHIR server
-
-### Access your Azure account 
+### Access your Azure Portal account 
 <details>
-    <summary>Access your Azure account</summary>
+    <summary>Steps to access Azure account and resource group</summary>
     
     1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
-    1. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
-    1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
+    2. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
+    3. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 </details>   
 
 ### Upload and run data through the pipeline
 > **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
+
+<details>
+    <summary>Steps to access Azure storage account and run VXU data through the pipeline </summary>
 
 1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click into the `Filter for any field...` search bar and type in `Storage account`.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click into the `PHI` storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
@@ -61,7 +58,8 @@ This how-to guide is divided into 3 sections:
 1. Navigate to the folder on your computer where you've downloaded or forked the `sample-data/` folder and select the `VXU-V04-01_success_single.hl7` file. Click `Open`, then click `Upload` to upload this file into the `source-data/vxu/` directory of your PHI bucket.![azure-upload-file](./images/azure-upload-file.png)    
 
      > **Note**: because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.
-
+</details>
+    
 ### Viewing the pipeline run
 
 1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the header, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
