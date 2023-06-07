@@ -40,9 +40,13 @@ This how-to guide is divided into 3 sections:
 3. Viewing data in the FHIR server
 
 ### Access your Azure account 
-1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
-1. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
-1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
+<details>
+    <summary>Access your Azure account</summary>
+    
+    1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
+    1. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
+    1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
+</details>   
 
 ### Upload and run data through the pipeline
 > **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
