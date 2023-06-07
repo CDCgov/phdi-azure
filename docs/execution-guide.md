@@ -133,6 +133,6 @@ Detailed troubleshooting instructions can be found in the [Pipeline Troubleshoot
 |VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully processes the data and uploads to the FHIR server. On the other execution it fails.|
 </details>
 
-### Additional Resources
+## Additional Resources
 [FHIR API Calls](https://github.com/CDCgov/phdi-azure/blob/main/docs/basic-guide-to-fhir-api-calls.md)
 [Pipeline Troubleshooting Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/pipeline-troubleshooting-guide.md)
