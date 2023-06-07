@@ -112,6 +112,9 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 1. Copy and paste the below command into the terminal and hit enter. This uses the bearer token from above to authenticate and search for the "John Doe" user: <pre>RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://$FHIR_SERVER.azurehealthcareapis.com/Patient?family=DOE&given=JOHN")</pre>
 1. Finally, copy and paste the below command into the terminal and hit enter. This pretty-prints the JSON response showing that John Doe was found in the VXU message. After you're done reviewing the response, press `q` on your keyboard to exit out of the jq tool and return to the terminal. <pre>echo $RESPONSE | jq | less</pre> 
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
+
+For other FHIR API calls that you can make in the Cloud Shell, see documentation on [FHIR API Calls](https://github.com/CDCgov/phdi-azure/blob/main/docs/basic-guide-to-fhir-api-calls.md)
+    
 </details>    
 
 ## Additional Examples: Run single and batch VXU messages with expected errors and troubleshoot
@@ -141,4 +144,7 @@ When a pipeline run ends in failure, Azure Data Factory makes it easy to see the
 ![azure-data-factory-error-button](./images/azure-data-factory-error-button.png)
 1. The error message should provide the information you need to resolve the issue before reuploading the data for another pipeline run.
 ![azure-data-factory-error-details](./images/azure-data-factory-error-details.png)
+
+For more detailed troubleshooting instructions, go to the [Pipeline Troubleshooting Guide](https://github.com/CDCgov/phdi-azure/blob/main/docs/pipeline-troubleshooting-guide.md)
+ 
 </details>
