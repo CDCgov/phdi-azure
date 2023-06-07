@@ -36,7 +36,7 @@ PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M1
 If you would like, feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice.
 </details>
     
-This guide is divided into 4 parts:
+<b>This guide is divided into 4 parts:</b>
 1. Accessing your Azure account 
 2. Uploading and running data through the pipline
 3. Monitoring pipeline activities in Azure Data Factory
