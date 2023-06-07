@@ -37,16 +37,16 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 <details>
     <summary>Steps to access Azure account and resource group</summary>
     
-    1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
-    2. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
-    3. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
+1. Open [https://portal.azure.com/](https://portal.azure.com/) in your browser and log in with your username and password.![azure-portal](./images/azure-portal.png)
+1. Go to the search bar in the header and search for `Resource groups`. Click on `Resource groups` in the search dropdown.![azure-portal-resource-groups](./images/azure-portal-resource-groups.png) 
+1. Click into the appropriate Azure resource group.![azure-portal-resource-group](./images/azure-portal-resource-group.png) 
 </details>   
 
 ### Upload and run data through the pipeline
 > **Note**: If you prefer, you can upload data using the [Azure Storage Explorer Tool](https://azure.microsoft.com/en-us/products/storage/storage-explorer/). We don't provide instructions for using that tool here, but the broad strokes will be the same - you'll need to upload `sample-data/VXU-V04-01_success_single.hl7` to the `source-data` container in your PHI storage account.
 
 <details>
-    <summary>Steps to access Azure storage account and run VXU data through the pipeline </summary>
+    <summary>Steps to access storage account and run VXU data through the pipeline in Azure Portal</summary>
 
 1. Within your `Resource group`, filter down to view only `Storage account` type resources. To do so, click into the `Filter for any field...` search bar and type in `Storage account`.![azure-filter-storage-accounts](./images/azure-filter-storage-accounts.png)
 1. Click into the `PHI` storage account, which is where all Protected Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi{environment}phi{clientId}`, e.g., `phdidevphi1667849158`.![azure-select-phi-bucket](./images/azure-select-phi-bucket.png)
@@ -62,6 +62,9 @@ If you would like, feel free to confirm that this is the case by inspecting the 
     
 ### Viewing the pipeline run
 
+<details>
+    <summary>Steps to view pipeline run and activities in Azure Data Factory Studio</summary>
+
 1. Congrats! You've run a VXU message through the pipeline. To check that the pipeline has executed, go to the search bar in the header, and search for `Data factories`. Select the `Data factories` option in the search dropdown.![azure-search-data-factories](./images/azure-search-data-factories.png)
 1. Click into your data factory, which will have the form `phdi-{environment}-data-factory-{client-id}`.![azure-select-ingestion-pipeline](./images/azure-select-ingestion-pipeline.png)
 1. Launch the Data Factory Studio by clicking the blue button that says `Launch studio`![azure-data-factory-launch-studio](./images/azure-data-factory-launch-studio.png)
@@ -74,9 +77,13 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 1. After clicking into your pipeline run, you should see a diagram showing the steps of the pipeline and a table with information about each activity. We should now see that the ingestion pipeline has processed one message successfully.![azure-pipeline-diagram](./images/azure-pipeline-diagram.png)
 
      > **Note**: You can click the 'refresh' button to view the pipeline run activities in their most recent status. 
-
+</details>
+    
 ### View data in the FHIR server
-1. Now we can view the cleaned and enriched data in the FHIR server using Cloud Shell. To do so, open another tab and go to [https://shell.azure.com](https://shell.azure.com).
+<details>
+    <summary>Steps to view cleaned and enriched data in the FHIR server using Cloud Shell</summary>
+
+1. Open another tab and go to [https://shell.azure.com](https://shell.azure.com).
      > **Instructions for first time users**: 
      
      > A pop up will appear asking you to select either the Bash or PowerShell option. Select the `Bash` option.![azure-cloud-select-bash](./images/azure-cloud-select-bash.png) 
@@ -99,7 +106,8 @@ token=$(az account get-access-token --resource=https://$FHIR_SERVER.azurehealthc
 1. Copy and paste the below command into the terminal and hit enter. This uses the bearer token from above to authenticate and search for the "John Doe" user: <pre>RESPONSE=$(curl -X GET --header "Authorization: Bearer $token" "https://$FHIR_SERVER.azurehealthcareapis.com/Patient?family=DOE&given=JOHN")</pre>
 1. Finally, copy and paste the below command into the terminal and hit enter. This pretty-prints the JSON response showing that John Doe was found in the VXU message. After you're done reviewing the response, press `q` on your keyboard to exit out of the jq tool and return to the terminal. <pre>echo $RESPONSE | jq | less</pre> 
 ![azure-fhir-api-response](./images/azure-fhir-api-response.png)
-
+</details>    
+    
 ### Run another VXU message through the pipeline
 The table below describes the contents and expected ingestion pipeline behavior for each of the other files included in `sample-data/`. Choose another message to run through the pipeline below to see what a pipeline run with an expected error or a batch message will look like. 
 1. Return to [https://portal.azure.com/](https://portal.azure.com/) and repeat the steps in the ["Upload and run data through the pipeline" section](#upload-and-run-data-through-the-pipeline)! 
