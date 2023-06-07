@@ -81,7 +81,7 @@ This how-to guide is divided into 3 sections:
      
      > A second pop up will appear stating "You have no storage mounted". Click `Create storage`.![azure-cloud-create-storage](./images/azure-cloud-create-storage.png)
 1. Confirm that you're in Bash mode by checking that the dropdown in the top left under the `Microsoft Azure` header has `Bash` selected.![azure-cloud-shell](./images/azure-cloud-shell.png)
-1. Then in the terminal, type the command `az login` and press enter.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)
+1. Then in the terminal, type the command `az login` and press enter on your keyboard.![azure-cloud-shell-login](./images/azure-cloud-shell-login.png)
 1. Copy the authentication code provided.![azure-cloud-copy-code](./images/azure-cloud-copy-code.png)
 1. Click the device login link, and paste in the authentication code.![azure-device-login](./images/azure-device-login.png)
 1. Follow the prompts to complete login. After logging in, you should see a pop up that says "You have signed in...".![azure-cloud-logged-in](./images/azure-cloud-logged-in.png)
