@@ -238,7 +238,6 @@ data "docker_registry_image" "ghcr_data" {
   for_each = local.images
   name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.6"
 }
-ghcr.io/cdcgov/phdi/ingestion:update-variable-names
 
 resource "docker_image" "ghcr_image" {
   for_each      = local.images
