@@ -184,4 +184,24 @@ Now that you have connected Terraform to Azure, you can start using Terraform co
 
 Refer to the official [Terraform documentation](https://www.terraform.io/docs/cli/commands/index.html) for more details on using Terraform commands.
 
+### Testing Local Container Changes in Azure
+In order to test local changes to PHDI containers in the Azure test environments, several steps must be done. You must build your local containers, tag them, publish to Azure container repo, and link your app to the new container.
+
+- Open the PHDI project files
+- Push your changes to a branch of PHDI
+- For the container you wish to publish `/containers`, navigate to `requirements.txt` in the root of the container.
+- Modify the `phdi` line as follows `phdi @ git+https://github.com/CDCgov/phdi@{NAME OF BRANCH}`
+- From the command line, navigate to your container's root `phdi/containers/{container name}`
+- Login to azure `az login`
+- Login to ACR `az acr login --name {name of azure container registry}`
+- Build the docker image `docker build . -t {name of container}:{tag name} --no-cache`
+- Tag the image `docker tag {container name}:{tag name} {name of azure container registry}.azurecr.io/phdi/{container name}:{tag name}`
+- Push the build to azure `docker push {name of azure container registry}.azurecr.io/phdi/{container name}:{tag name}`
+- Navigate to the azure portal
+- Select the name space resource
+- Open the container app for the local changes you are testing
+- Select `Containers` from the left side menu
+- Select `Edit and deploy` from the top
+- Select the image from the list and click `Edit`
+- Select the image tag that you made above, click `save`, then `create`
 
