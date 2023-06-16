@@ -342,15 +342,15 @@ resource "azurerm_container_app" "container_app" {
       memory = "1Gi"
 
       env {
-        name  = "AUTH_ID"
+        name  = "SMARTY_AUTH_ID"
         value = var.smarty_auth_id
       }
       env {
-        name  = "AUTH_TOKEN"
+        name  = "SMARTY_AUTH_TOKEN"
         value = var.smarty_auth_token
       }
       env {
-        name  = "LICENSE_TYPE"
+        name  = "SMARTY_LICENSE_TYPE"
         value = var.smarty_license_type
       }
       env {
