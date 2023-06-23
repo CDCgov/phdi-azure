@@ -1,5 +1,20 @@
 # DevOps
 
+This doc offers detailed information about the features of the starter kit related to DevOps.
+
+- [Continuous Integration and Continuous Deployment (CI/CD)](#continuous-integration-and-continuous-deployment-cicd)
+  - [Continuous Integration (CI)](#continuous-integration-ci)
+  - [Continuous Deployment (CD)](#continuous-deployment-cd)
+  - [Table of CI/CD Pipelines](#table-of-cicd-pipelines)
+- [Environments](#environments)
+- [Deployments](#deployments)
+- [Repository Secrets](#repository-secrets)
+  - [Table of Repository Secrets](#table-of-repository-secrets)
+  - [Creating and Editing Secrets](#creating-and-editing-secrets)
+- [Tearing Down An Environment](#tearing-down-an-environment)
+- [Upgrading the PHDI Version](#upgrading-the-phdi-version)
+  - [Upgrade Steps](#upgrade-steps)
+
 ## Continuous Integration and Continuous Deployment (CI/CD)
 
 We have implemented CI/CD pipelines with [GitHub Actions](https://docs.github.com/en/actions) orchestrated by [GitHub Workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) found in the `phdi-azure/.github/` directory.
@@ -30,12 +45,60 @@ Our deployment pipeline is defined in the YAML file `phdi-azure/.github/workflow
 | end-to-end      | Run end-to-end tests to ensure the pipeline functions as expected within Azure.                                          | Pushes to `main`, or manually.                                                  | Verify the pipeline records the correct number of successes and failures and that data can be queried from the FHIR server. |
 | destroy         | Destroy an environment within Azure.                                                                                     | Manual                                                                          | Destroys a given Terraform environment.                                                                                     |
 
-## New Releases
-It's important to keep your repository up-to-date with version changes from the main `phdi` repository. Even if you're not using new features of the services, staying up to date is a security best practice.
 
-To update, visit the [main phdi repository](https://github.com/CDCgov/phdi) and copy the [latest version number](https://github.com/CDCgov/phdi/releases). Update the container image tag in [`main.tf`](https://github.com/CDCgov/phdi-azure/blob/main/terraform/modules/shared/main.tf#L201-L201).
+## Environments
 
-We recommend doing this update at least monthly, and deploying every time an update is made.
+The deployment pipeline is capable of deploying the starter kit to any number of environments. This allows users to flexibly configure however many distinct instances of the starter kit they need (dev, test, staging, prod, etc.). Currently all environments are deployed within a single Azure resource group. The environment name is included in the names of individual resources to distinguish which environment they belong to. If the starter kit is initially deployed by following the [Implementation Guide](implementation-guide.md), as recommended, it will only have a `dev` environment. To create additional environments follow the steps below:
+1. Navigate to `Settings` on your version of the `phdi-azure` repository in GitHub.
+2. Click on `Environments` in the side bar.
+3. Click on `New Environment` in the top right.
+![make-new-env-1](./images/make-new-env-1.png)
+4. Enter the name of your new environment and click `Configure environment`.
+![make-new-env-2](./images/make-new-env-2.png)
+
+After following these steps to initialize a new environment see the [Deployments](#deployments) sections below for guidance on how to deploy the starter kit to it.
+
+## Deployments
+
+As mentioned in [Continuous Deployment (CD)](#continuous-deployment-cd) the deployment process for the starter kit is completely automated. By default any time code is merged into the `main` branch of the repository a deployment to the `dev` environment is automatically triggered. Deployments may also be triggered manually from any branch to any environment. This allows for easy deployment to development environments to during initial development and testing of new features. Additionally, after successful testing of `main` in a development environment, changes can easily be promoted to higher level environments (e.g. testing, production). To manually trigger a deployment follow the steps below.
+
+1. Navigate to `Actions` on your version of the `phdi-azure` repository in GitHub.
+2. Select the `Deployment` workflow from the menu of the left.
+![trigger-deployment-1](./images/trigger-deployment-1.png)
+3. Open the `Run workflow` menu in the top right.
+4. Select the branch you would like to deploy from.
+5. Select the environment you would like to deploy to.
+6. Click the green `Run workflow` button.
+![trigger-deployment-2](./images/trigger-deployment-2.png)
+
+## Repository Secrets
+
+The quick start script is run to initially deploy the starter kit several GitHub repository secrets are created. The secrets are effectively environment variables used across all starter kit environment that provide important configuration. Some of these secrets like `SMARTY_AUTH_ID`, `SMARTY_AUTH_TOKEN` and `SMARTY_LICENSE_TYPE` are read by Terraform and set as environment variables on the Azure Container Applications during deployments. The table below describes all of these secrets. 
+
+### Table of Repository Secrets
+| Name | Purpose |
+|------|---------|
+| CLIENT_ID | The ID of the Azure service principle used to run deployments to Azure. |
+| LOCATION | The Azure [location](https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies) defining where Azure resource are created. |
+| OBJECT_ID | The object ID of the Azure service principle use to run deployments to Azure. |
+| RESOURCE_GROUP_NAME | The name of the Azure resource group where all starter kit Azure resources are created. |
+| SMARTY_AUTH_ID | The authentication ID for the Smarty geocoding provider. The quick start script prompts users to provide this value. |
+| SMARTY_AUTH_TOKEN | The authentication token for the Smarty geocoding provider. The quick start script prompts users to provide this value. |
+| SMARTY_LICENSE_TYPE | The type of license being used for the Smarty geocoding service. The quick start script prompts users to provide this value. |
+| SUBSCRIPTION_ID | The ID of the Azure subscription where the starter kit is deployed. |
+| TENANT_ID | The ID of the the Azure tenant where the starter kit is deployed. |
+
+### Creating and Editing Secrets
+
+For security purposes GitHub does not allow the values of secrets to be read once they have been set. However, new values can be provided by those with administrator access to the repository. To see which secrets exists in the starter kit repository, create new secrets, or edit the values of existing secrets follow these steps:
+
+1. Navigate to `Settings` on your version of the `phdi-azure` repository in GitHub.
+2. Click on `Secrets and variables` in the side bar on the left.
+3. Select `Actions`.
+
+![edit-secrets](./images/edit-secrets.png)
+
+From here new secrets can be created by clicking on the green `New repository secret` button in the top right. Values for existing secrets may be edited by clicking on the edit icons the right of individual secrets.
 
 ## Tearing Down an Environment
 
@@ -79,13 +142,15 @@ Once you have followed all the steps outlined above, you have successfully torn 
 
 Please note that tearing down an environment permanently removes all associated resources, and this action cannot be undone. Ensure that you have backed up any important data or configurations before proceeding with the teardown process.
 
-## Maintenance
+## Upgrading the PHDI Version
 
-### Upgrading the PHDI Version
+It's important to keep your repository up-to-date with version changes from the main `phdi` repository. Even if you're not using new features of the services, staying up to date is a security best practice. We recommend doing this update at least monthly, and deploying every time an update is made.
 
-When a new version of PHDI is availble, the version used by `phdi-azure` can be updated by doing the following steps.
+To update, visit the [main phdi repository](https://github.com/CDCgov/phdi) and copy the [latest version number](https://github.com/CDCgov/phdi/releases). Update the container image tag in [`main.tf`](https://github.com/CDCgov/phdi-azure/blob/main/terraform/modules/shared/main.tf#L201-L201).
 
-#### Upgrade Steps
+When a new version of PHDI is available, the version used by `phdi-azure` can be updated by following the process outlined below.
+
+### Upgrade Steps
 
 1. Create a new branch for the upgrade.
 
