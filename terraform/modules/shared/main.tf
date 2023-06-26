@@ -182,7 +182,7 @@ resource "azurerm_key_vault_secret" "phi_storage_account_name" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
-resource "azurerm_key_vault_secret" "record_linkage_url" {
+resource "azurerm_key_vault_secret" "record-linkage-url" {
   name         = "record-linkage-url"
   value        = "https://phdi-${terraform.workspace}-record-linkage.${azurerm_container_app_environment.phdi.default_domain}"
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
