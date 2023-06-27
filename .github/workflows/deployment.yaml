@@ -221,7 +221,7 @@ jobs:
               FILENAME="$(basename $FILE .ipynb)"
               if ! az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME; then
                 cat "../../scripts/Synapse/${FILENAME}.ipynb" | envsubst > "../../scripts/Synapse/${FILENAME}Substituted.ipynb"
-                az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --file "@../../scripts/Synapse/${FILENAME}Substituted.ipynb"
+                az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --file "@../../scripts/Synapse/${FILENAME}Substituted.ipynb" --spark-pool-name sparkpool
               fi
             fi
           done
