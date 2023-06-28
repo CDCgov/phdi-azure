@@ -1,5 +1,5 @@
 {
-    "name": "test_pipeline",
+    "name": "Synapse Pipeline",
     "properties": {
         "activities": [
             {
