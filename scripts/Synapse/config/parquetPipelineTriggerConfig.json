@@ -6,7 +6,7 @@
         "pipelines": [
             {
                 "pipelineReference": {
-                    "referenceName": "Parquet Pipeline",
+                    "referenceName": "Synapse Pipeline",
                     "type": "PipelineReference"
                 }
             }

@@ -231,11 +231,8 @@ jobs:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
-          if ! az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet Pipeline"; then
-            az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet Pipeline" --file @../../scripts/Synapse/config/parquetPipelineConfig.json
-          fi
-          if ! az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "test_pipeline"; then
-            az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "test_pipeline" --file @../../scripts/Synapse/config/testPipelineConfig.json
+          if ! az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Pipeline"; then
+            az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Pipeline" --file @../../scripts/Synapse/config/SynapsePipelineConfig.json
           fi
           cat ../../scripts/Synapse/config/parquetPipelineTriggerConfig.json | envsubst > ../../scripts/Synapse/config/parquetPipelineTriggerConfigSubstituted.json
           if ! az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet file upload"; then
