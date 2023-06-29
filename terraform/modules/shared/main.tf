@@ -25,8 +25,8 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "source_data" {
 }
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "bundle_snapshots" {
-    name               = "bundle-snapshots"
-    storage_account_id = azurerm_storage_account.phi.id
+  name               = "bundle-snapshots"
+  storage_account_id = azurerm_storage_account.phi.id
 }
 
 resource "azurerm_storage_blob" "vxu" {
