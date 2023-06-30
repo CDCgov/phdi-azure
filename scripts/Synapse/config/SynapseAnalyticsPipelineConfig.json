@@ -1,5 +1,5 @@
 {
-    "name": "Synapse Analytics Pipeline",
+    "name": "Synapse Analytics Pipeline Test",
     "properties": {
         "activities": [
             {
@@ -182,6 +182,39 @@
                 "typeProperties": {
                     "notebook": {
                         "referenceName": "updateECRDataStoreIncidentID",
+                        "type": "NotebookReference"
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": "sparkpool",
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "driverSize": "Small"
+                }
+            },
+            {
+                "name": "extractTSV",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "updateECRDataStoreIncidentID",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "extractTSV",
                         "type": "NotebookReference"
                     },
                     "snapshot": true,
