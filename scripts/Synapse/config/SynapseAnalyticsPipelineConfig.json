@@ -1,5 +1,5 @@
 {
-    "name": "Synapse Analytics Pipeline Test",
+    "name": "Synapse Analytics Pipeline",
     "properties": {
         "activities": [
             {
@@ -19,13 +19,18 @@
                         "referenceName": "convertParquetMII",
                         "type": "NotebookReference"
                     },
-                    "snapshot": true,
                     "sparkPool": {
                         "referenceName": "sparkpool",
                         "type": "BigDataPoolReference"
                     },
                     "executorSize": "Small",
-                    "driverSize": "Small"
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
                 }
             },
             {
@@ -52,13 +57,18 @@
                         "referenceName": "convertParquetMPI",
                         "type": "NotebookReference"
                     },
-                    "snapshot": true,
                     "sparkPool": {
                         "referenceName": "sparkpool",
                         "type": "BigDataPoolReference"
                     },
                     "executorSize": "Small",
-                    "driverSize": "Small"
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
                 }
             },
             {
@@ -85,13 +95,18 @@
                         "referenceName": "updateECRDataStore",
                         "type": "NotebookReference"
                     },
-                    "snapshot": true,
                     "sparkPool": {
                         "referenceName": "sparkpool",
                         "type": "BigDataPoolReference"
                     },
                     "executorSize": "Small",
-                    "driverSize": "Small"
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
                 }
             },
             {
@@ -118,13 +133,18 @@
                         "referenceName": "updateECRDataStorePersonID",
                         "type": "NotebookReference"
                     },
-                    "snapshot": true,
                     "sparkPool": {
                         "referenceName": "sparkpool",
                         "type": "BigDataPoolReference"
                     },
                     "executorSize": "Small",
-                    "driverSize": "Small"
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
                 }
             },
             {
@@ -151,13 +171,18 @@
                         "referenceName": "updateECRDataStoreIrisID",
                         "type": "NotebookReference"
                     },
-                    "snapshot": true,
                     "sparkPool": {
                         "referenceName": "sparkpool",
                         "type": "BigDataPoolReference"
                     },
                     "executorSize": "Small",
-                    "driverSize": "Small"
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
                 }
             },
             {
@@ -184,13 +209,18 @@
                         "referenceName": "updateECRDataStoreIncidentID",
                         "type": "NotebookReference"
                     },
-                    "snapshot": true,
                     "sparkPool": {
                         "referenceName": "sparkpool",
                         "type": "BigDataPoolReference"
                     },
                     "executorSize": "Small",
-                    "driverSize": "Small"
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
                 }
             },
             {
@@ -217,13 +247,18 @@
                         "referenceName": "extractTSV",
                         "type": "NotebookReference"
                     },
-                    "snapshot": true,
                     "sparkPool": {
                         "referenceName": "sparkpool",
                         "type": "BigDataPoolReference"
                     },
                     "executorSize": "Small",
-                    "driverSize": "Small"
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
                 }
             }
         ],
@@ -234,7 +269,7 @@
             }
         },
         "annotations": [],
-        "lastPublishTime": "2023-06-29T23:39:12Z"
+        "lastPublishTime": "2023-07-05T21:26:37Z"
     },
     "type": "Microsoft.Synapse/workspaces/pipelines"
 }
