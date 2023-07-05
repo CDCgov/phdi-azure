@@ -95,6 +95,7 @@ jobs:
         run: |
           terraform init -backend-config=backend.tfvars
           terraform workspace select $TF_ENV || terraform workspace new $TF_ENV
+          terraform import module.shared.azurerm_storage_data_lake_gen2_filesystem.source_data "https://phdidevphi9d194c64.blob.core.windows.net/source-data"
           terraform apply -auto-approve -lock-timeout=30m \
             -replace="module.shared.docker_tag.tag_for_azure[\"alerts\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"fhir-converter\"]" \
