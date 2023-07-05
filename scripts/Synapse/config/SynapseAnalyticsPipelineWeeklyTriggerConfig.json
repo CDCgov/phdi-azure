@@ -3,14 +3,7 @@
     "properties": {
         "annotations": [],
         "runtimeState": "Stopped",
-        "pipelines": [
-            {
-                "pipelineReference": {
-                    "referenceName": "Synapse Analytics Pipeline",
-                    "type": "PipelineReference"
-                }
-            }
-        ],
+        "pipelines": [],
         "type": "ScheduleTrigger",
         "typeProperties": {
             "recurrence": {
