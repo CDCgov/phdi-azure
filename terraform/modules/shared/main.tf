@@ -599,12 +599,12 @@ resource "azurerm_key_vault_secret" "synapse_client_id" {
 }
 
 resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault"{
-  name        = "${terraform.workspace}funcs${substr(var.client_id, 0, 8)}-keyvault-linked-service"
+  name        = "${terraform.workspace}${substr(var.client_id, 0, 8)}-keyvault-linked-service"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   type = "AzureKeyVault"
   type_properties_json = <<JSON
 {
-  "baseUrl": "${azurerm_storage_account.phi.primary_blob_endpoint}"
+  "baseUrl": "https://${terraform.workspace}vault${substr(var.client_id, 0, 8)}.vault.azure.net/"
 }
 JSON
 }
