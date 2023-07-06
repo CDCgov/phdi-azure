@@ -604,7 +604,7 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault"{
   type = "AzureKeyVault"
   type_properties_json = <<JSON
 {
-  "baseUrl": "https://${azurerm_storage_account}.vault.azure.net/"
+  "baseUrl": "https://${azurerm_storage_account.phdi.id}.vault.azure.net/"
 }
 JSON
 }
