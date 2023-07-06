@@ -604,7 +604,7 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault"{
   type = "AzureKeyVault"
   type_properties_json = <<JSON
 {
-  "baseUrl": azurerm_storage_account.phi.primary_blob_endpoint
+  "baseUrl": "${azurerm_storage_account.phi.primary_blob_endpoint}"
 }
 JSON
 }
