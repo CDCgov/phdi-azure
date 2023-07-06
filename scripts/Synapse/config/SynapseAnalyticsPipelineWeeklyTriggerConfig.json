@@ -2,7 +2,7 @@
     "name": "Synapse Analytics Pipeline Weekly Trigger",
     "properties": {
         "annotations": [],
-        "runtimeState": "Stopped",
+        "runtimeState": "Started",
         "pipelines": [
             {
                 "pipelineReference": {
