@@ -231,12 +231,12 @@ jobs:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
-          if ! az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet Pipeline"; then
-            az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet Pipeline" --file @../../scripts/Synapse/config/parquetPipelineConfig.json
+          if ! az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline"; then
+            az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineConfig.json
           fi
-          cat ../../scripts/Synapse/config/parquetPipelineTriggerConfig.json | envsubst > ../../scripts/Synapse/config/parquetPipelineTriggerConfigSubstituted.json
-          if ! az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet file upload"; then
-            az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Parquet file upload" --file @../../scripts/Synapse/config/parquetPipelineTriggerConfigSubstituted.json
+          cat ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfig.json | envsubst > ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
+          if ! az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger"; then
+            az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
           fi
 
   end-to-end:
