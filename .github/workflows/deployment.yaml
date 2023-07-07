@@ -215,6 +215,7 @@ jobs:
           export STORAGE_ACCOUNT=phdi${TF_ENV}phi${SHORT_CID}
           export KEY_VAULT=${TF_ENV}vault${SHORT_CID}
           export MPI_DB_HOST=phdi${TF_ENV}mpi${SHORT_CID}.postgres.database.azure.com
+          export KEY_VAULT_LINKED_SERVICE=${TF_ENV}${SHORT_CID}-keyvault-linked-service
           for FILE in ../../scripts/Synapse/*
           do
             if [[ $FILE == *.ipynb ]]; then
