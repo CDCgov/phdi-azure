@@ -205,7 +205,18 @@ jobs:
             fi
           done
 
+      - name: "Check for Synapse changes"
+        uses: dorny/paths-filter@v2
+        id: synapse_changes
+        with:
+          filters: |
+            synapse:
+              - 'scripts/Synapse/**'
+            synapse_config:
+              - 'scripts/Synapse/config/**'
+
       - name: Deploy Synapse notebooks
+        if: steps.synapse_changes.outputs.synapse == 'true'
         env:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
@@ -229,6 +240,7 @@ jobs:
           done
 
       - name: Deploy Synapse pipeline and trigger
+        if: steps.synapse_changes.outputs.synapse_config == 'true'
         env:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
