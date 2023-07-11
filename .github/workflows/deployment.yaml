@@ -205,18 +205,7 @@ jobs:
             fi
           done
 
-      - name: "Check for Synapse changes"
-        uses: dorny/paths-filter@v2
-        id: synapse_changes
-        with:
-          filters: |
-            synapse:
-              - 'scripts/Synapse/**'
-            synapse_config:
-              - 'scripts/Synapse/config/**'
-
-      - name: Deploy Synapse notebooks
-        if: steps.synapse_changes.outputs.synapse == 'true'
+      - name: Deploy Synapse Notebooks, Pipeline and Trigger
         env:
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
@@ -227,6 +216,12 @@ jobs:
           export KEY_VAULT=${TF_ENV}vault${SHORT_CID}
           export MPI_DB_HOST=phdi${TF_ENV}mpi${SHORT_CID}.postgres.database.azure.com
           export KEY_VAULT_LINKED_SERVICE=${TF_ENV}${SHORT_CID}-keyvault-linked-service
+          if az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger"; then
+            az synapse trigger delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger"
+          fi
+          if az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline"; then
+            az synapse pipeline delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" 
+          fi
           for FILE in ../../scripts/Synapse/*
           do
             if [[ $FILE == *.ipynb ]]; then
@@ -238,20 +233,7 @@ jobs:
               az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --file "@../../scripts/Synapse/${FILENAME}Substituted.ipynb" --spark-pool-name sparkpool
             fi
           done
-
-      - name: Deploy Synapse pipeline and trigger
-        if: steps.synapse_changes.outputs.synapse_config == 'true'
-        env:
-          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
-          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
-        run: |
-          if az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline"; then
-            az synapse pipeline delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" 
-          fi
           az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineConfig.json
-          if az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger"; then
-            az synapse trigger delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger"
-          fi
           cat ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfig.json | envsubst > ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
           az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
 
