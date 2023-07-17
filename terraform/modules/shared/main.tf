@@ -463,7 +463,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   #  This will need to be updated to include the workspace name
   name = "phdi-${terraform.workspace}-cluster"
 #  location = var.location
-  location = "us-west"
+  location = "westus"
   resource_group_name = var.resource_group_name
   dns_prefix = "phdi-${terraform.workspace}"
 
