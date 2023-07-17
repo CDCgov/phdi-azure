@@ -462,7 +462,8 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
 resource "azurerm_kubernetes_cluster" "cluster" {
   #  This will need to be updated to include the workspace name
   name = "phdi-${terraform.workspace}-cluster"
-  location = var.location
+#  location = var.location
+  location = "us-west"
   resource_group_name = var.resource_group_name
   dns_prefix = "phdi-${terraform.workspace}"
 
