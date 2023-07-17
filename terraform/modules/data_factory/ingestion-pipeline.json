@@ -51,12 +51,12 @@
                     },
                     "ifFalseActivities": [
                         {
-                            "name": "Fail1",
+                            "name": "message_validation_failure",
                             "type": "Fail",
                             "dependsOn": [],
                             "userProperties": [],
                             "typeProperties": {
-                                "message": "Validation failure, logging to validation failure storage.",
+                                "message": "@{activity('validate_message').output}",
                                 "errorCode": "422"
                             }
                         }
@@ -162,6 +162,43 @@
                     "method": "POST",
                     "body": {
                         "value": "{\n    \"blob\": @{activity('convert_to_fhir').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_conversion_failures_container_name}\",\n    \"file_name\": \"@{concat(substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
+                "name": "store_bundle_pre_harmonization",
+                "description": "Save a copy of the converted FHIR bundle to the diffs/ container before it undergoes standardization",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "convert_to_fhir",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"blob\": @{activity('convert_to_fhir').output.response},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"bundle-snapshots\",\n    \"file_name\": \"@{concat('pre/', substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
                         "type": "Expression"
                     },
                     "authentication": {
@@ -323,6 +360,42 @@
                 }
             },
             {
+                "name": "store_bundle_post_harmonization",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "geocode",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"blob\": @{activity('geocode').output.bundle},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"bundle-snapshots\",\n    \"file_name\": \"@{concat('post/', substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
+                        },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
                 "name": "record_linkage",
                 "description": "Link new healthcare messages to existing records if a connection exists.",
                 "type": "WebActivity",
@@ -360,9 +433,8 @@
                 }
             },
             {
-                "name": "message_parser",
-                "description": "Extract desired fields from a given healthcare message.",
-                "type": "WebActivity",
+                "name": "case_type_ecr_if_condition",
+                "type": "IfCondition",
                 "dependsOn": [
                     {
                         "activity": "record_linkage",
@@ -371,69 +443,80 @@
                         ]
                     }
                 ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "${message_parser_url}/parse_message",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('record_linkage').output.updated_bundle}\n}",
+                    "expression": {
+                        "value": "@equals(pipeline().parameters.message_type, 'ecr')",
                         "type": "Expression"
                     },
-                    "authentication": {
-                        "resource": "api://phdi-${environment}-message-parser",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
+                    "ifTrueActivities": [
+                        {
+                            "name": "message_parser",
+                            "description": "Extract desired fields from a given healthcare message.",
+                            "type": "WebActivity",
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "url": "${message_parser_url}/parse_message",
+                                "method": "POST",
+                                "body": {
+                                    "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('record_linkage').output.updated_bundle}\n}",
+                                    "type": "Expression"
+                                },
+                                "authentication": {
+                                    "resource": "api://phdi-${environment}-message-parser",
+                                    "credential": {
+                                        "referenceName": "pipeline-runner-credential",
+                                        "type": "CredentialReference"
+                                    },
+                                    "type": "UserAssignedManagedIdentity"
+                                }
+                            }
                         },
-                        "type": "UserAssignedManagedIdentity"
-                    }
-                }
-            },
-            {
-                "name": "post_to_eventhub",
-                "description": "Post the output of the message_parser activity to an Azure Event Hub.",
-                "type": "WebActivity",
-                "dependsOn": [
-                    {
-                        "activity": "message_parser",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "https://${eventhub_namespace_name}.servicebus.windows.net/${eventhub_name}/messages",
-                    "method": "POST",
-                    "body": {
-                        "value": "@{activity('message_parser').output}",
-                        "type": "Expression"
-                    },
-                    "headers": {
-                        "Content-Type": "application/atom+xml;type=entry;charset=utf-8"
-                    },
-                    "authentication": {
-                        "resource": "https://${eventhub_namespace_name}.servicebus.windows.net",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
-                        },
-                        "type": "UserAssignedManagedIdentity"
-                    }
+                        {
+                            "name": "post_to_storage_container",
+                            "description": "Write message parser JSON to storage.",
+                            "type": "WebActivity",
+                            "dependsOn": [
+                                {
+                                    "activity": "message_parser",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                                "method": "POST",
+                                "body": {
+                                    "value": "{\n    \"blob\": @{activity('message_parser').output.parsed_values},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${delta_tables_container_name}\",\n    \"file_name\": \"raw_data/@{concat(pipeline().RunId, '.json')}\"\n}",
+                                    "type": "Expression"
+                                },
+                                "authentication": {
+                                    "resource": "api://phdi-${environment}-ingestion",
+                                    "credential": {
+                                        "referenceName": "pipeline-runner-credential",
+                                        "type": "CredentialReference"
+                                    },
+                                    "type": "UserAssignedManagedIdentity"
+                                }
+                            }
+                        }
+                    ]
                 }
             },
             {
@@ -497,7 +580,7 @@
                     "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.fhir_server_response_body},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_upload_failures_container_name}\",\n    \"file_name\": \"@{concat(substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
+                        "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.message},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_upload_failures_container_name}\",\n    \"file_name\": \"@{concat(substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
                         "type": "Expression"
                     },
                     "authentication": {
@@ -511,6 +594,7 @@
                 }
             }
         ],
+        "concurrency": 10,
         "parameters": {
             "message": {
                 "type": "String"
