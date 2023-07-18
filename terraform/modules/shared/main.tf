@@ -459,11 +459,15 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
 
 #### Kubernetes Service ####
 
+# hey hey hey, it's working!
+# need to figure out the location thing
+# then need to look into CI/CD to figure out how to apply K8s configuration to cluster
+# Will probably need to export/output things from here
 resource "azurerm_kubernetes_cluster" "cluster" {
   #  This will need to be updated to include the workspace name
   name = "phdi-${terraform.workspace}-cluster"
-#  location = var.location
-  location = "westus"
+  location = var.location
+#  location = "westus"
   resource_group_name = var.resource_group_name
   dns_prefix = "phdi-${terraform.workspace}"
 
