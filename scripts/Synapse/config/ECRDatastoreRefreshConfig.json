@@ -1,0 +1,33 @@
+{
+    "name": "ECR Datastore Refresh",
+    "properties": {
+        "description": "Updates the ECR Datastore daily with ECR data that has run through the DIBBs Pipeline",
+        "activities": [
+            {
+                "name": "UpdateECRDataStore",
+                "type": "SynapseNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "updateECRDataStore",
+                        "type": "NotebookReference"
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": "sparkpool",
+                        "type": "BigDataPoolReference"
+                    }
+                }
+            }
+        ],
+        "annotations": []
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "name": "ECR Datastore Refresh Daily Trigger",
+    "properties": {
+        "annotations": [],
+        "runtimeState": "Started",
+        "pipelines": [
+            {
+                "pipelineReference": {
+                    "referenceName": "ECR Datastore Refresh",
+                    "type": "PipelineReference"
+                }
+            }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+            "recurrence": {
+                "frequency": "Day",
+                "interval": 1,
+                "startTime": "2023-07-20T17:30:00",
+                "timeZone": "Pacific Standard Time",
+                "schedule": {
+                    "minutes": [
+                        30
+                    ],
+                    "hours": [
+                        17
+                    ]
+                }
+            }
+        }
+    }
+}
