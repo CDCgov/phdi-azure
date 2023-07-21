@@ -351,7 +351,7 @@ resource "azurerm_container_app" "container_app" {
   }
 
   template {
-    max_replicas = 200
+    max_replicas = 30
     min_replicas = 0
     container {
       name   = "phdi-${terraform.workspace}-${each.key}"
