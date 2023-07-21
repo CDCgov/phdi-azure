@@ -346,11 +346,13 @@ resource "azurerm_container_app" "container_app" {
   }
 
   template {
+    max_replicas = 200
+    min_replicas = 0
     container {
       name   = "phdi-${terraform.workspace}-${each.key}"
       image  = docker_registry_image.acr_image[each.key].name
-      cpu    = 0.5
-      memory = "1Gi"
+      cpu    = 1.0
+      memory = "2Gi"
 
       env {
         name  = "SMARTY_AUTH_ID"

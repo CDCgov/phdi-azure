@@ -594,7 +594,6 @@
                 }
             }
         ],
-        "concurrency": 10,
         "parameters": {
             "message": {
                 "type": "String"
