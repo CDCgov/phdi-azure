@@ -460,15 +460,15 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
 #### Kubernetes Service ####
 
 resource "azurerm_kubernetes_cluster" "cluster" {
-  name = "phdi-${terraform.workspace}-cluster"
-  location = var.location
+  name                = "phdi-${terraform.workspace}-cluster"
+  location            = var.location
   resource_group_name = var.resource_group_name
-  dns_prefix = "phdi-${terraform.workspace}"
+  dns_prefix          = "phdi-${terraform.workspace}"
 
   default_node_pool {
-    name    = "default"
+    name       = "default"
     node_count = 1
-    vm_size = "Standard_D2_v2"
+    vm_size    = "Standard_D2_v2"
   }
 
   identity {
