@@ -216,26 +216,26 @@ jobs:
           export KEY_VAULT=${TF_ENV}vault${SHORT_CID}
           export MPI_DB_HOST=phdi${TF_ENV}mpi${SHORT_CID}.postgres.database.azure.com
           export KEY_VAULT_LINKED_SERVICE=${TF_ENV}${SHORT_CID}-keyvault-linked-service
-#          if az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger"; then
-#            az synapse trigger delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger" --yes
-#          fi
-#          if az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline"; then
-#            az synapse pipeline delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" --yes
-#          fi
-#          for FILE in ../../scripts/Synapse/*
-#          do
-#            if [[ $FILE == *.ipynb ]]; then
-#              FILENAME="$(basename $FILE .ipynb)"
-#              if az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME; then
-#                az synapse notebook delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --yes
-#              fi
-#              cat "../../scripts/Synapse/${FILENAME}.ipynb" | envsubst > "../../scripts/Synapse/${FILENAME}Substituted.ipynb"
-#              az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --file "@../../scripts/Synapse/${FILENAME}Substituted.ipynb" --spark-pool-name sparkpool
-#            fi
-#          done
-#          az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineConfig.json
-#          cat ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfig.json | envsubst > ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
-#          az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
+          if az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger"; then
+            az synapse trigger delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger" --yes
+          fi
+          if az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline"; then
+            az synapse pipeline delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" --yes
+          fi
+          for FILE in ../../scripts/Synapse/*
+          do
+            if [[ $FILE == *.ipynb ]]; then
+              FILENAME="$(basename $FILE .ipynb)"
+              if az synapse notebook show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME; then
+                az synapse notebook delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --yes
+              fi
+              cat "../../scripts/Synapse/${FILENAME}.ipynb" | envsubst > "../../scripts/Synapse/${FILENAME}Substituted.ipynb"
+              az synapse notebook create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name $FILENAME --file "@../../scripts/Synapse/${FILENAME}Substituted.ipynb" --spark-pool-name sparkpool
+            fi
+          done
+          az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineConfig.json
+          cat ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfig.json | envsubst > ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
+          az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
 
   end-to-end:
     name: End-to-end tests
