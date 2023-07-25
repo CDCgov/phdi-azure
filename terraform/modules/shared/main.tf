@@ -141,18 +141,18 @@ resource "azurerm_key_vault" "phdi_key_vault" {
     ]
   }
 
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = azurerm_synapse_workspace.phdi.identity.0.principal_id
-
-    key_permissions = [
-      "Get",
-    ]
-
-    secret_permissions = [
-      "Get",
-    ]
-  }
+  #  access_policy {
+  #    tenant_id = data.azurerm_client_config.current.tenant_id
+  #    object_id = azurerm_synapse_workspace.phdi.identity.0.principal_id
+  #
+  #    key_permissions = [
+  #      "Get",
+  #    ]
+  #
+  #    secret_permissions = [
+  #      "Get",
+  #    ]
+  #  }
 }
 
 resource "random_uuid" "salt" {}
@@ -528,103 +528,103 @@ resource "azurerm_communication_service" "communication_service" {
 
 ##### Synapse #####
 
-resource "random_password" "synapse_sql_password" {
-  length           = 32
-  special          = true
-  override_special = "_%@"
-}
-
-# Store password in key vault
-resource "azurerm_key_vault_secret" "synapse_sql_password" {
-  name         = "synapse-sql-password"
-  value        = random_password.synapse_sql_password.result
-  key_vault_id = azurerm_key_vault.phdi_key_vault.id
-}
-
-resource "azurerm_synapse_workspace" "phdi" {
-  name                                 = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
-  resource_group_name                  = var.resource_group_name
-  location                             = var.location
-  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.delta-tables.id
-  sql_administrator_login              = "sqladminuser"
-  sql_administrator_login_password     = random_password.synapse_sql_password.result
-
-  identity {
-    type = "SystemAssigned, UserAssigned"
-    identity_ids = [
-      azurerm_user_assigned_identity.pipeline_runner.id
-    ]
-  }
-}
-
-resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
-  name                 = "AllowAllWindowsAzureIps"
-  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
-  start_ip_address     = "0.0.0.0"
-  end_ip_address       = "0.0.0.0"
-}
-
-resource "azurerm_synapse_spark_pool" "phdi" {
-  name                                = "sparkpool"
-  synapse_workspace_id                = azurerm_synapse_workspace.phdi.id
-  node_size_family                    = "MemoryOptimized"
-  node_size                           = "Small"
-  cache_size                          = 100
-  spark_version                       = 3.3
-  dynamic_executor_allocation_enabled = true
-  min_executors                       = 1
-  max_executors                       = 2
-
-  auto_scale {
-    max_node_count = 50
-    min_node_count = 3
-  }
-
-  auto_pause {
-    delay_in_minutes = 15
-  }
-
-  spark_config {
-    content  = <<EOF
-spark.shuffle.spill                true
-EOF
-    filename = "config.txt"
-  }
-}
-
-resource "azurerm_role_assignment" "synapse_blob_contributor" {
-  scope                = azurerm_storage_account.phi.id
-  role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_synapse_workspace.phdi.identity[0].principal_id
-}
-
-resource "azuread_application" "synapse_app" {
-  display_name = "phdi-${terraform.workspace}-synapse-${substr(var.client_id, 0, 8)}"
-}
-
-resource "azuread_application_password" "synapse_app_password" {
-  application_object_id = azuread_application.synapse_app.object_id
-}
-
-resource "azurerm_key_vault_secret" "synapse_client_secret" {
-  name         = "synapse-client-secret"
-  value        = azuread_application_password.synapse_app_password.value
-  key_vault_id = azurerm_key_vault.phdi_key_vault.id
-}
-
-resource "azurerm_key_vault_secret" "synapse_client_id" {
-  name         = "synapse-client-id"
-  value        = azuread_application.synapse_app.application_id
-  key_vault_id = azurerm_key_vault.phdi_key_vault.id
-}
-
-resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
-  name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-keyvault-linked-service"
-  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
-  type                 = "AzureKeyVault"
-  type_properties_json = <<JSON
-  {
-  "baseUrl": "https://${terraform.workspace}vault${substr(var.client_id, 0, 8)}.vault.azure.net/"
-  }
-  JSON
-}
+#resource "random_password" "synapse_sql_password" {
+#  length           = 32
+#  special          = true
+#  override_special = "_%@"
+#}
+#
+## Store password in key vault
+#resource "azurerm_key_vault_secret" "synapse_sql_password" {
+#  name         = "synapse-sql-password"
+#  value        = random_password.synapse_sql_password.result
+#  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+#}
+#
+#resource "azurerm_synapse_workspace" "phdi" {
+#  name                                 = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
+#  resource_group_name                  = var.resource_group_name
+#  location                             = var.location
+#  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.delta-tables.id
+#  sql_administrator_login              = "sqladminuser"
+#  sql_administrator_login_password     = random_password.synapse_sql_password.result
+#
+#  identity {
+#    type = "SystemAssigned, UserAssigned"
+#    identity_ids = [
+#      azurerm_user_assigned_identity.pipeline_runner.id
+#    ]
+#  }
+#}
+#
+#resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
+#  name                 = "AllowAllWindowsAzureIps"
+#  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+#  start_ip_address     = "0.0.0.0"
+#  end_ip_address       = "0.0.0.0"
+#}
+#
+#resource "azurerm_synapse_spark_pool" "phdi" {
+#  name                                = "sparkpool"
+#  synapse_workspace_id                = azurerm_synapse_workspace.phdi.id
+#  node_size_family                    = "MemoryOptimized"
+#  node_size                           = "Small"
+#  cache_size                          = 100
+#  spark_version                       = 3.3
+#  dynamic_executor_allocation_enabled = true
+#  min_executors                       = 1
+#  max_executors                       = 2
+#
+#  auto_scale {
+#    max_node_count = 50
+#    min_node_count = 3
+#  }
+#
+#  auto_pause {
+#    delay_in_minutes = 15
+#  }
+#
+#  spark_config {
+#    content  = <<EOF
+#spark.shuffle.spill                true
+#EOF
+#    filename = "config.txt"
+#  }
+#}
+#
+#resource "azurerm_role_assignment" "synapse_blob_contributor" {
+#  scope                = azurerm_storage_account.phi.id
+#  role_definition_name = "Storage Blob Data Contributor"
+#  principal_id         = azurerm_synapse_workspace.phdi.identity[0].principal_id
+#}
+#
+#resource "azuread_application" "synapse_app" {
+#  display_name = "phdi-${terraform.workspace}-synapse-${substr(var.client_id, 0, 8)}"
+#}
+#
+#resource "azuread_application_password" "synapse_app_password" {
+#  application_object_id = azuread_application.synapse_app.object_id
+#}
+#
+#resource "azurerm_key_vault_secret" "synapse_client_secret" {
+#  name         = "synapse-client-secret"
+#  value        = azuread_application_password.synapse_app_password.value
+#  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+#}
+#
+#resource "azurerm_key_vault_secret" "synapse_client_id" {
+#  name         = "synapse-client-id"
+#  value        = azuread_application.synapse_app.application_id
+#  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+#}
+#
+#resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
+#  name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-keyvault-linked-service"
+#  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+#  type                 = "AzureKeyVault"
+#  type_properties_json = <<JSON
+#  {
+#  "baseUrl": "https://${terraform.workspace}vault${substr(var.client_id, 0, 8)}.vault.azure.net/"
+#  }
+#  JSON
+#}
