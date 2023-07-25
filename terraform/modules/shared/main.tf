@@ -466,7 +466,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
   location            = "eastus"
   resource_group_name = var.resource_group_name
   kind                = "fhir-R4"
-  cosmosdb_throughput = 400
+  cosmosdb_throughput = 1400
 
   lifecycle {
     ignore_changes = [name, tags]
