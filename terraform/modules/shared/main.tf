@@ -457,6 +457,26 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
   access_mode                  = "ReadWrite"
 }
 
+#### Kubernetes Service ####
+
+resource "azurerm_kubernetes_cluster" "cluster" {
+  name                = "phdi-${terraform.workspace}-cluster"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  dns_prefix          = "phdi-${terraform.workspace}"
+
+  default_node_pool {
+    name       = "default"
+    node_count = 1
+    vm_size    = "Standard_D2_v2"
+  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+  }
+}
+
 ##### FHIR Server #####
 
 resource "azurerm_healthcare_service" "fhir_server" {
