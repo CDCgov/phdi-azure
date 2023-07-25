@@ -181,7 +181,7 @@ jobs:
               --name phdi-$TF_ENV-$SERVICE \
               --resource-group $RESOURCE_GROUP_NAME \
               --scale-rule-name concurrent-http-requests \
-              --scale-rule-http-concurrency 10 \
+              --scale-rule-http-concurrency 10 
           done
       - name: Add authentication to container apps
         env:
