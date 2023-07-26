@@ -471,14 +471,14 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     vm_size    = "Standard_D2_v2"
   }
 
-  identity {
-    type = "SystemAssigned"
-  }
-
 #  identity {
-#    type         = "UserAssigned"
-#    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+#    type = "SystemAssigned"
 #  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+  }
 }
 
 #output "client_certificate" {
