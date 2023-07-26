@@ -8,3 +8,8 @@ data "azurerm_client_config" "current" {}
 #    azurerm_kubernetes_cluster.cluster
 #  ]
 #}
+
+data "azurerm_key_vault_secret" "mpi_database_password" {
+    name = "mpi_db_password"
+    key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}

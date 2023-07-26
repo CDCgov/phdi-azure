@@ -471,14 +471,14 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     vm_size    = "Standard_D2_v2"
   }
 
-#  identity {
-#    type = "SystemAssigned"
-#  }
-
   identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+    type = "SystemAssigned"
   }
+
+#  identity {
+#    type         = "UserAssigned"
+#    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+#  }
 }
 
 #output "client_certificate" {
@@ -533,6 +533,21 @@ resource "helm_release" "record_linkage" {
   values = [
     file("${path.module}/dev-record-linkage-values.yaml")
   ]
+
+  set {
+    name = "databasePassword"
+    value = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.mpi_database_password.id})"
+  }
+
+  set {
+    name = "databaseName"
+    value = azurerm_postgresql_flexible_server_database.mpi.name
+  }
+
+  set {
+    name = "databaseHost"
+    value = azurerm_postgresql_flexible_server_database.mpi.server_id
+  }
 
   # use set to read secrets out of the key vault
 }
