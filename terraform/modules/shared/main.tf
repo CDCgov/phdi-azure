@@ -551,7 +551,7 @@ resource "helm_release" "record_linkage" {
 
   set {
     name = "databaseHost"
-    value = azurerm_postgresql_flexible_server_database.mpi.server_id
+    value = azurerm_postgresql_flexible_server.mpi.fqdn
   }
 
   # use set to read secrets out of the key vault
