@@ -530,9 +530,9 @@ resource "helm_release" "record_linkage" {
   repository = "https://cdcgov.github.io/phdi-charts/"
   chart      = "record-linkage-chart"
 
-  values = [
-    file("${path.module}/dev-record-linkage-values.yaml")
-  ]
+#  values = [
+#    file("${path.module}/dev-record-linkage-values.yaml")
+#  ]
 
   set {
     name = "databasePassword"
