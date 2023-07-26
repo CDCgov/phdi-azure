@@ -535,6 +535,11 @@ resource "helm_release" "record_linkage" {
 #  ]
 
   set {
+    name = "image.tag"
+    value = "v1.0.9"
+  }
+
+  set {
     name = "databasePassword"
     value = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.mpi-database-password.id})"
   }
