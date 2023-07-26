@@ -488,14 +488,14 @@ output "kube_config" {
   sensitive = true
 }
 
-data "azurerm_kubernetes_cluster" "cluster_data" {
-  name = "phdi-${terraform.workspace}-cluster_data"
-  resource_group_name = var.resource_group_name
-
-  depends_on = [
-    azurerm_kubernetes_cluster.cluster
-  ]
-}
+#data "azurerm_kubernetes_cluster" "cluster_data" {
+#  name = "phdi-${terraform.workspace}-cluster_data"
+#  resource_group_name = var.resource_group_name
+#
+#  depends_on = [
+#    azurerm_kubernetes_cluster.cluster
+#  ]
+#}
 
 provider "helm" {
   kubernetes {
