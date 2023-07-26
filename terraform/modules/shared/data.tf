@@ -10,6 +10,6 @@ data "azurerm_client_config" "current" {}
 #}
 
 data "azurerm_key_vault_secret" "mpi-database-password" {
-    name = "mpi_db_password"
+    name = "mpi-db-password"
     key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
