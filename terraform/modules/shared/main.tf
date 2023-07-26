@@ -477,32 +477,36 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 }
 
-output "client_certificate" {
-  value     = azurerm_kubernetes_cluster.cluster.kube_config.0.client_certificate
-  sensitive = true
-}
+#output "client_certificate" {
+#  value     = azurerm_kubernetes_cluster.cluster.kube_config.0.client_certificate
+#  sensitive = true
+#}
+#
+#output "kube_config" {
+#  value = azurerm_kubernetes_cluster.cluster.kube_config_raw
+#  sensitive = true
+#}
 
-output "kube_config" {
-  value = azurerm_kubernetes_cluster.cluster.kube_config_raw
-  sensitive = true
-}
+#data "azurerm_kubernetes_cluster" "cluster_data" {
+#  name = "phdi-${terraform.workspace}-cluster"
+#  resource_group_name = var.resource_group_name
+#
+#  depends_on = [
+#    azurerm_kubernetes_cluster.cluster
+#  ]
+#}
 
-data "azurerm_kubernetes_cluster" "cluster_data" {
-  name = "phdi-${terraform.workspace}-cluster"
+data "azurerm_kubernetes_cluster" "credentials" {
+  name                = azurerm_kubernetes_cluster.cluster.name
   resource_group_name = var.resource_group_name
-
-  depends_on = [
-    azurerm_kubernetes_cluster.cluster
-  ]
 }
 
 provider "helm" {
   kubernetes {
-#    host                   = data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.host
-    host                   = kube_config.0.host
-    client_certificate     = base64decode(data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.client_certificate)
-    client_key             = base64decode(data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.client_key)
-    cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.cluster_ca_certificate)
+    host                   = data.azurerm_kubernetes_cluster.credentials.kube_admin_config.0.host
+    client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_admin_config.0.client_certificate)
+    client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_admin_config.0.client_key)
+    cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_admin_config.0.cluster_ca_certificate)
 #    exec {
 #      api_version = "client.authentication.k8s.io/v1beta1"
 #      args        = ["az", "get-token", "--cluster-name", data.azurerm_kubernetes_cluster.cluster_data.name]
