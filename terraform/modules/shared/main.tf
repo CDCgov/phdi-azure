@@ -578,23 +578,27 @@ resource "azurerm_role_assignment" "synapse_blob_contributor" {
   principal_id         = azurerm_synapse_workspace.phdi.identity[0].principal_id
 }
 
-resource "azuread_application" "synapse_app" {
+resource "azuread_application" "synapse_app_registration" {
   display_name = "phdi-${terraform.workspace}-synapse-${substr(var.client_id, 0, 8)}"
 }
 
-resource "azuread_application_password" "synapse_app_password" {
-  application_object_id = azuread_application.synapse_app.object_id
+resource "azuread_service_principal" "synapse_service_principal" {
+  application_id = azuread_application.synapse_app_registration.application_id
+}
+
+resource "azuread_service_principal_password" "synapse_service_principal_password" {
+  service_principal_id = azuread_service_principal.synapse_service_principal.object_id
 }
 
 resource "azurerm_key_vault_secret" "synapse_client_secret" {
   name         = "synapse-client-secret"
-  value        = azuread_application_password.synapse_app_password.value
+  value        = azuread_service_principal_password.synapse_service_principal_password.value
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "synapse_client_id" {
   name         = "synapse-client-id"
-  value        = azuread_application.synapse_app.application_id
+  value        = azuread_service_principal.synapse_service_principal.application_id
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
