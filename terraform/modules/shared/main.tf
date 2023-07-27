@@ -541,7 +541,7 @@ resource "helm_release" "record_linkage" {
 
   set {
     name = "databasePassword"
-    value = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.mpi-database-password.id})"
+    value = azurerm_postgresql_flexible_server.mpi.administrator_password
   }
 
   set {
