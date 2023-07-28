@@ -346,11 +346,13 @@ resource "azurerm_container_app" "container_app" {
   }
 
   template {
+    max_replicas = 200
+    min_replicas = 0
     container {
       name   = "phdi-${terraform.workspace}-${each.key}"
       image  = docker_registry_image.acr_image[each.key].name
-      cpu    = 0.5
-      memory = "1Gi"
+      cpu    = 1.0
+      memory = "2Gi"
 
       env {
         name  = "SMARTY_AUTH_ID"
@@ -464,7 +466,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
   location            = "eastus"
   resource_group_name = var.resource_group_name
   kind                = "fhir-R4"
-  cosmosdb_throughput = 400
+  cosmosdb_throughput = (terraform.workspace == "uat" ? 2000 : 400)
 
   lifecycle {
     ignore_changes = [name, tags]

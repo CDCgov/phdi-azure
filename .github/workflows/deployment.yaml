@@ -171,7 +171,17 @@ jobs:
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
             --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
             --endpoint-type azurefunction
-
+      - name: Add scaling rules to container apps
+        env:
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+        run: |
+          for SERVICE in fhir-converter ingestion tabulation validation message-parser record-linkage; do
+            az containerapp update --name phdi-$TF_ENV-$SERVICE \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --scale-rule-name concurrent-http-requests \
+              --scale-rule-http-concurrency 10 
+          done
       - name: Add authentication to container apps
         env:
           TENANT_ID: ${{ secrets.TENANT_ID }}
