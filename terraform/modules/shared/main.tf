@@ -517,6 +517,9 @@ provider "helm" {
 #      command     = "az"
 #    }
   }
+  experiments {
+    manifest = true
+  }
 }
 #  provider "kubernetes" {
 #  host                   = data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.host
@@ -552,6 +555,11 @@ resource "helm_release" "record_linkage" {
   set {
     name = "databaseHost"
     value = azurerm_postgresql_flexible_server.mpi.fqdn
+  }
+
+  set {
+    name = "patientTable"
+    value = "dining table"
   }
 
   # use set to read secrets out of the key vault
