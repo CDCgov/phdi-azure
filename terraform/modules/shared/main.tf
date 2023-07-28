@@ -529,10 +529,10 @@ provider "helm" {
 #}
 
 resource "helm_release" "record_linkage" {
-  name       = "emma-chart"
-  repository = "https://cdcgov.github.io/phdi-charts/"
-  chart      = "record-linkage-chart"
-  version    = "5.0"
+  name         = "emma-chart"
+  repository   = "https://cdcgov.github.io/phdi-charts/"
+  chart        = "record-linkage-chart"
+  force_update = true
 
 #  values = [
 #    file("${path.module}/dev-record-linkage-values.yaml")
