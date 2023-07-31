@@ -495,7 +495,7 @@ provider "helm" {
 }
 
 resource "helm_release" "record_linkage" {
-  name         = "emma-chart"
+  name         = "phdi-${terraform.workspace}"
   repository   = "https://cdcgov.github.io/phdi-charts/"
   chart        = "record-linkage-chart"
   recreate_pods = true
