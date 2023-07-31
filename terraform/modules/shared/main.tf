@@ -498,7 +498,7 @@ resource "helm_release" "record_linkage" {
   name         = "emma-chart"
   repository   = "https://cdcgov.github.io/phdi-charts/"
   chart        = "record-linkage-chart"
-  force_update = true
+  recreate_pods = true
 
 #  values = [
 #    file("${path.module}/dev-record-linkage-values.yaml")
