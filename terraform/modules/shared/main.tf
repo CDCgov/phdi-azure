@@ -475,30 +475,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     type = "SystemAssigned"
   }
 
-#  identity {
-#    type         = "UserAssigned"
-#    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
-#  }
 }
-
-#output "client_certificate" {
-#  value     = azurerm_kubernetes_cluster.cluster.kube_config.0.client_certificate
-#  sensitive = true
-#}
-#
-#output "kube_config" {
-#  value = azurerm_kubernetes_cluster.cluster.kube_config_raw
-#  sensitive = true
-#}
-
-#data "azurerm_kubernetes_cluster" "cluster_data" {
-#  name = "phdi-${terraform.workspace}-cluster"
-#  resource_group_name = var.resource_group_name
-#
-#  depends_on = [
-#    azurerm_kubernetes_cluster.cluster
-#  ]
-#}
 
 data "azurerm_kubernetes_cluster" "credentials" {
   name                = azurerm_kubernetes_cluster.cluster.name
@@ -511,22 +488,11 @@ provider "helm" {
     client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_certificate)
     client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
     cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
-#    exec {
-#      api_version = "client.authentication.k8s.io/v1beta1"
-#      args        = ["az", "get-token", "--cluster-name", data.azurerm_kubernetes_cluster.cluster_data.name]
-#      command     = "az"
-#    }
   }
   experiments {
     manifest = true
   }
 }
-#  provider "kubernetes" {
-#  host                   = data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.host
-#  client_certificate     = base64decode(data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.client_certificate)
-#  client_key             = base64decode(data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.client_key)
-#  cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.cluster_data.kube_admin_config.0.cluster_ca_certificate)
-#}
 
 resource "helm_release" "record_linkage" {
   name         = "emma-chart"
@@ -540,7 +506,7 @@ resource "helm_release" "record_linkage" {
 
   set {
     name = "image.tag"
-    value = "v1.0.9"
+    value = "latest"
   }
 
   set {
@@ -557,13 +523,6 @@ resource "helm_release" "record_linkage" {
     name = "databaseHost"
     value = azurerm_postgresql_flexible_server.mpi.fqdn
   }
-
-  set {
-    name = "patientTable"
-    value = "be PATIENT"
-  }
-
-  # use set to read secrets out of the key vault
 }
 
 ##### FHIR Server #####
