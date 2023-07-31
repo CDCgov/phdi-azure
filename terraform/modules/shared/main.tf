@@ -489,9 +489,6 @@ provider "helm" {
     client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
     cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
   }
-  experiments {
-    manifest = true
-  }
 }
 
 resource "helm_release" "record_linkage" {
