@@ -523,11 +523,6 @@ resource "helm_release" "record_linkage" {
     name = "databaseHost"
     value = azurerm_postgresql_flexible_server.mpi.fqdn
   }
-
-    set {
-    name = "patientTable"
-    value = "dining_room_table"
-  }
 }
 
 ##### FHIR Server #####
