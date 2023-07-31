@@ -495,32 +495,28 @@ provider "helm" {
 }
 
 resource "helm_release" "record_linkage" {
-  name         = "phdi-${terraform.workspace}"
-  repository   = "https://cdcgov.github.io/phdi-charts/"
-  chart        = "record-linkage-chart"
+  name          = "phdi-${terraform.workspace}"
+  repository    = "https://cdcgov.github.io/phdi-charts/"
+  chart         = "record-linkage-chart"
   recreate_pods = true
 
-#  values = [
-#    file("${path.module}/dev-record-linkage-values.yaml")
-#  ]
-
   set {
-    name = "image.tag"
+    name  = "image.tag"
     value = "latest"
   }
 
   set {
-    name = "databasePassword"
+    name  = "databasePassword"
     value = azurerm_postgresql_flexible_server.mpi.administrator_password
   }
 
   set {
-    name = "databaseName"
+    name  = "databaseName"
     value = azurerm_postgresql_flexible_server_database.mpi.name
   }
 
   set {
-    name = "databaseHost"
+    name  = "databaseHost"
     value = azurerm_postgresql_flexible_server.mpi.fqdn
   }
 }

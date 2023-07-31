@@ -47,7 +47,3 @@ variable "log_analytics_workspace_id" {
   type        = string
   description = "Log Analytics Workspace ID."
 }
-
-#variable "key_vault_name" {
-#  value = azurerm_key_vault.phdi_key_vault.name
-#}
