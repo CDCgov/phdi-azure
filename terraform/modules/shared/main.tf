@@ -624,10 +624,4 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" 
   "accountKind": "StorageV2"
   }
   JSON
-  connect_via_json = <<JSON
-  {
-  "referenceName": "AutoResolveIntegrationRuntime",
-  "type": "IntegrationRuntimeReference"
-  }
-  JSON
 }
