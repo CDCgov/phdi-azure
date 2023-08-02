@@ -171,7 +171,17 @@ jobs:
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
             --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
             --endpoint-type azurefunction
-
+      - name: Add scaling rules to container apps
+        env:
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+        run: |
+          for SERVICE in fhir-converter ingestion tabulation validation message-parser record-linkage; do
+            az containerapp update --name phdi-$TF_ENV-$SERVICE \
+              --resource-group $RESOURCE_GROUP_NAME \
+              --scale-rule-name concurrent-http-requests \
+              --scale-rule-http-concurrency 10 
+          done
       - name: Add authentication to container apps
         env:
           TENANT_ID: ${{ secrets.TENANT_ID }}
@@ -216,6 +226,7 @@ jobs:
           export KEY_VAULT=${TF_ENV}vault${SHORT_CID}
           export MPI_DB_HOST=phdi${TF_ENV}mpi${SHORT_CID}.postgres.database.azure.com
           export KEY_VAULT_LINKED_SERVICE=${TF_ENV}${SHORT_CID}-keyvault-linked-service
+          export BLOB_STORAGE_LINKED_SERVICE=${TF_ENV}${SHORT_CID}-blob-storage-linked-service
           export SCOPE=${{ secrets.RESOURCE_GROUP_NAME }}-${TF_ENV}
           if az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger"; then
             az synapse trigger delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger" --yes
@@ -237,16 +248,6 @@ jobs:
           az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineConfig.json
           cat ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfig.json | envsubst > ../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
           az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Synapse Analytics Pipeline Weekly Trigger" --file @../../scripts/Synapse/config/SynapseAnalyticsPipelineWeeklyTriggerConfigSubstituted.json
-      - name: Deploy Daily ECR Refresh Pipeline and Trigger
-        env:
-          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
-          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
-          TENANT_ID: ${{ secrets.TENANT_ID }}
-        run: |
-          az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "ECR Datastore Refresh" --file @../../scripts/Synapse/config/ECRDatastoreRefreshConfig.json
-          cat ../../scripts/Synapse/config/ECRDatastoreRefreshDailyTriggerConfig.json | envsubst > ../../scripts/Synapse/config/ECRDatastoreRefreshDailyTriggerConfigSubstituted.json
-          az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "ECR Datastore Refresh Daily Trigger" --file @../../scripts/Synapse/config/ECRDatastoreRefreshDailyTriggerConfigSubstituted.json
-
 
   end-to-end:
     name: End-to-end tests

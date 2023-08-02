@@ -29,6 +29,11 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "bundle_snapshots" {
   storage_account_id = azurerm_storage_account.phi.id
 }
 
+resource "azurerm_storage_data_lake_gen2_filesystem" "linkage_notebook_outputs" {
+  name               = "linkage-notebook-outputs"
+  storage_account_id = azurerm_storage_account.phi.id
+}
+
 resource "azurerm_storage_blob" "vxu" {
   name                   = "vxu/.keep"
   storage_account_name   = azurerm_storage_account.phi.name
@@ -346,11 +351,13 @@ resource "azurerm_container_app" "container_app" {
   }
 
   template {
+    max_replicas = 200
+    min_replicas = 0
     container {
       name   = "phdi-${terraform.workspace}-${each.key}"
       image  = docker_registry_image.acr_image[each.key].name
-      cpu    = 0.5
-      memory = "1Gi"
+      cpu    = 1.0
+      memory = "2Gi"
 
       env {
         name  = "SMARTY_AUTH_ID"
@@ -464,7 +471,7 @@ resource "azurerm_healthcare_service" "fhir_server" {
   location            = "eastus"
   resource_group_name = var.resource_group_name
   kind                = "fhir-R4"
-  cosmosdb_throughput = 400
+  cosmosdb_throughput = (terraform.workspace == "uat" ? 2000 : 400)
 
   lifecycle {
     ignore_changes = [name, tags]
@@ -605,6 +612,18 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
   type_properties_json = <<JSON
   {
   "baseUrl": "https://${terraform.workspace}vault${substr(var.client_id, 0, 8)}.vault.azure.net/"
+  }
+  JSON
+}
+
+resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" {
+  name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  type                 = "AzureBlobStorage"
+  type_properties_json = <<JSON
+  {
+  "servieEndpoint": "https://${terraform.workspace}${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
+  "accountKind": "StorageV2"
   }
   JSON
 }

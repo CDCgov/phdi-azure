@@ -9,7 +9,7 @@
                 "dependsOn": [],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -77,7 +77,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -114,7 +114,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -151,7 +151,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -188,7 +188,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -225,7 +225,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -262,7 +262,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -299,7 +299,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -336,7 +336,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -372,7 +372,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -409,7 +409,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -456,7 +456,7 @@
                             "type": "WebActivity",
                             "policy": {
                                 "timeout": "0.12:00:00",
-                                "retry": 0,
+                                "retry": 3,
                                 "retryIntervalInSeconds": 30,
                                 "secureOutput": false,
                                 "secureInput": false
@@ -493,7 +493,7 @@
                             ],
                             "policy": {
                                 "timeout": "0.12:00:00",
-                                "retry": 0,
+                                "retry": 3,
                                 "retryIntervalInSeconds": 30,
                                 "secureOutput": false,
                                 "secureInput": false
@@ -533,7 +533,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -570,7 +570,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -594,7 +594,6 @@
                 }
             }
         ],
-        "concurrency": 10,
         "parameters": {
             "message": {
                 "type": "String"
