@@ -1,5 +1,9 @@
 from ReadSourceData import main as read_source_data
-from ReadSourceData import get_reportability_response, rr_to_ecr, MESSAGE_TO_TEMPLATE_MAP
+from ReadSourceData import (
+    get_reportability_response,
+    rr_to_ecr,
+    MESSAGE_TO_TEMPLATE_MAP,
+)
 from azure.core.exceptions import ResourceNotFoundError
 from unittest import mock
 from lxml import etree
@@ -86,7 +90,7 @@ def test_pipeline_trigger_success(
     adf_client = mock.MagicMock()
     adf_client.pipelines.create_run.return_value = good_response
     patched_adf_management_client.return_value = adf_client
-    
+
     for source_data_subdirectory in MESSAGE_TO_TEMPLATE_MAP.keys():
         message_type = source_data_subdirectory
         root_template = MESSAGE_TO_TEMPLATE_MAP[source_data_subdirectory]
