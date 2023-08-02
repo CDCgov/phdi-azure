@@ -38,7 +38,7 @@ def main(event: func.EventGridEvent) -> None:
     blob_url = event.get_json()["url"]
     storage_account_url, filename = blob_url.split(f"/{container_name}/")
 
-    # Determine data type and root template.
+    # Determine message type and root template.
     filename_parts = filename.split("/")
     message_type = filename_parts[0]
     
