@@ -1,6 +1,5 @@
 from ReadSourceData import main as read_source_data
-from ReadSourceData import get_reportability_response
-from ReadSourceData import rr_to_ecr as rr_to_ecr
+from ReadSourceData import get_reportability_response, rr_to_ecr, MESSAGE_TO_TEMPLATE_MAP
 from azure.core.exceptions import ResourceNotFoundError
 from unittest import mock
 from lxml import etree
@@ -87,18 +86,10 @@ def test_pipeline_trigger_success(
     adf_client = mock.MagicMock()
     adf_client.pipelines.create_run.return_value = good_response
     patched_adf_management_client.return_value = adf_client
-    for source_data_subdirectory in ["elr", "vxu", "ecr"]:
-        if source_data_subdirectory == "elr":
-            message_type = "elr"
-            root_template = "ORU_R01"
-
-        elif source_data_subdirectory == "vxu":
-            message_type = "vxu"
-            root_template = "VXU_V04"
-
-        elif source_data_subdirectory == "ecr":
-            message_type = "ecr"
-            root_template = "EICR"
+    
+    for source_data_subdirectory in MESSAGE_TO_TEMPLATE_MAP.keys():
+        message_type = source_data_subdirectory
+        root_template = MESSAGE_TO_TEMPLATE_MAP[source_data_subdirectory]
 
         event = mock.MagicMock()
         event.get_json.return_value = {

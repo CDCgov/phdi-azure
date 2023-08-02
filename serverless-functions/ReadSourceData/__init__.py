@@ -12,7 +12,7 @@ from phdi.harmonization.hl7 import (
 )
 from lxml import etree
 
-MESSSAGE_TO_TEMPLATE_MAP = {
+MESSAGE_TO_TEMPLATE_MAP = {
     "elr": "ORU_R01",
     "vxu": "VXU_V04",
     "ecr": "EICR",
@@ -23,7 +23,7 @@ MESSSAGE_TO_TEMPLATE_MAP = {
 def main(event: func.EventGridEvent) -> None:
     """
     When this function is triggered with a blob payload, read the new file if its
-    name begins with 'source-data/', identify each individual messsage
+    name begins with 'source-data/', identify each individual message
     (ELR, VXU, or eCR) contained in the file, and trigger in an Azure Data Factory
     ingestion pipeline for each of them. An exception is raised if pipeline triggering
     fails for any message.
@@ -43,7 +43,7 @@ def main(event: func.EventGridEvent) -> None:
     filename_parts = filename.split("/")
     message_type = filename_parts[0]
 
-    if message_type not in MESSSAGE_TO_TEMPLATE_MAP:
+    if message_type not in MESSAGE_TO_TEMPLATE_MAP:
         logging.warning(
             "The read source data function was triggered. We expected a file in the "
             "elr, vxu, or ecr folders, but something else was provided."
@@ -58,7 +58,7 @@ def main(event: func.EventGridEvent) -> None:
             )
             return
 
-    root_template = MESSSAGE_TO_TEMPLATE_MAP.get(message_type)
+    root_template = MESSAGE_TO_TEMPLATE_MAP.get(message_type)
 
     # Download blob contents.
     cred_manager = AzureCredentialManager(resource_location=storage_account_url)
