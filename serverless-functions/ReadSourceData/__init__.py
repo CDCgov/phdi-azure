@@ -12,6 +12,12 @@ from phdi.harmonization.hl7 import (
 )
 from lxml import etree
 
+MESSSAGE_TO_TEMPLATE_MAP = {
+    "elr": "ORU_R01",
+    "vxu": "VXU_V04",
+    "ecr": "EICR",
+    "fhir": "",
+}
 
 def main(event: func.EventGridEvent) -> None:
     """
@@ -34,38 +40,25 @@ def main(event: func.EventGridEvent) -> None:
 
     # Determine data type and root template.
     filename_parts = filename.split("/")
-    directory_name = filename_parts[0]
-
-    if directory_name == "elr":
-        message_type = "elr"
-        root_template = "ORU_R01"
-
-    elif directory_name == "vxu":
-        message_type = "vxu"
-        root_template = "VXU_V04"
-
-    elif directory_name == "ecr":
-        message_type = "ecr"
-        root_template = "EICR"
-
-        if any([name for name in ["RR", "html"] if name in filename_parts[1]]):
-            logging.info(
-                "The read source data function was triggered. Processing will not "
-                "continue as the file uploaded was not a currently handled type."
-            )
-            return
-    elif directory_name == "fhir":
-        message_type = "fhir"
-        # FHIR data does not need to be converted, so no root template is needed.
-        root_template = "" 
-
-    else:
+    message_type = filename_parts[0]
+    
+    if message_type not in MESSSAGE_TO_TEMPLATE_MAP:
         logging.warning(
             "The read source data function was triggered. We expected a file in the "
             "elr, vxu, or ecr folders, but something else was provided."
         )
         return
 
+    if message_type == "ecr":
+        if any([name for name in ["_RR", ".html"] if name in filename_parts[1]]):
+            logging.info(
+                "The read source data function was triggered. Processing will not "
+                "continue as the file uploaded was not a currently handled type."
+            )
+            return
+
+    root_template = MESSSAGE_TO_TEMPLATE_MAP.get(message_type)
+    
     # Download blob contents.
     cred_manager = AzureCredentialManager(resource_location=storage_account_url)
     cloud_container_connection = AzureCloudContainerConnection(
