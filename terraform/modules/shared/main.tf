@@ -481,7 +481,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     name       = "default"
     node_count = 1
     vm_size    = "Standard_D2_v2"
-    vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnet_ids[0]
+    vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnets[0].id
   }
 
   identity {
