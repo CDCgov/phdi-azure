@@ -19,6 +19,7 @@ MESSSAGE_TO_TEMPLATE_MAP = {
     "fhir": "",
 }
 
+
 def main(event: func.EventGridEvent) -> None:
     """
     When this function is triggered with a blob payload, read the new file if its
@@ -41,7 +42,7 @@ def main(event: func.EventGridEvent) -> None:
     # Determine message type and root template.
     filename_parts = filename.split("/")
     message_type = filename_parts[0]
-    
+
     if message_type not in MESSSAGE_TO_TEMPLATE_MAP:
         logging.warning(
             "The read source data function was triggered. We expected a file in the "
@@ -58,7 +59,7 @@ def main(event: func.EventGridEvent) -> None:
             return
 
     root_template = MESSSAGE_TO_TEMPLATE_MAP.get(message_type)
-    
+
     # Download blob contents.
     cred_manager = AzureCredentialManager(resource_location=storage_account_url)
     cloud_container_connection = AzureCloudContainerConnection(
@@ -70,7 +71,6 @@ def main(event: func.EventGridEvent) -> None:
 
     # Handle eICR + Reportability Response messages
     if message_type == "ecr":
-
         wait_time = float(os.environ.get("WAIT_TIME", 10))
         sleep_time = float(os.environ.get("SLEEP_TIME", 1))
 
@@ -137,7 +137,7 @@ def main(event: func.EventGridEvent) -> None:
     # Handle batch Hl7v2 messages.
     elif message_type == "vxu" or message_type == "elr":
         messages = convert_hl7_batch_messages_to_list(blob_contents)
-    
+
     # Handle FHIR messages.
     elif message_type == "fhir":
         messages = [blob_contents]
