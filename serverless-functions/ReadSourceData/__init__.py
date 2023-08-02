@@ -71,6 +71,7 @@ def main(event: func.EventGridEvent) -> None:
 
     # Handle eICR + Reportability Response messages
     if message_type == "ecr":
+        ecr = blob_contents
         wait_time = float(os.environ.get("WAIT_TIME", 10))
         sleep_time = float(os.environ.get("SLEEP_TIME", 1))
 
@@ -130,7 +131,7 @@ def main(event: func.EventGridEvent) -> None:
                 logging.warning(missing_rr_message)
         else:
             # Extract RR fields and put them in the ecr
-            ecr = rr_to_ecr(reportability_response, blob_contents)
+            ecr = rr_to_ecr(reportability_response, ecr)
 
         messages = [ecr]
 
