@@ -34,16 +34,17 @@ def main(event: func.EventGridEvent) -> None:
 
     # Determine data type and root template.
     filename_parts = filename.split("/")
+    directory_name = filename_parts[0]
 
-    if filename_parts[0] == "elr":
+    if directory_name == "elr":
         message_type = "elr"
         root_template = "ORU_R01"
 
-    elif filename_parts[0] == "vxu":
+    elif directory_name == "vxu":
         message_type = "vxu"
         root_template = "VXU_V04"
 
-    elif filename_parts[0] == "ecr":
+    elif directory_name == "ecr":
         message_type = "ecr"
         root_template = "EICR"
 
@@ -53,6 +54,10 @@ def main(event: func.EventGridEvent) -> None:
                 "continue as the file uploaded was not a currently handled type."
             )
             return
+    elif directory_name == "fhir":
+        message_type = "fhir"
+        # FHIR data does not need to be converted, so no root template is needed.
+        root_template = "" 
 
     else:
         logging.warning(
@@ -66,12 +71,12 @@ def main(event: func.EventGridEvent) -> None:
     cloud_container_connection = AzureCloudContainerConnection(
         storage_account_url=storage_account_url, cred_manager=cred_manager
     )
+    blob_contents = cloud_container_connection.download_object(
+        container_name=container_name, filename=filename
+    )
 
     # Handle eICR + Reportability Response messages
     if message_type == "ecr":
-        ecr = cloud_container_connection.download_object(
-            container_name=container_name, filename=filename
-        )
 
         wait_time = float(os.environ.get("WAIT_TIME", 10))
         sleep_time = float(os.environ.get("SLEEP_TIME", 1))
@@ -132,16 +137,17 @@ def main(event: func.EventGridEvent) -> None:
                 logging.warning(missing_rr_message)
         else:
             # Extract RR fields and put them in the ecr
-            ecr = rr_to_ecr(reportability_response, ecr)
+            ecr = rr_to_ecr(reportability_response, blob_contents)
 
         messages = [ecr]
 
     # Handle batch Hl7v2 messages.
     elif message_type == "vxu" or message_type == "elr":
-        blob_contents = cloud_container_connection.download_object(
-            container_name=container_name, filename=filename
-        )
         messages = convert_hl7_batch_messages_to_list(blob_contents)
+    
+    # Handle FHIR messages.
+    elif message_type == "fhir":
+        messages = [blob_contents]
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
