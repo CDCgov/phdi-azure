@@ -491,7 +491,10 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     network_plugin = "azure"
   }
   private_cluster_enabled = true
-
+  
+  role_based_access_control {
+    enabled = true
+  }
 }
 
 data "azurerm_kubernetes_cluster" "credentials" {
