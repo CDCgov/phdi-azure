@@ -471,10 +471,6 @@ resource "azurerm_virtual_network" "aks_vnet" {
   }
 }
 
-output "virtual_network_id" {
-  value = data.azurerm_virtual_network.aks_vnet.subnets[0].id
-}
-
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = "phdi-${terraform.workspace}-cluster"
   location            = var.location
@@ -485,7 +481,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     name       = "default"
     node_count = 1
     vm_size    = "Standard_D2_v2"
-    vnet_subnet_id  = virtual_network_id
+    vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnets[0].id
   }
 
   identity {
