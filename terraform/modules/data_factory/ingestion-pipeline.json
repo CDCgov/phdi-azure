@@ -203,6 +203,12 @@
                         "dependencyConditions": [
                             "Succeeded"
                         ]
+                    },
+                    {
+                        "activity": "fhir_check",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
                     }
                 ],
                 "policy": {
