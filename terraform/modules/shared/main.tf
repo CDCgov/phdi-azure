@@ -29,10 +29,10 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "bundle_snapshots" {
   storage_account_id = azurerm_storage_account.phi.id
 }
 
-resource "azurerm_storage_data_lake_gen2_filesystem" "linkage_notebook_outputs" {
-  name               = "linkage-notebook-outputs"
-  storage_account_id = azurerm_storage_account.phi.id
-}
+# resource "azurerm_storage_data_lake_gen2_filesystem" "linkage_notebook_outputs" {
+#   name               = "linkage-notebook-outputs"
+#   storage_account_id = azurerm_storage_account.phi.id
+# }
 
 resource "azurerm_storage_blob" "vxu" {
   name                   = "vxu/.keep"
@@ -616,14 +616,14 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
   JSON
 }
 
-resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" {
-  name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
-  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
-  type                 = "AzureBlobStorage"
-  type_properties_json = <<JSON
-  {
-  "servieEndpoint": "https://${terraform.workspace}${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
-  "accountKind": "StorageV2"
-  }
-  JSON
-}
+# resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" {
+#   name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
+#   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+#   type                 = "AzureBlobStorage"
+#   type_properties_json = <<JSON
+#   {
+#   "servieEndpoint": "https://${terraform.workspace}${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
+#   "accountKind": "StorageV2"
+#   }
+#   JSON
+# }
