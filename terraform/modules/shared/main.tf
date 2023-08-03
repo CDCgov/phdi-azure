@@ -481,7 +481,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     name       = "default"
     node_count = 1
     vm_size    = "Standard_D2_v2"
-    vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnet[0].id
+    vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnet["phdi-${terraform.workspace}-aks_subnet"].id
   }
 
   identity {
