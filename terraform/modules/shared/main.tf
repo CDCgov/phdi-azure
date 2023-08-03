@@ -459,17 +459,17 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
 
 #### Kubernetes Service ####
 
-resource "azurerm_virtual_network" "aks_vnet" {
-  name                = "phdi-${terraform.workspace}-vnet"
-  resource_group_name = var.resource_group_name
-  address_space       = ["10.30.0.0/16"]
-  location            = var.location
+# resource "azurerm_virtual_network" "aks_vnet" {
+#   name                = "phdi-${terraform.workspace}-vnet"
+#   resource_group_name = var.resource_group_name
+#   address_space       = ["10.30.0.0/16"]
+#   location            = var.location
 
-  subnet {
-    name           = "phdi-${terraform.workspace}-aks_subnet"
-    address_prefix = "10.30.1.0/24"
-  }
-}
+#   subnet {
+#     name           = "phdi-${terraform.workspace}-aks_subnet"
+#     address_prefix = "10.30.1.0/24"
+#   }
+# }
 
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = "phdi-${terraform.workspace}-cluster"
@@ -481,7 +481,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     name       = "default"
     node_count = 1
     vm_size    = "Standard_D2_v2"
-    vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
+    # vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
   }
 
   identity {
