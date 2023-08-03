@@ -3,10 +3,29 @@
     "properties": {
         "activities": [
             {
+                "name": "fhir_check",
+                "type": "IfCondition",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(pipeline().parameters.message_type, 'fhir')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
                 "name": "validate_message",
                 "description": "Validate Hl7 or CDA message.\n",
                 "type": "WebActivity",
-                "dependsOn": [],
+                "dependsOn": [
+                    {
+                        "activity": "fhir_check",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
                 "policy": {
                     "timeout": "0.12:00:00",
                     "retry": 3,
@@ -218,6 +237,12 @@
                 "dependsOn": [
                     {
                         "activity": "convert_to_fhir",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "fhir_check",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
