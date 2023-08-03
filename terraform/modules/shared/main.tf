@@ -620,6 +620,12 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" 
   name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   type                 = "AzureBlobStorage"
-  type_properties_json = { "accountKind" : "StorageV2" }
+  type_properties_json = <<JSON
+  {
+  "servieEndpoint": "https://${terraform.workspace}${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
+  "accountKind": "StorageV2"
+  }
+  JSON
+}
 
 }
