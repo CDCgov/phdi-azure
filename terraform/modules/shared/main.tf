@@ -467,7 +467,7 @@ resource "azurerm_virtual_network" "aks_vnet" {
 
   subnet {
     name           = "phdi-${terraform.workspace}-aks_subnet"
-    address_prefix = "10.0.1.0/24"
+    address_prefix = "10.0.0.0/24"
   }
 }
 
