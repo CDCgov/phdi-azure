@@ -459,17 +459,17 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
 
 #### Kubernetes Service ####
 
-# resource "azurerm_virtual_network" "aks_vnet" {
-#   name                = "phdi-${terraform.workspace}-vnet"
-#   resource_group_name = var.resource_group_name
-#   address_space       = ["10.30.0.0/16"]
-#   location            = var.location
+resource "azurerm_virtual_network" "aks_vnet" {
+  name                = "phdi-${terraform.workspace}-vnet"
+  resource_group_name = var.resource_group_name
+  address_space       = ["10.30.0.0/16"]
+  location            = var.location
 
-#   subnet {
-#     name           = "phdi-${terraform.workspace}-aks_subnet"
-#     address_prefix = "10.30.1.0/24"
-#   }
-# }
+  subnet {
+    name           = "phdi-${terraform.workspace}-aks_subnet"
+    address_prefix = "10.30.1.0/24"
+  }
+}
 
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = "phdi-${terraform.workspace}-cluster"
@@ -481,7 +481,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     name       = "default"
     node_count = 1
     vm_size    = "Standard_D2_v2"
-    # vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
+    vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
   }
 
   identity {
@@ -490,7 +490,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   network_profile {
     network_plugin = "azure"
   }
-  private_cluster_enabled = true
+  # private_cluster_enabled = true
 }
 
 data "azurerm_kubernetes_cluster" "credentials" {
@@ -498,47 +498,47 @@ data "azurerm_kubernetes_cluster" "credentials" {
   resource_group_name = var.resource_group_name
 }
 
-# provider "helm" {
-#   kubernetes {
-#     host                   = data.azurerm_kubernetes_cluster.credentials.kube_config.0.host
-#     # client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_certificate)
-#     # client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
-#     cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
+provider "helm" {
+  kubernetes {
+    host                   = data.azurerm_kubernetes_cluster.credentials.kube_config.0.host
+    client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_certificate)
+    client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
+    cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
     
-#     exec {
-#       api_version     = "client.authentication.k8s.io/v1beta1"
-#       args            = ["aks", "get-credentials","--resource-group", var.resource_group_name, "--name", azurerm_kubernetes_cluster.cluster.name]    
-#       command         = "az"
-#     }
-#   }
-# }
+    # exec {
+    #   api_version     = "client.authentication.k8s.io/v1beta1"
+    #   args            = ["aks", "get-credentials","--resource-group", var.resource_group_name, "--name", azurerm_kubernetes_cluster.cluster.name]    
+    #   command         = "az"
+    # }
+  }
+}
 
-# resource "helm_release" "record_linkage" {
-#   name          = "phdi-${terraform.workspace}"
-#   repository    = "https://cdcgov.github.io/phdi-charts/"
-#   chart         = "record-linkage-chart"
-#   recreate_pods = true
+resource "helm_release" "record_linkage" {
+  name          = "phdi-${terraform.workspace}"
+  repository    = "https://cdcgov.github.io/phdi-charts/"
+  chart         = "record-linkage-chart"
+  recreate_pods = true
 
-#   set {
-#     name  = "image.tag"
-#     value = "latest"
-#   }
+  set {
+    name  = "image.tag"
+    value = "latest"
+  }
 
-#   set {
-#     name  = "databasePassword"
-#     value = azurerm_postgresql_flexible_server.mpi.administrator_password
-#   }
+  set {
+    name  = "databasePassword"
+    value = azurerm_postgresql_flexible_server.mpi.administrator_password
+  }
 
-#   set {
-#     name  = "databaseName"
-#     value = azurerm_postgresql_flexible_server_database.mpi.name
-#   }
+  set {
+    name  = "databaseName"
+    value = azurerm_postgresql_flexible_server_database.mpi.name
+  }
 
-#   set {
-#     name  = "databaseHost"
-#     value = azurerm_postgresql_flexible_server.mpi.fqdn
-#   }
-# }
+  set {
+    name  = "databaseHost"
+    value = azurerm_postgresql_flexible_server.mpi.fqdn
+  }
+}
 
 ##### FHIR Server #####
 
