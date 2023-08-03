@@ -628,4 +628,3 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" 
   JSON
 }
 
-}
