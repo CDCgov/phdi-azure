@@ -622,7 +622,7 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" 
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-  "serviceEndpoint": "https://phdi${terraform.workspace}${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
+  "serviceEndpoint": "https://phdi${terraform.workspace}phi${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
   "accountKind": "StorageV2"
   }
   JSON
