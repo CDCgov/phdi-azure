@@ -14,18 +14,10 @@
         "type": "ScheduleTrigger",
         "typeProperties": {
             "recurrence": {
-                "frequency": "Day",
+                "frequency": "Hour",
                 "interval": 1,
-                "startTime": "2023-07-20T17:30:00",
+                "startTime": "2023-07-20T12:50:00",
                 "timeZone": "Pacific Standard Time",
-                "schedule": {
-                    "minutes": [
-                        30
-                    ],
-                    "hours": [
-                        12
-                    ]
-                }
             }
         }
     }
