@@ -518,6 +518,29 @@ resource "helm_release" "record_linkage" {
   }
 }
 
+resource "helm_release" "ingestion" {
+  name          = "phdi-${terraform.workspace}"
+  repository    = "https://cdcgov.github.io/phdi-charts/"
+  chart         = "ingestion-chart"
+  recreate_pods = true
+
+  set {
+    name  = "image.tag"
+    value = "latest"
+  }
+
+  set {
+    name  = "smartyAuthId"
+    value = azurerm_key_vault_secret.smarty_auth_id.value
+  }
+
+  set {
+    name  = "smartyToken"
+    value = azurerm_key_vault_secret.smarty_auth_token.value
+  }
+}
+
+
 ##### FHIR Server #####
 
 resource "azurerm_healthcare_service" "fhir_server" {
