@@ -471,6 +471,51 @@ resource "azurerm_virtual_network" "aks_vnet" {
   }
 }
 
+resource "azurerm_network_security_group" "aks_nsg" {
+  name                = "phdi-${terraform.workspace}-nsg"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  security_rule {
+    name                       = "AzureDataFactoryInbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "DataFactory"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "AzureDataFactoryOutbound"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "DataFactory"
+  }
+  security_rule {
+    name                       = "AzureDataFactoryOutbound"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "DataFactory"
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "aks_nsg_association" {
+  subnet_id                 = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
+  network_security_group_id = azurerm_network_security_group.aks_nsg.id
+}
+
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = "phdi-${terraform.workspace}-cluster"
   location            = var.location
