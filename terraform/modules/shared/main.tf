@@ -617,7 +617,7 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
 }
 
 resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" {
-  name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
+  name                 = "phdi${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
