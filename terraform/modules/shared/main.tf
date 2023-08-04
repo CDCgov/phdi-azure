@@ -517,6 +517,16 @@ resource "helm_release" "helm_clusters" {
     name  = "databaseHost"
     value = azurerm_postgresql_flexible_server.mpi.fqdn
   }
+
+  set {
+    name  = "smartyAuthId"
+    value = azurerm_key_vault_secret.smarty_auth_id.value
+  }
+
+  set {
+    name  = "smartyToken"
+    value = azurerm_key_vault_secret.smarty_auth_token.value
+  }
 }
 
 # resource "helm_release" "record_linkage" {
