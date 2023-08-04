@@ -523,10 +523,10 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   dns_prefix          = "phdi-${terraform.workspace}"
 
   default_node_pool {
-    name       = "default"
-    node_count = 1
-    vm_size    = "Standard_D2_v2"
-    vnet_subnet_id  = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
+    name           = "default"
+    node_count     = 1
+    vm_size        = "Standard_D2_v2"
+    vnet_subnet_id = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
   }
 
   identity {
@@ -549,7 +549,7 @@ provider "helm" {
     client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_certificate)
     client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
     cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
-    
+
     # exec {
     #   api_version     = "client.authentication.k8s.io/v1beta1"
     #   args            = ["aks", "get-credentials","--resource-group", var.resource_group_name, "--name", azurerm_kubernetes_cluster.cluster.name]    
