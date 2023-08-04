@@ -549,12 +549,6 @@ provider "helm" {
     client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_certificate)
     client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
     cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
-
-    # exec {
-    #   api_version     = "client.authentication.k8s.io/v1beta1"
-    #   args            = ["aks", "get-credentials","--resource-group", var.resource_group_name, "--name", azurerm_kubernetes_cluster.cluster.name]    
-    #   command         = "az"
-    # }
   }
 }
 
