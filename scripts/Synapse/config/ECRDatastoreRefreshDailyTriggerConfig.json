@@ -17,7 +17,7 @@
                 "frequency": "Hour",
                 "interval": 1,
                 "startTime": "2023-07-20T12:58:00",
-                "timeZone": "Pacific Standard Time",
+                "timeZone": "Pacific Standard Time"
             }
         }
     }
