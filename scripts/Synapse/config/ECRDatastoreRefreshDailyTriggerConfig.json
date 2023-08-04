@@ -20,7 +20,7 @@
                 "timeZone": "Pacific Standard Time",
                 "schedule": {
                     "minutes": [
-                        0
+                        30
                     ],
                     "hours": [
                         12
