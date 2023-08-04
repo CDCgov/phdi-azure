@@ -491,10 +491,11 @@ provider "helm" {
   }
 }
 
-resource "helm_release" "record_linkage" {
-  name          = "phdi-${terraform.workspace}"
+resource "helm_release" "helm_clusters" {
+  for_each = local.images
   repository    = "https://cdcgov.github.io/phdi-charts/"
-  chart         = "record-linkage-chart"
+  name = "phdi-${terraform.workspace}-${each.key}"
+  chart = "${each.key}-chart"
   recreate_pods = true
 
   set {
@@ -518,27 +519,54 @@ resource "helm_release" "record_linkage" {
   }
 }
 
-resource "helm_release" "ingestion" {
-  name          = "phdi-${terraform.workspace}"
-  repository    = "https://cdcgov.github.io/phdi-charts/"
-  chart         = "ingestion-chart"
-  recreate_pods = true
+# resource "helm_release" "record_linkage" {
+#   name          = "phdi-${terraform.workspace}"
+#   repository    = "https://cdcgov.github.io/phdi-charts/"
+#   chart         = "record-linkage-chart"
+#   recreate_pods = true
 
-  set {
-    name  = "image.tag"
-    value = "latest"
-  }
+#   set {
+#     name  = "image.tag"
+#     value = "latest"
+#   }
 
-  set {
-    name  = "smartyAuthId"
-    value = azurerm_key_vault_secret.smarty_auth_id.value
-  }
+#   set {
+#     name  = "databasePassword"
+#     value = azurerm_postgresql_flexible_server.mpi.administrator_password
+#   }
 
-  set {
-    name  = "smartyToken"
-    value = azurerm_key_vault_secret.smarty_auth_token.value
-  }
-}
+#   set {
+#     name  = "databaseName"
+#     value = azurerm_postgresql_flexible_server_database.mpi.name
+#   }
+
+#   set {
+#     name  = "databaseHost"
+#     value = azurerm_postgresql_flexible_server.mpi.fqdn
+#   }
+# }
+
+# resource "helm_release" "ingestion" {
+#   name          = "phdi-${terraform.workspace}"
+#   repository    = "https://cdcgov.github.io/phdi-charts/"
+#   chart         = "ingestion-chart"
+#   recreate_pods = true
+
+#   set {
+#     name  = "image.tag"
+#     value = "latest"
+#   }
+
+#   set {
+#     name  = "smartyAuthId"
+#     value = azurerm_key_vault_secret.smarty_auth_id.value
+#   }
+
+#   set {
+#     name  = "smartyToken"
+#     value = azurerm_key_vault_secret.smarty_auth_token.value
+#   }
+# }
 
 
 ##### FHIR Server #####
