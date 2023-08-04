@@ -14,9 +14,9 @@
         "type": "ScheduleTrigger",
         "typeProperties": {
             "recurrence": {
-                "frequency": "Hour",
+                "frequency": "Day",
                 "interval": 1,
-                "startTime": "2023-07-20T12:58:00",
+                "startTime": "2023-07-20T17:30:00",
                 "timeZone": "Pacific Standard Time"
             }
         }
