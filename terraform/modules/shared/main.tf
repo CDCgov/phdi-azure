@@ -492,10 +492,10 @@ provider "helm" {
 }
 
 resource "helm_release" "helm_clusters" {
-  for_each = local.images
+  for_each      = local.images
   repository    = "https://cdcgov.github.io/phdi-charts/"
-  name = "phdi-${terraform.workspace}-${each.key}"
-  chart = "${each.key}-chart"
+  name          = "phdi-${terraform.workspace}-${each.key}"
+  chart         = "${each.key}-chart"
   recreate_pods = true
 
   set {
