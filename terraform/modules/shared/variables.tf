@@ -47,3 +47,13 @@ variable "log_analytics_workspace_id" {
   type        = string
   description = "Log Analytics Workspace ID."
 }
+
+variable "k8s_vnet_address_space" {
+  type        = string
+  description = "Ip address space for kubernetes vnet"
+}
+
+variable "k8s_subnet_address_prefix" {
+  type        = string
+  description = "Ip address space for kubernetes subnet vnet"
+}
