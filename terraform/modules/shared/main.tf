@@ -457,6 +457,54 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
   access_mode                  = "ReadWrite"
 }
 
+#### VNET for kubernetes ####
+
+resource "azurerm_virtual_network" "aks_vnet" {
+  name                = "phdi-${terraform.workspace}-vnet"
+  resource_group_name = var.resource_group_name
+  address_space       = [var.k8s_vnet_address_space]
+  location            = var.location
+
+  subnet {
+    name           = "phdi-${terraform.workspace}-aks_subnet"
+    address_prefix = var.k8s_subnet_address_prefix
+  }
+}
+
+resource "azurerm_network_security_group" "aks_nsg" {
+  name                = "phdi-${terraform.workspace}-nsg"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  security_rule {
+    name                       = "AzureDataFactoryInbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "DataFactory"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "AzureDataFactoryOutbound"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "DataFactory"
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "aks_nsg_association" {
+  subnet_id                 = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
+  network_security_group_id = azurerm_network_security_group.aks_nsg.id
+}
+
 #### Kubernetes Service ####
 
 resource "azurerm_kubernetes_cluster" "cluster" {
@@ -466,15 +514,18 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   dns_prefix          = "phdi-${terraform.workspace}"
 
   default_node_pool {
-    name       = "default"
-    node_count = 1
-    vm_size    = "Standard_D2_v2"
+    name           = "default"
+    node_count     = 1
+    vm_size        = "Standard_D2_v2"
+    vnet_subnet_id = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
   }
 
   identity {
     type = "SystemAssigned"
   }
-
+  network_profile {
+    network_plugin = "azure"
+  }
 }
 
 data "azurerm_kubernetes_cluster" "credentials" {
