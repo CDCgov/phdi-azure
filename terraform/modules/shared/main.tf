@@ -462,12 +462,12 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
 resource "azurerm_virtual_network" "aks_vnet" {
   name                = "phdi-${terraform.workspace}-vnet"
   resource_group_name = var.resource_group_name
-  address_space       = [var.k8s_vnet_address_space]
+  address_space       = [module.shared.k8s_vnet_address_space]
   location            = var.location
 
   subnet {
     name           = "phdi-${terraform.workspace}-aks_subnet"
-    address_prefix = var.k8s_subnet_address_prefix
+    address_prefix = module.shared.k8s_subnet_address_prefix
   }
 }
 
