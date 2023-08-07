@@ -86,6 +86,6 @@ output kubernetes_vnet_address_space {
 }
 
 output kubernetes_subnet_address_prefix {
-  value       = "10.30.1.0/24"
+  value       = "10.30.0.0/16"
 }
 
