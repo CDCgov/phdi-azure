@@ -457,17 +457,17 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
   access_mode                  = "ReadWrite"
 }
 
-#### Kubernetes Service ####
+#### VNET for kubernetes ####
 
 resource "azurerm_virtual_network" "aks_vnet" {
   name                = "phdi-${terraform.workspace}-vnet"
   resource_group_name = var.resource_group_name
-  address_space       = ["10.30.0.0/16"]
+  address_space       = [module.shared.kubernetes_vnet_address_space]
   location            = var.location
 
   subnet {
     name           = "phdi-${terraform.workspace}-aks_subnet"
-    address_prefix = "10.30.1.0/24"
+    address_prefix = module.shared.kubernetes_subnet_address_prefix
   }
 }
 
@@ -498,23 +498,14 @@ resource "azurerm_network_security_group" "aks_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "DataFactory"
   }
-  security_rule {
-    name                       = "AzureDataFactoryOutbound"
-    priority                   = 100
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "DataFactory"
-  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "aks_nsg_association" {
   subnet_id                 = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
   network_security_group_id = azurerm_network_security_group.aks_nsg.id
 }
+
+#### Kubernetes Service ####
 
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = "phdi-${terraform.workspace}-cluster"
@@ -535,7 +526,6 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   network_profile {
     network_plugin = "azure"
   }
-  # private_cluster_enabled = true
 }
 
 data "azurerm_kubernetes_cluster" "credentials" {
