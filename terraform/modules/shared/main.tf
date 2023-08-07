@@ -1,10 +1,3 @@
-output kubernetes_vnet_address_space {
-  value       = "10.30.0.0/16"
-}
-
-output kubernetes_subnet_address_prefix {
-  value       = "10.30.0.0/16"
-}
 module "shared" {
   source                     = "./"
   kubernetes_vnet_address_space             = var.resource_group_name
