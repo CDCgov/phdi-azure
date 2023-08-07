@@ -1,9 +1,3 @@
-module "shared" {
-  source                     = "./outputs.tf"
-  kubernetes_vnet_address_space             = var.resource_group_name
-  kubernetes_subnet_address_prefix          = var.location
-}
-
 ##### PHI Storage Account #####
 
 resource "azurerm_storage_account" "phi" {

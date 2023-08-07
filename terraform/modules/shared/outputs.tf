@@ -81,11 +81,11 @@ output "key_vault_name" {
   value = azurerm_key_vault.phdi_key_vault.name
 }
 
-output kubernetes_vnet_address_space {
+output k8s_vnet_address_space {
   value       = "10.30.0.0/16"
 }
 
-output kubernetes_subnet_address_prefix {
+output k8s_subnet_address_prefix {
   value       = "10.30.1.0/24"
 }
 

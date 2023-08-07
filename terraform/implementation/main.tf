@@ -12,6 +12,8 @@ module "shared" {
   ghcr_username              = var.ghcr_username
   ghcr_token                 = var.ghcr_token
   log_analytics_workspace_id = module.read_source_data.log_analytics_workspace_id
+  k8s_vnet_address_space     = var.resource_group_name
+  k8s_subnet_address_prefix  = var.location
 }
 
 
