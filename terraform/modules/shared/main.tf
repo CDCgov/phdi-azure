@@ -1,5 +1,5 @@
 module "shared" {
-  source                     = "./"
+  source                     = "./outputs.tf"
   kubernetes_vnet_address_space             = var.resource_group_name
   kubernetes_subnet_address_prefix          = var.location
 }
