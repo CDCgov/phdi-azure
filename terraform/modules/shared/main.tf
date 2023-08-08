@@ -533,42 +533,42 @@ data "azurerm_kubernetes_cluster" "credentials" {
   resource_group_name = var.resource_group_name
 }
 
-provider "helm" {
-  kubernetes {
-    host                   = data.azurerm_kubernetes_cluster.credentials.kube_config.0.host
-    client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_certificate)
-    client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
-    cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
-  }
-}
+#provider "helm" {
+#  kubernetes {
+#    host                   = data.azurerm_kubernetes_cluster.credentials.kube_config.0.host
+#    client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_certificate)
+#    client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
+#    cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
+#  }
+#}
 
-resource "helm_release" "record_linkage" {
-  name          = "phdi-${terraform.workspace}"
-  repository    = "https://cdcgov.github.io/phdi-charts/"
-  chart         = "record-linkage-chart"
-  recreate_pods = true
-  version = "0.1.0"
-
-  set {
-    name  = "image.tag"
-    value = "latest"
-  }
-
-  set {
-    name  = "databasePassword"
-    value = azurerm_postgresql_flexible_server.mpi.administrator_password
-  }
-
-  set {
-    name  = "databaseName"
-    value = azurerm_postgresql_flexible_server_database.mpi.name
-  }
-
-  set {
-    name  = "databaseHost"
-    value = azurerm_postgresql_flexible_server.mpi.fqdn
-  }
-}
+#resource "helm_release" "record_linkage" {
+#  name          = "phdi-${terraform.workspace}"
+#  repository    = "https://cdcgov.github.io/phdi-charts/"
+#  chart         = "record-linkage-chart"
+#  recreate_pods = true
+#  version = "0.1.0"
+#
+#  set {
+#    name  = "image.tag"
+#    value = "latest"
+#  }
+#
+#  set {
+#    name  = "databasePassword"
+#    value = azurerm_postgresql_flexible_server.mpi.administrator_password
+#  }
+#
+#  set {
+#    name  = "databaseName"
+#    value = azurerm_postgresql_flexible_server_database.mpi.name
+#  }
+#
+#  set {
+#    name  = "databaseHost"
+#    value = azurerm_postgresql_flexible_server.mpi.fqdn
+#  }
+#}
 
 ##### FHIR Server #####
 
