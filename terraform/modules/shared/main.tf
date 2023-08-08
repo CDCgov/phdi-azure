@@ -548,10 +548,10 @@ resource "helm_release" "record_linkage" {
   chart         = "record-linkage-chart"
   recreate_pods = true
 
-  set {
-    name  = "image.tag"
-    value = "latest"
-  }
+#  set {
+#    name  = "image.tag"
+#    value = "latest"
+#  }
 
   set {
     name  = "databasePassword"
