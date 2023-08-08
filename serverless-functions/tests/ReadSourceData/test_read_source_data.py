@@ -406,15 +406,16 @@ def test_add_rr_to_ecr():
 
 
 def test_get_external_patient_id():
-    with open("./tests/ReadSourceData/fhir_bundle.json", "r") as file:
+    with open("./tests/ReadSourceData/test_fhir_bundle.json", "r") as file:
         fhir_bundle = file.read()
 
+    fhir_bundle = json.dumps(json.loads(fhir_bundle))  # Remove whitespace and newlines.
     # Without external patient id
-    assert get_external_patient_id(fhir_bundle) == fhir_bundle, None
+    assert get_external_patient_id(fhir_bundle) == (fhir_bundle, None)
 
     # With external patient id
 
     blob_contents = {"bundle": json.loads(fhir_bundle), "external_patient_id": "12345"}
     blob_contents = json.dumps(blob_contents)
 
-    assert get_external_patient_id(blob_contents) == fhir_bundle, "12345"
+    assert get_external_patient_id(blob_contents) == (fhir_bundle, "12345")
