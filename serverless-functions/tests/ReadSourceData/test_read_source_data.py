@@ -2,12 +2,14 @@ from ReadSourceData import main as read_source_data
 from ReadSourceData import (
     get_reportability_response,
     rr_to_ecr,
+    get_external_patient_id,
     MESSAGE_TO_TEMPLATE_MAP,
 )
 from azure.core.exceptions import ResourceNotFoundError
 from unittest import mock
 from lxml import etree
 import pytest
+import json
 
 
 @mock.patch("ReadSourceData.DataFactoryManagementClient")
@@ -110,6 +112,7 @@ def test_pipeline_trigger_success(
             "root_template": root_template,
             "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
             "include_error_types": "fatal, errors",
+            "external_patient_id": "some-id",
         }
 
         read_source_data(event)
@@ -400,3 +403,18 @@ def test_add_rr_to_ecr():
             assert temps is not None
             assert temps.attrib["root"] == "2.16.840.1.113883.10.20.15.2.3.29"
             assert "RRVS19" in status_code.attrib["code"]
+
+
+def test_get_external_patient_id():
+    with open("./tests/ReadSourceData/fhir_bundle.json", "r") as file:
+        fhir_bundle = file.read()
+
+    # Without external patient id
+    assert get_external_patient_id(fhir_bundle) == fhir_bundle, None
+
+    # With external patient id
+
+    blob_contents = {"bundle": json.loads(fhir_bundle), "external_patient_id": "12345"}
+    blob_contents = json.dumps(blob_contents)
+
+    assert get_external_patient_id(blob_contents) == fhir_bundle, "12345"

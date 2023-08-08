@@ -71,7 +71,7 @@ def main(event: func.EventGridEvent) -> None:
     )
 
     external_patient_id = None
-    
+
     # Handle eICR + Reportability Response messages
     if message_type == "ecr":
         ecr = blob_contents
@@ -325,30 +325,30 @@ def rr_to_ecr(rr: str, ecr: str) -> str:
 
     return ecr
 
-def get_external_patient_id(blob_contents:str) -> Tuple[str, Union[str, None]]:
+
+def get_external_patient_id(blob_contents: str) -> Tuple[str, Union[str, None]]:
     """
     FHIR data can be uploaded to the source-data container as a plain FHIR bundle, or
     it can be uploaded as JSON object containing a FHIR bundle and an external patient
     id with the form:
-    
+
     {"bundle": <FHIR bundle>, "external_patient_id": <external patient id>}.
-    
+
     Given the contents of a blob read from source-data/fhir, this function returns the
-    the FHIR bundle and the external patient id. In the case that the data is simply a 
+    the FHIR bundle and the external patient id. In the case that the data is simply a
     FHIR bundle and no patient id has been provided a null value is returned for
     external_patient_id.
-    
+
     :param blob_contents: The contents of a blob read from source-data/fhir.
     :return: A tuple containing the FHIR bundle and the external patient id of the form
         [<fhir_bundle>, <external_patient_id>]. If no external patient id is provided
         the second element of the tuple is None.
     """
-    
+
     blob_contents = json.loads(blob_contents)
-    
+
     get_external_patient_id = blob_contents.get("external_patient_id", None)
     fhir_bundle = blob_contents.get("bundle", blob_contents)
     fhir_bundle = json.dumps(fhir_bundle)
-    
+
     return fhir_bundle, get_external_patient_id
-    
