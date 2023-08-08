@@ -252,7 +252,7 @@ locals {
 
 data "docker_registry_image" "ghcr_data" {
   for_each = local.images
-  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.7"
+  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.9"
 }
 
 resource "docker_image" "ghcr_image" {
@@ -265,13 +265,13 @@ resource "docker_image" "ghcr_image" {
 resource "docker_tag" "tag_for_azure" {
   for_each     = local.images
   source_image = docker_image.ghcr_image[each.key].name
-  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:v1.0.9"
 }
 
 resource "docker_registry_image" "acr_image" {
   for_each      = local.images
   depends_on    = [docker_tag.tag_for_azure]
-  name          = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+  name          = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:v1.0.9"
   keep_remotely = true
 
   triggers = {
@@ -617,12 +617,12 @@ resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
 }
 
 resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" {
-  name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
+  name                 = "phdi${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   type                 = "AzureBlobStorage"
   type_properties_json = <<JSON
   {
-  "servieEndpoint": "https://${terraform.workspace}${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
+  "serviceEndpoint": "https://phdi${terraform.workspace}phi${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
   "accountKind": "StorageV2"
   }
   JSON
