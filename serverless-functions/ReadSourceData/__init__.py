@@ -47,7 +47,7 @@ def main(event: func.EventGridEvent) -> None:
     if message_type not in MESSAGE_TO_TEMPLATE_MAP:
         logging.warning(
             "The read source data function was triggered. We expected a file in the "
-            "elr, vxu, or ecr folders, but something else was provided."
+            "elr, vxu, ecr, or fhir folders, but something else was provided."
         )
         return
 
