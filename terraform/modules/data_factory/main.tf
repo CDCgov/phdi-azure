@@ -92,7 +92,7 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
     "external_patient_id" : ""
   }
   variables = {
-    "fhir_bundle": ""
+    "fhir_bundle" : ""
   }
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
