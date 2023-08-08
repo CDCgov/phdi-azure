@@ -547,11 +547,12 @@ resource "helm_release" "record_linkage" {
   repository    = "https://cdcgov.github.io/phdi-charts/"
   chart         = "record-linkage-chart"
   recreate_pods = true
+  version = "0.1.0"
 
-#  set {
-#    name  = "image.tag"
-#    value = "latest"
-#  }
+  set {
+    name  = "image.tag"
+    value = "latest"
+  }
 
   set {
     name  = "databasePassword"
