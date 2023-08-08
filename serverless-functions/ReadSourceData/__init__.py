@@ -11,6 +11,7 @@ from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
 from lxml import etree
+from typing import Tuple, Union
 
 MESSAGE_TO_TEMPLATE_MAP = {
     "elr": "ORU_R01",
@@ -69,6 +70,8 @@ def main(event: func.EventGridEvent) -> None:
         container_name=container_name, filename=filename
     )
 
+    external_patient_id = None
+    
     # Handle eICR + Reportability Response messages
     if message_type == "ecr":
         ecr = blob_contents
@@ -141,7 +144,8 @@ def main(event: func.EventGridEvent) -> None:
 
     # Handle FHIR messages.
     elif message_type == "fhir":
-        messages = [blob_contents]
+        fhir_bundle, external_patient_id = get_external_patient_id(blob_contents)
+        messages = [fhir_bundle]
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
@@ -169,6 +173,7 @@ def main(event: func.EventGridEvent) -> None:
             "root_template": root_template,
             "filename": f"{container_name}/{filename}",
             "include_error_types": include_error_types,
+            "external_patient_id": external_patient_id,
         }
 
         try:
@@ -208,7 +213,7 @@ def get_reportability_response(
 
 
 # extract rr fields and insert them into the ecr
-def rr_to_ecr(rr, ecr):
+def rr_to_ecr(rr: str, ecr: str) -> str:
     """
     Extracts relevant fields from an RR document, and inserts them into a
     given eICR document. Ensures that the eICR contains properly formatted
@@ -319,3 +324,31 @@ def rr_to_ecr(rr, ecr):
     ecr = etree.tostring(ecr, encoding="unicode", method="xml")
 
     return ecr
+
+def get_external_patient_id(blob_contents:str) -> Tuple[str, Union[str, None]]:
+    """
+    FHIR data can be uploaded to the source-data container as a plain FHIR bundle, or
+    it can be uploaded as JSON object containing a FHIR bundle and an external patient
+    id with the form:
+    
+    {"bundle": <FHIR bundle>, "external_patient_id": <external patient id>}.
+    
+    Given the contents of a blob read from source-data/fhir, this function returns the
+    the FHIR bundle and the external patient id. In the case that the data is simply a 
+    FHIR bundle and no patient id has been provided a null value is returned for
+    external_patient_id.
+    
+    :param blob_contents: The contents of a blob read from source-data/fhir.
+    :return: A tuple containing the FHIR bundle and the external patient id of the form
+        [<fhir_bundle>, <external_patient_id>]. If no external patient id is provided
+        the second element of the tuple is None.
+    """
+    
+    blob_contents = json.loads(blob_contents)
+    
+    get_external_patient_id = blob_contents.get("external_patient_id", None)
+    fhir_bundle = blob_contents.get("bundle", blob_contents)
+    fhir_bundle = json.dumps(fhir_bundle)
+    
+    return fhir_bundle, get_external_patient_id
+    
