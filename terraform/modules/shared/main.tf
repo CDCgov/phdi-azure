@@ -58,6 +58,14 @@ resource "azurerm_storage_blob" "elr" {
   source_content         = ""
 }
 
+resource "azurerm_storage_blob" "fhir" {
+  name                   = "fhir/.keep"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.source_data.name
+  type                   = "Block"
+  source_content         = ""
+}
+
 resource "azurerm_storage_blob" "covid-identification-config" {
   name                   = "covid_identification_config.json"
   storage_account_name   = azurerm_storage_account.phi.name
