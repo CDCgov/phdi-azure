@@ -91,6 +91,9 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
     "include_error_types" : "",
     "external_patient_id" : ""
   }
+  variables = {
+    "fhir_bundle": ""
+  }
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
 

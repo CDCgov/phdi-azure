@@ -645,6 +645,11 @@
                 "type": "String"
             }
         },
+        "variables": {
+            "fhir_bundle": {
+                "type": "String"
+            }
+        },
         "annotations": [
             "FileName"
         ],
