@@ -60,6 +60,7 @@ def test_handle_batch_hl7(
     patched_batch_converter.assert_called()
 
 
+@mock.patch("ReadSourceData.get_external_patient_id")
 @mock.patch("ReadSourceData.DataFactoryManagementClient")
 @mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.AzureCloudContainerConnection")
@@ -71,6 +72,7 @@ def test_pipeline_trigger_success(
     patched_cloud_container_connection,
     patched_azure_cred_manager,
     patched_adf_management_client,
+    patched_get_external_patient_id,
 ):
     patched_os.environ = {
         "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
@@ -89,6 +91,10 @@ def test_pipeline_trigger_success(
         "<some-message/>"
     )
 
+    patched_batch_converter.return_value = ["<some-message/>"]
+
+    patched_get_external_patient_id.return_value = ("<some-message/>", None)
+
     adf_client = mock.MagicMock()
     adf_client.pipelines.create_run.return_value = good_response
     patched_adf_management_client.return_value = adf_client
@@ -104,7 +110,6 @@ def test_pipeline_trigger_success(
                 f"source-data/{source_data_subdirectory}/some-filename.hl7"
             )
         }
-        patched_batch_converter.return_value = ["<some-message/>"]
 
         parameters = {
             "message": '"<some-message/>"',
@@ -112,9 +117,8 @@ def test_pipeline_trigger_success(
             "root_template": root_template,
             "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
             "include_error_types": "fatal, errors",
-            "external_patient_id": "some-id",
+            "external_patient_id": None,
         }
-
         read_source_data(event)
         adf_client.pipelines.create_run.assert_called_with(
             patched_os.environ["RESOURCE_GROUP_NAME"],
