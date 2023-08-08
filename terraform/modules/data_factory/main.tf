@@ -89,6 +89,7 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
     "message_type" : "",
     "root_template" : "",
     "include_error_types" : ""
+    "external_patient_id" : null,
   }
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
