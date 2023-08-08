@@ -450,7 +450,7 @@
                     "url": "${record_linkage_container_url}/link-record",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
+                        "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle},\n    \"external_patient_id\": @{pipeline().parameters.external_patient_id}\n}",
                         "type": "Expression"
                     },
                     "authentication": {
@@ -639,6 +639,9 @@
                 "type": "String"
             },
             "include_error_types": {
+                "type": "String"
+            },
+            "external_patient_id": {
                 "type": "String"
             }
         },
