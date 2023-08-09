@@ -3,7 +3,7 @@
     "properties": {
         "activities": [
             {
-                "name": "fhir_check",
+                "name": "validate_non_fhir_data",
                 "type": "IfCondition",
                 "dependsOn": [],
                 "userProperties": [],
@@ -12,25 +12,7 @@
                         "value": "@equals(pipeline().parameters.message_type, 'fhir')",
                         "type": "Expression"
                     },
-                    "ifTrueActivities": [
-                        {
-                            "name": "set_fhir_bundle",
-                            "type": "SetVariable",
-                            "dependsOn": [],
-                            "policy": {
-                                "secureOutput": false,
-                                "secureInput": false
-                            },
-                            "userProperties": [],
-                            "typeProperties": {
-                                "variableName": "fhir_bundle",
-                                "value": {
-                                    "value": "@pipeline().parameters.message",
-                                    "type": "Expression"
-                                }
-                            }
-                        }
-                    ],
+                    "ifTrueActivities": [],
                     "ifFalseActivities": [
                         {
                             "name": "validate_message",
@@ -61,75 +43,115 @@
                                     "type": "UserAssignedManagedIdentity"
                                 }
                             }
-                        },
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "if_valid_continue_otherwise_fail",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "validate_non_fhir_data",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(activity('validate_message').output.message_valid, true)",
+                        "type": "Expression"
+                    },
+                    "ifFalseActivities": [
                         {
-                            "name": "validation_if_condition",
-                            "type": "IfCondition",
-                            "dependsOn": [
-                                {
-                                    "activity": "validate_message",
-                                    "dependencyConditions": [
-                                        "Succeeded"
-                                    ]
-                                }
-                            ],
+                            "name": "message_validation_failure",
+                            "type": "Fail",
+                            "dependsOn": [],
                             "userProperties": [],
                             "typeProperties": {
-                                "expression": {
-                                    "value": "@equals(activity('validate_message').output.message_valid, true)",
-                                    "type": "Expression"
-                                },
-                                "ifFalseActivities": [
-                                    {
-                                        "name": "message_validation_failure",
-                                        "type": "Fail",
-                                        "dependsOn": [],
-                                        "userProperties": [],
-                                        "typeProperties": {
-                                            "message": "@{activity('validate_message').output}",
-                                            "errorCode": "422"
-                                        }
-                                    }
-                                ]
+                                "message": "@{activity('validate_message').output}",
+                                "errorCode": "422"
                             }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "log_validation_failure",
+                "description": "Write validation failures to storage.\n",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "if_valid_continue_otherwise_fail",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 3,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
+                    "method": "POST",
+                    "body": {
+                        "value": "{\n    \"blob\": @{activity('validate_message').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${validation_failures_container_name}\",\n    \"file_name\": \"@{concat(substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
+                        "type": "Expression"
+                    },
+                    "authentication": {
+                        "resource": "api://phdi-${environment}-ingestion",
+                        "credential": {
+                            "referenceName": "pipeline-runner-credential",
+                            "type": "CredentialReference"
                         },
+                        "type": "UserAssignedManagedIdentity"
+                    }
+                }
+            },
+            {
+                "name": "if_fhir_continue_otherwise_convert",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "if_valid_continue_otherwise_fail",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(pipeline().parameters.message_type, 'fhir')",
+                        "type": "Expression"
+                    },
+                    "ifTrueActivities": [
                         {
-                            "name": "log_validation_failure",
-                            "description": "Write validation failures to storage.\n",
-                            "type": "WebActivity",
-                            "dependsOn": [
-                                {
-                                    "activity": "validation_if_condition",
-                                    "dependencyConditions": [
-                                        "Failed"
-                                    ]
-                                }
-                            ],
+                            "name": "set_fhir_bundle",
+                            "type": "SetVariable",
+                            "dependsOn": [],
                             "policy": {
-                                "timeout": "0.12:00:00",
-                                "retry": 3,
-                                "retryIntervalInSeconds": 30,
                                 "secureOutput": false,
                                 "secureInput": false
                             },
                             "userProperties": [],
                             "typeProperties": {
-                                "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
-                                "method": "POST",
-                                "body": {
-                                    "value": "{\n    \"blob\": @{activity('validate_message').output},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${validation_failures_container_name}\",\n    \"file_name\": \"@{concat(substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
+                                "variableName": "fhir_bundle",
+                                "value": {
+                                    "value": "@pipeline().parameters.message",
                                     "type": "Expression"
-                                },
-                                "authentication": {
-                                    "resource": "api://phdi-${environment}-ingestion",
-                                    "credential": {
-                                        "referenceName": "pipeline-runner-credential",
-                                        "type": "CredentialReference"
-                                    },
-                                    "type": "UserAssignedManagedIdentity"
                                 }
                             }
-                        },
+                        }
+                    ],
+                    "ifFalseActivities": [
                         {
                             "name": "convert_to_fhir",
                             "description": "Convert message from Hl7 or CCD to FHIR.\n",
@@ -223,7 +245,7 @@
                             "typeProperties": {
                                 "variableName": "fhir_bundle",
                                 "value": {
-                                    "value": "@{activity('convert_to_fhir').output.response.FhirResource",
+                                    "value": "@{activity('convert_to_fhir').output.response.FhirResource}",
                                     "type": "Expression"
                                 }
                             }
@@ -237,7 +259,7 @@
                 "type": "WebActivity",
                 "dependsOn": [
                     {
-                        "activity": "fhir_check",
+                        "activity": "if_valid_continue_otherwise_fail",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -274,13 +296,7 @@
                 "type": "WebActivity",
                 "dependsOn": [
                     {
-                        "activity": "fhir_check",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    },
-                    {
-                        "activity": "fhir_check",
+                        "activity": "if_valid_continue_otherwise_fail",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
