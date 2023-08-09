@@ -3,7 +3,7 @@
     "properties": {
         "activities": [
             {
-                "name": "validate_non_fhir_data",
+                "name": "if_fhir_continue_otherwise_validate",
                 "type": "IfCondition",
                 "dependsOn": [],
                 "userProperties": [],
@@ -52,7 +52,7 @@
                 "type": "IfCondition",
                 "dependsOn": [
                     {
-                        "activity": "validate_non_fhir_data",
+                        "activity": "if_fhir_continue_otherwise_validate",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -134,7 +134,7 @@
                     },
                     "ifTrueActivities": [
                         {
-                            "name": "set_fhir_bundle",
+                            "name": "set_fhir_bundle_1",
                             "type": "SetVariable",
                             "dependsOn": [],
                             "policy": {
@@ -227,7 +227,7 @@
                             }
                         },
                         {
-                            "name": "set_fhir_bundle",
+                            "name": "set_fhir_bundle_2",
                             "type": "SetVariable",
                             "dependsOn": [
                                 {
