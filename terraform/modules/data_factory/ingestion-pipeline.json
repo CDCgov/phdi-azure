@@ -259,7 +259,7 @@
                 "type": "WebActivity",
                 "dependsOn": [
                     {
-                        "activity": "if_valid_continue_otherwise_fail",
+                        "activity": "if_fhir_continue_otherwise_convert",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -296,7 +296,7 @@
                 "type": "WebActivity",
                 "dependsOn": [
                     {
-                        "activity": "if_valid_continue_otherwise_fail",
+                        "activity": "if_fhir_continue_otherwise_convert",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
