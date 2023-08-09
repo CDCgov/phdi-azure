@@ -12,7 +12,25 @@
                         "value": "@equals(pipeline().parameters.message_type, 'fhir')",
                         "type": "Expression"
                     },
-                    "ifTrueActivities": [],
+                    "ifTrueActivities": [                        
+                        {
+                            "name": "set_message_valid_1",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "policy": {
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "message_valid",
+                                "value": {
+                                    "value": true,
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    ],
                     "ifFalseActivities": [
                         {
                             "name": "validate_message",
@@ -45,9 +63,16 @@
                             }
                         },
                         {
-                            "name": "set_message_valid",
+                            "name": "set_message_valid_2",
                             "type": "SetVariable",
-                            "dependsOn": [],
+                            "dependsOn": [
+                                {
+                                    "activity": "validate_message",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
                             "policy": {
                                 "secureOutput": false,
                                 "secureInput": false
