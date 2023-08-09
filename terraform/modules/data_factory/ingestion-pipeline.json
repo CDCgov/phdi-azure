@@ -43,7 +43,25 @@
                                     "type": "UserAssignedManagedIdentity"
                                 }
                             }
-                        }
+                        },
+                        {
+                            "name": "set_message_valid",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "policy": {
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "message_valid",
+                                "value": {
+                                    "value": "@{activity('validate_message').output.message_valid}",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+
                     ]
                 }
             },
@@ -61,9 +79,10 @@
                 "userProperties": [],
                 "typeProperties": {
                     "expression": {
-                        "value": "@equals(activity('validate_message').output.message_valid, true)",
+                        "value": "@equals(pipeline().variables.message_valid, true)",
                         "type": "Expression"
                     },
+                    "ifTrueActivities":[],
                     "ifFalseActivities": [
                         {
                             "name": "message_validation_failure",
@@ -696,6 +715,9 @@
         "variables": {
             "fhir_bundle": {
                 "type": "String"
+            },
+            "message_valid": {
+                "type": "Boolean"
             }
         },
         "annotations": [
