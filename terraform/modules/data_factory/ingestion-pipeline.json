@@ -200,14 +200,7 @@
                             "name": "convert_to_fhir",
                             "description": "Convert message from Hl7 or CCD to FHIR.\n",
                             "type": "WebActivity",
-                            "dependsOn": [
-                                {
-                                    "activity": "if_fhir_continue_otherwise_validate",
-                                    "dependencyConditions": [
-                                        "Succeeded"
-                                    ]
-                                }
-                            ],
+                            "dependsOn": [],
                             "policy": {
                                 "timeout": "0.12:00:00",
                                 "retry": 3,
