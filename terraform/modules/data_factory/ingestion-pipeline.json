@@ -104,7 +104,7 @@
                 "userProperties": [],
                 "typeProperties": {
                     "expression": {
-                        "value": "@equals(pipeline().variables.message_valid, true)",
+                        "value": "@equals(variables('message_valid'), 'True')",
                         "type": "Expression"
                     },
                     "ifTrueActivities":[],
@@ -321,7 +321,7 @@
                     "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"blob\": @variables('fhir_bundle')},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"bundle-snapshots\",\n    \"file_name\": \"@{concat('pre/', substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
+                        "value": "{\n    \"blob\": @{variables('fhir_bundle')},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"bundle-snapshots\",\n    \"file_name\": \"@{concat('pre/', substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
                         "type": "Expression"
                     },
                     "authentication": {
@@ -358,7 +358,7 @@
                     "url": "${ingestion_container_url}/fhir/harmonization/standardization/standardize_names",
                     "method": "POST",
                     "body": {
-                        "value": "{\n    \"data\": @variables('fhir_bundle')}\n}",
+                        "value": "{\n    \"data\": @{variables('fhir_bundle')}\n}",
                         "type": "Expression"
                     },
                     "authentication": {
@@ -519,9 +519,8 @@
                 }
             },
             {
-                "name": "record_linkage",
-                "description": "Link new healthcare messages to existing records if a connection exists.",
-                "type": "WebActivity",
+                "name": "record_linkage_with_and_without_external_id",
+                "type": "IfCondition",
                 "dependsOn": [
                     {
                         "activity": "geocode",
@@ -530,29 +529,124 @@
                         ]
                     }
                 ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 3,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
                 "userProperties": [],
                 "typeProperties": {
-                    "url": "${record_linkage_container_url}/link-record",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle},\n    \"external_patient_id\": @{pipeline().parameters.external_patient_id}\n}",
+                    "expression": {
+                        "value": "@equals(pipeline().parameters.external_person_id, 'no external person id provided')",
                         "type": "Expression"
                     },
-                    "authentication": {
-                        "resource": "api://phdi-${environment}-record-linkage",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
+                    "ifTrueActivities": [
+                        {
+                            "name": "record_linkage_without_external_id",
+                            "description": "Link new healthcare messages to existing records if a connection exists.",
+                            "type": "WebActivity",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 3,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "url": "${record_linkage_container_url}/link-record",
+                                "method": "POST",
+                                "body": {
+                                    "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle}\n}",
+                                    "type": "Expression"
+                                },
+                                "authentication": {
+                                    "resource": "api://phdi-${environment}-record-linkage",
+                                    "credential": {
+                                        "referenceName": "pipeline-runner-credential",
+                                        "type": "CredentialReference"
+                                    },
+                                    "type": "UserAssignedManagedIdentity"
+                                }
+                            }
                         },
-                        "type": "UserAssignedManagedIdentity"
-                    }
+                        {
+                            "name": "set_fhir_bundle_3",
+                            "type": "SetVariable",
+                            "dependsOn": [
+                                {
+                                    "activity": "record_linkage_without_external_id",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "fhir_bundle",
+                                "value": {
+                                    "value": "@{activity('record_linkage_without_external_id').output.response.updated_bundle}",
+                                    "type": "Expression"
+                                }
+                            }
+                        }                        
+                    ],
+                    "ifFalseActivities": [
+                        {
+                            "name": "record_linkage_with_external_id",
+                            "description": "Link new healthcare messages to existing records if a connection exists.",
+                            "type": "WebActivity",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 3,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "url": "${record_linkage_container_url}/link-record",
+                                "method": "POST",
+                                "body": {
+                                    "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle},\n    \"external_patient_id\": @{pipeline().parameters.external_patient_id}\n}",
+                                    "type": "Expression"
+                                },
+                                "authentication": {
+                                    "resource": "api://phdi-${environment}-record-linkage",
+                                    "credential": {
+                                        "referenceName": "pipeline-runner-credential",
+                                        "type": "CredentialReference"
+                                    },
+                                    "type": "UserAssignedManagedIdentity"
+                                }
+                            }
+                        },
+                        {
+                            "name": "set_fhir_bundle_4",
+                            "type": "SetVariable",
+                            "dependsOn": [
+                                {
+                                    "activity": "record_linkage_with_external_id",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "fhir_bundle",
+                                "value": {
+                                    "value": "@{activity('record_linkage_with_external_id').output.response.updated_bundle}",
+                                    "type": "Expression"
+                                }
+                            }
+                        }    
+                    ]
                 }
             },
             {
@@ -560,7 +654,7 @@
                 "type": "IfCondition",
                 "dependsOn": [
                     {
-                        "activity": "record_linkage",
+                        "activity": "record_linkage_with_and_without_external_id",
                         "dependencyConditions": [
                             "Succeeded"
                         ]
@@ -589,7 +683,7 @@
                                 "url": "${message_parser_url}/parse_message",
                                 "method": "POST",
                                 "body": {
-                                    "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{activity('record_linkage').output.updated_bundle}\n}",
+                                    "value": "{\n    \"message_format\": \"fhir\",\n    \"parsing_schema_name\": \"ecr.json\",\n    \"message\": @{variables('fhir_bundle')}\n}",
                                     "type": "Expression"
                                 },
                                 "authentication": {
@@ -641,80 +735,6 @@
                         }
                     ]
                 }
-            },
-            {
-                "name": "upload_fhir_bundle",
-                "description": "Compute a hashed identifier that can be used for record linkage.",
-                "type": "WebActivity",
-                "dependsOn": [
-                    {
-                        "activity": "record_linkage",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 3,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${ingestion_container_url}/fhir/transport/http/upload_bundle_to_fhir_server",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('record_linkage').output.updated_bundle},\n    \"cred_manager\": \"azure\"\n}",
-                        "type": "Expression"
-                    },
-                    "authentication": {
-                        "resource": "api://phdi-${environment}-ingestion",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
-                        },
-                        "type": "UserAssignedManagedIdentity"
-                    }
-                }
-            },
-            {
-                "name": "log_fhir_upload_failure",
-                "description": "Write FHIR upload failures to storage.",
-                "type": "WebActivity",
-                "dependsOn": [
-                    {
-                        "activity": "upload_fhir_bundle",
-                        "dependencyConditions": [
-                            "Failed"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 3,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.message},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_upload_failures_container_name}\",\n    \"file_name\": \"@{concat(substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
-                        "type": "Expression"
-                    },
-                    "authentication": {
-                        "resource": "api://phdi-${environment}-ingestion",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
-                        },
-                        "type": "UserAssignedManagedIdentity"
-                    }
-                }
             }
         ],
         "parameters": {
@@ -733,7 +753,8 @@
             "include_error_types": {
                 "type": "String"
             },
-            "external_patient_id": {
+            "external_person_id": {
+                "defaultValue": "no external person id provided",
                 "type": "String"
             }
         },
