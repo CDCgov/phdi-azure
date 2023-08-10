@@ -2,7 +2,7 @@ from ReadSourceData import main as read_source_data
 from ReadSourceData import (
     get_reportability_response,
     rr_to_ecr,
-    get_external_patient_id,
+    get_external_person_id,
     MESSAGE_TO_TEMPLATE_MAP,
 )
 from azure.core.exceptions import ResourceNotFoundError
@@ -60,7 +60,7 @@ def test_handle_batch_hl7(
     patched_batch_converter.assert_called()
 
 
-@mock.patch("ReadSourceData.get_external_patient_id")
+@mock.patch("ReadSourceData.get_external_person_id")
 @mock.patch("ReadSourceData.DataFactoryManagementClient")
 @mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.AzureCloudContainerConnection")
@@ -72,7 +72,7 @@ def test_pipeline_trigger_success(
     patched_cloud_container_connection,
     patched_azure_cred_manager,
     patched_adf_management_client,
-    patched_get_external_patient_id,
+    patched_get_external_person_id,
 ):
     patched_os.environ = {
         "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
@@ -93,7 +93,7 @@ def test_pipeline_trigger_success(
 
     patched_batch_converter.return_value = ["<some-message/>"]
 
-    patched_get_external_patient_id.return_value = ("<some-message/>", None)
+    patched_get_external_person_id.return_value = ("<some-message/>", None)
 
     adf_client = mock.MagicMock()
     adf_client.pipelines.create_run.return_value = good_response
@@ -117,7 +117,6 @@ def test_pipeline_trigger_success(
             "root_template": root_template,
             "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
             "include_error_types": "fatal, errors",
-            "external_patient_id": None,
         }
         read_source_data(event)
         adf_client.pipelines.create_run.assert_called_with(
@@ -409,17 +408,17 @@ def test_add_rr_to_ecr():
             assert "RRVS19" in status_code.attrib["code"]
 
 
-def test_get_external_patient_id():
+def test_get_external_person_id():
     with open("./tests/ReadSourceData/test_fhir_bundle.json", "r") as file:
         fhir_bundle = file.read()
 
     fhir_bundle = json.dumps(json.loads(fhir_bundle))  # Remove whitespace and newlines.
     # Without external patient id
-    assert get_external_patient_id(fhir_bundle) == (fhir_bundle, None)
+    assert get_external_person_id(fhir_bundle) == (fhir_bundle, None)
 
     # With external patient id
 
-    blob_contents = {"bundle": json.loads(fhir_bundle), "external_patient_id": "12345"}
+    blob_contents = {"bundle": json.loads(fhir_bundle), "external_person_id": "12345"}
     blob_contents = json.dumps(blob_contents)
 
-    assert get_external_patient_id(blob_contents) == (fhir_bundle, "12345")
+    assert get_external_person_id(blob_contents) == (fhir_bundle, "12345")
