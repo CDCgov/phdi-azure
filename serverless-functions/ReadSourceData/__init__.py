@@ -177,7 +177,7 @@ def main(event: func.EventGridEvent) -> None:
 
         if external_person_id is not None:
             pipeline_parameters["external_person_id"] = external_person_id
-        
+
         try:
             adf_client.pipelines.create_run(
                 resource_group_name,
