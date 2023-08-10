@@ -202,7 +202,7 @@
                             "type": "WebActivity",
                             "dependsOn": [
                                 {
-                                    "activity": "validation_if_condition",
+                                    "activity": "if_fhir_continue_otherwise_validate",
                                     "dependencyConditions": [
                                         "Succeeded"
                                     ]
