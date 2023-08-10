@@ -578,7 +578,7 @@
                             "typeProperties": {
                                 "variableName": "fhir_bundle",
                                 "value": {
-                                    "value": "@{activity('record_linkage_without_external_id').output.response.updated_bundle}",
+                                    "value": "@{activity('record_linkage_without_external_id').output.updated_bundle}",
                                     "type": "Expression"
                                 }
                             }
@@ -634,7 +634,7 @@
                             "typeProperties": {
                                 "variableName": "fhir_bundle",
                                 "value": {
-                                    "value": "@{activity('record_linkage_with_external_id').output.response.updated_bundle}",
+                                    "value": "@{activity('record_linkage_with_external_id').output.updated_bundle}",
                                     "type": "Expression"
                                 }
                             }
