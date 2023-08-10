@@ -1,0 +1,28 @@
+{
+    "name": "Update MII Trigger",
+    "properties": {
+        "annotations": [],
+        "runtimeState": "Started",
+        "pipelines": [
+            {
+                "pipelineReference": {
+                    "referenceName": "Update MII",
+                    "type": "PipelineReference"
+                },
+                "parameters": {
+                    "triggeringFile": "@trigger().outputs.body.fileName"
+                }
+            }
+        ],
+        "type": "BlobEventsTrigger",
+        "typeProperties": {
+            "blobPathBeginsWith": "/patient-data/blobs/MII",
+            "blobPathEndsWith": ".parquet",
+            "ignoreEmptyBlobs": true,
+            "scope": "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Storage/storageAccounts/phdi${TF_ENV}phi${SHORT_CID}",
+            "events": [
+                "Microsoft.Storage.BlobCreated"
+            ]
+        }
+    }
+}
