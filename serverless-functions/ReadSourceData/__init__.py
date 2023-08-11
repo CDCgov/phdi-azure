@@ -339,10 +339,10 @@ def rr_to_ecr(rr: str, ecr: str) -> str:
     return ecr
 
 
-def get_external_person_id(blob_contents: str) -> Tuple[str, Union[str, None]]:
+def get_external_person_id(blob_contents: dict) -> Tuple[dict, Union[str, None]]:
     """
     FHIR data can be uploaded to the source-data container as a plain FHIR bundle, or
-    it can be uploaded as JSON object containing a FHIR bundle and an external patient
+    it can be uploaded as dict representing a FHIR bundle and an external patient
     id with the form:
 
     {"bundle": <FHIR bundle>, "external_person_id": <external patient id>}.
@@ -362,6 +362,5 @@ def get_external_person_id(blob_contents: str) -> Tuple[str, Union[str, None]]:
 
     get_external_person_id = blob_contents.get("external_person_id", None)
     fhir_bundle = blob_contents.get("bundle", blob_contents)
-    fhir_bundle = json.dumps(fhir_bundle)
 
     return fhir_bundle, get_external_person_id
