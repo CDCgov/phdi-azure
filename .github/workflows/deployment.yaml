@@ -263,6 +263,40 @@ jobs:
           az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "ECR Datastore Refresh" --file @../../scripts/Synapse/config/ECRDatastoreRefreshConfig.json
           az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "ECR Datastore Refresh Daily Trigger" --file @../../scripts/Synapse/config/ECRDatastoreRefreshDailyTriggerConfig.json
           az synapse trigger start --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "ECR Datastore Refresh Daily Trigger"
+      - name: Deploy Update MPI Pipeline and Trigger
+        env:
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
+        run: |
+          if az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MPI Trigger"; then
+            az synapse trigger delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MPI Trigger" --yes
+          fi
+          if az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MPI"; then
+            az synapse pipeline delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MPI" --yes
+          fi
+          az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MPI" --file @../../scripts/Synapse/config/UpdateMPIConfig.json
+          cat ../../scripts/Synapse/config/UpdateMPITriggerConfig.json | envsubst > ../../scripts/Synapse/config/UpdateMPITriggerConfigSubstituted.json
+          az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MPI Trigger" --file @../../scripts/Synapse/config/UpdateMPITriggerConfigSubstituted.json
+          az synapse trigger start --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MPI Trigger"
+      - name: Deploy Update MII Pipeline and Trigger
+        env:
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
+        run: |
+          if az synapse trigger show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII Trigger"; then
+            az synapse trigger delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII Trigger" --yes
+          fi
+          if az synapse pipeline show --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII"; then
+            az synapse pipeline delete --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII" --yes
+          fi
+          az synapse pipeline create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII" --file @../../scripts/Synapse/config/UpdateMIIConfig.json
+          cat ../../scripts/Synapse/config/UpdateMIITriggerConfig.json | envsubst > ../../scripts/Synapse/config/UpdateMIITriggerConfigSubstituted.json
+          az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII Trigger" --file @../../scripts/Synapse/config/UpdateMIITriggerConfigSubstituted.json
+          az synapse trigger start --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII Trigger"
   end-to-end:
     name: End-to-end tests
     needs: 
