@@ -10,6 +10,12 @@ from phdi.cloud.azure import AzureCredentialManager, AzureCloudContainerConnecti
 from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
+import requests
+from phdi.fhir.harmonization.standardization import (
+    standardize_names,   
+    standardize_phones,
+    standardize_dob
+)
 from lxml import etree
 from typing import Tuple, Union
 
@@ -145,7 +151,12 @@ def main(event: func.EventGridEvent) -> None:
     # Handle FHIR messages.
     elif message_type == "fhir":
         fhir_bundle, external_person_id = get_external_person_id(blob_contents)
-        messages = [fhir_bundle]
+        fhir_bundle = standardize_dob(standardize_phones(standardize_names(fhir_bundle)))
+        geocoding_response = requests.post(body={"bundle":fhir_bundle, "geocode_method":"smarty"})
+        record_linkage_response = requests.post(body={"bundle":geocoding_response.json().get("bundle"), "external_person_id":external_person_id})
+        return
+        
+        
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
