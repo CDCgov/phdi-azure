@@ -152,8 +152,10 @@ def main(event: func.EventGridEvent) -> None:
     elif message_type == "fhir":
         fhir_bundle, external_person_id = get_external_person_id(blob_contents)
         fhir_bundle = standardize_dob(standardize_phones(standardize_names(fhir_bundle)))
-        geocoding_response = requests.post(body={"bundle":fhir_bundle, "geocode_method":"smarty"})
-        record_linkage_response = requests.post(body={"bundle":geocoding_response.json().get("bundle"), "external_person_id":external_person_id})
+        geocoding_url = os.environ["GEOCODING_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
+        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link_record"
+        geocoding_response = requests.post(url=geocoding_url, body={"bundle":fhir_bundle, "geocode_method":"smarty"})
+        record_linkage_response = requests.post(url=record_linkage_url, body={"bundle":geocoding_response.json().get("bundle"), "external_person_id":external_person_id})
         return
         
         

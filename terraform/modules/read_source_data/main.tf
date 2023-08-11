@@ -58,6 +58,8 @@ resource "azurerm_linux_function_app" "read_source_data" {
     AZURE_SUBSCRIPTION_ID           = var.subscription_id
     WAIT_TIME                       = var.wait_time
     SLEEP_TIME                      = var.sleep_time
+    INGESTION_URL                   = var.ingestion_container_url
+    RECORD_LINKAGE_URL              = var.record_linkage_container_url
   }
 
   lifecycle {

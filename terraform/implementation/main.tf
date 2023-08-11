@@ -42,17 +42,19 @@ module "data_factory" {
 
 
 module "read_source_data" {
-  source                    = "../modules/read_source_data"
-  resource_group_name       = var.resource_group_name
-  location                  = var.location
-  phdi_data_factory_name    = module.data_factory.phdi_data_factory_name
-  ingestion_pipeline_name   = module.data_factory.ingestion_pipeline_name
-  subscription_id           = var.subscription_id
-  pipeline_runner_id        = module.shared.pipeline_runner_id
-  pipeline_runner_client_id = module.shared.pipeline_runner_client_id
-  client_id                 = var.client_id
-  wait_time                 = 10
-  sleep_time                = 1
+  source                       = "../modules/read_source_data"
+  resource_group_name          = var.resource_group_name
+  location                     = var.location
+  phdi_data_factory_name       = module.data_factory.phdi_data_factory_name
+  ingestion_pipeline_name      = module.data_factory.ingestion_pipeline_name
+  subscription_id              = var.subscription_id
+  pipeline_runner_id           = module.shared.pipeline_runner_id
+  pipeline_runner_client_id    = module.shared.pipeline_runner_client_id
+  client_id                    = var.client_id
+  wait_time                    = 10
+  sleep_time                   = 1
+  ingestion_container_url      = module.shared.ingestion_container_url
+  record_linkage_container_url = module.shared.record_linkage_container_url
 }
 
 output "record_linkage_container_url" {
