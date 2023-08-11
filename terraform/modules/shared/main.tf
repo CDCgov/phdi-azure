@@ -248,11 +248,13 @@ locals {
     "validation",
     "record-linkage",
   ])
+
+  phdi_version = "v1.0.10"
 }
 
 data "docker_registry_image" "ghcr_data" {
   for_each = local.images
-  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.9"
+  name     = "ghcr.io/cdcgov/phdi/${each.key}:${local.phdi_version}"
 }
 
 resource "docker_image" "ghcr_image" {
@@ -265,13 +267,13 @@ resource "docker_image" "ghcr_image" {
 resource "docker_tag" "tag_for_azure" {
   for_each     = local.images
   source_image = docker_image.ghcr_image[each.key].name
-  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:v1.0.9"
+  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:${local.phdi_version}"
 }
 
 resource "docker_registry_image" "acr_image" {
   for_each      = local.images
   depends_on    = [docker_tag.tag_for_azure]
-  name          = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:v1.0.9"
+  name          = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:${local.phdi_version}"
   keep_remotely = true
 
   triggers = {
