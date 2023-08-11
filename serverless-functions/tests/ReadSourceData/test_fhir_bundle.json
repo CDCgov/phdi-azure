@@ -1,4 +1,6 @@
-{
+{   
+    "external_person_id": "some-uuid",
+    "bundle":{
     "resourceType": "Bundle",
     "identifier": {
       "value": "a very contrived FHIR bundle"
@@ -74,3 +76,4 @@
       }
     ]
   }
+}

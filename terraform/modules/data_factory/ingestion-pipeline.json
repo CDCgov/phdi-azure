@@ -81,7 +81,7 @@
                             "typeProperties": {
                                 "variableName": "message_valid",
                                 "value": {
-                                    "value": "@{activity('validate_message').output.message_valid}",
+                                    "value": "@string(activity('validate_message').output.message_valid)",
                                     "type": "Expression"
                                 }
                             }
@@ -104,7 +104,7 @@
                 "userProperties": [],
                 "typeProperties": {
                     "expression": {
-                        "value": "@equals(variables('message_valid'), 'True')",
+                        "value": "@equals(variables('message_valid'), 'true')",
                         "type": "Expression"
                     },
                     "ifTrueActivities":[],
@@ -602,7 +602,7 @@
                                 "url": "${record_linkage_container_url}/link-record",
                                 "method": "POST",
                                 "body": {
-                                    "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle},\n    \"external_person_id\": @{pipeline().parameters.external_person_id}\n}",
+                                    "value": "{\n    \"bundle\" :@{activity('geocode').output.bundle},\n    \"external_person_id\": \"@{pipeline().parameters.external_person_id}\"\n}",
                                     "type": "Expression"
                                 },
                                 "authentication": {
