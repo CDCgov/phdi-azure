@@ -189,7 +189,7 @@
                             "typeProperties": {
                                 "variableName": "fhir_bundle",
                                 "value": {
-                                    "value": "@pipeline().parameters.message",
+                                    "value": "@json(pipeline().parameters.message)",
                                     "type": "Expression"
                                 }
                             }
