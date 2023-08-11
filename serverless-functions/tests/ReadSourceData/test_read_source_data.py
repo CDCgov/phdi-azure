@@ -420,5 +420,4 @@ def test_get_external_person_id():
 
     blob_contents = {"bundle": json.loads(fhir_bundle), "external_person_id": "12345"}
     blob_contents = json.dumps(blob_contents)
-
     assert get_external_person_id(blob_contents) == (fhir_bundle, "12345")
