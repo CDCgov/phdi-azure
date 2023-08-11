@@ -12,9 +12,9 @@ from phdi.harmonization.hl7 import (
 )
 import requests
 from phdi.fhir.harmonization.standardization import (
-    standardize_names,   
+    standardize_names,
     standardize_phones,
-    standardize_dob
+    standardize_dob,
 )
 from lxml import etree
 from typing import Tuple, Union
@@ -151,14 +151,28 @@ def main(event: func.EventGridEvent) -> None:
     # Handle FHIR messages.
     elif message_type == "fhir":
         fhir_bundle, external_person_id = get_external_person_id(blob_contents)
-        fhir_bundle = standardize_dob(standardize_phones(standardize_names(fhir_bundle)))
-        geocoding_url = os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
+        fhir_bundle = standardize_dob(
+            standardize_phones(standardize_names(fhir_bundle))
+        )
+        geocoding_url = (
+            os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
+        )
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link_record"
-        geocoding_response = requests.post(url=geocoding_url, data={"bundle":fhir_bundle, "geocode_method":"smarty"})
-        record_linkage_response = requests.post(url=record_linkage_url, data={"bundle":geocoding_response.json().get("bundle"), "external_person_id":external_person_id})
+        geocoding_response = requests.post(
+            url=geocoding_url, data={"bundle": fhir_bundle, "geocode_method": "smarty"}
+        )
+        print("GEOCODING STATUS CODE:")
+        print(geocoding_response.status_code)
+        print("GEOCODING RESPONSE:")
+        print(geocoding_response.json())
+        record_linkage_response = requests.post(
+            url=record_linkage_url,
+            data={
+                "bundle": geocoding_response.json().get("bundle"),
+                "external_person_id": external_person_id,
+            },
+        )
         return
-        
-        
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
