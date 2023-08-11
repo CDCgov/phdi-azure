@@ -154,8 +154,8 @@ def main(event: func.EventGridEvent) -> None:
         fhir_bundle = standardize_dob(standardize_phones(standardize_names(fhir_bundle)))
         geocoding_url = os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link_record"
-        geocoding_response = requests.post(url=geocoding_url, body={"bundle":fhir_bundle, "geocode_method":"smarty"})
-        record_linkage_response = requests.post(url=record_linkage_url, body={"bundle":geocoding_response.json().get("bundle"), "external_person_id":external_person_id})
+        geocoding_response = requests.post(url=geocoding_url, data={"bundle":fhir_bundle, "geocode_method":"smarty"})
+        record_linkage_response = requests.post(url=record_linkage_url, data={"bundle":geocoding_response.json().get("bundle"), "external_person_id":external_person_id})
         return
         
         
