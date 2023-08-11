@@ -529,56 +529,6 @@ resource "helm_release" "helm_clusters" {
   }
 }
 
-# resource "helm_release" "record_linkage" {
-#   name          = "phdi-${terraform.workspace}"
-#   repository    = "https://cdcgov.github.io/phdi-charts/"
-#   chart         = "record-linkage-chart"
-#   recreate_pods = true
-
-#   set {
-#     name  = "image.tag"
-#     value = "latest"
-#   }
-
-#   set {
-#     name  = "databasePassword"
-#     value = azurerm_postgresql_flexible_server.mpi.administrator_password
-#   }
-
-#   set {
-#     name  = "databaseName"
-#     value = azurerm_postgresql_flexible_server_database.mpi.name
-#   }
-
-#   set {
-#     name  = "databaseHost"
-#     value = azurerm_postgresql_flexible_server.mpi.fqdn
-#   }
-# }
-
-# resource "helm_release" "ingestion" {
-#   name          = "phdi-${terraform.workspace}"
-#   repository    = "https://cdcgov.github.io/phdi-charts/"
-#   chart         = "ingestion-chart"
-#   recreate_pods = true
-
-#   set {
-#     name  = "image.tag"
-#     value = "latest"
-#   }
-
-#   set {
-#     name  = "smartyAuthId"
-#     value = azurerm_key_vault_secret.smarty_auth_id.value
-#   }
-
-#   set {
-#     name  = "smartyToken"
-#     value = azurerm_key_vault_secret.smarty_auth_token.value
-#   }
-# }
-
-
 ##### FHIR Server #####
 
 resource "azurerm_healthcare_service" "fhir_server" {
