@@ -157,21 +157,40 @@ def main(event: func.EventGridEvent) -> None:
         geocoding_url = (
             os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
         )
-        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link_record"
-        geocoding_response = requests.post(
-            url=geocoding_url, data={"bundle": fhir_bundle, "geocode_method": "smarty"}
+        geocoding_scope = (
+            "api://" + geocoding_url.split(".")[0].replace("https://", "") + "/.default"
         )
-        print("GEOCODING STATUS CODE:")
-        print(geocoding_response.status_code)
-        print("GEOCODING RESPONSE:")
-        print(geocoding_response.json())
+        access_token = AzureCredentialManager(
+            resource_location=geocoding_scope
+        ).get_access_token()
+        geocoding_response = requests.post(
+            url=geocoding_url,
+            data={"bundle": fhir_bundle, "geocode_method": "smarty"},
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+
+        logging.info(f"GEOCODING STATUS CODE: {geocoding_response.status_code}")
+        logging.info(f"GEOCODING RESPONSE: {geocoding_response.text}")
+        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link_record"
+        record_linkage_scope = (
+            "api://"
+            + record_linkage_url.split(".")[0].replace("https://", "")
+            + "/.default"
+        )
+        access_token = AzureCredentialManager(
+            resource_location=record_linkage_scope
+        ).get_access_token()
+
         record_linkage_response = requests.post(
             url=record_linkage_url,
             data={
                 "bundle": geocoding_response.json().get("bundle"),
                 "external_person_id": external_person_id,
             },
+            headers={"Authorization": f"Bearer {access_token}"},
         )
+        logging.info(f"RECORD LINKAGE STATUS CODE: {record_linkage_response.status_code}")
+        logging.info(f"RECORD LINKAGE RESPONSE: {record_linkage_response.text}")
         return
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
