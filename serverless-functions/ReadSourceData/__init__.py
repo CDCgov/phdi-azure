@@ -165,7 +165,7 @@ def main(event: func.EventGridEvent) -> None:
         ).get_access_token()
         geocoding_response = requests.post(
             url=geocoding_url,
-            data={"bundle": fhir_bundle, "geocode_method": "smarty"},
+            json={"bundle": fhir_bundle, "geocode_method": "smarty"},
             headers={"Authorization": f"Bearer {access_token}"},
         )
 
@@ -182,7 +182,7 @@ def main(event: func.EventGridEvent) -> None:
 
         record_linkage_response = requests.post(
             url=record_linkage_url,
-            data={
+            json={
                 "bundle": geocoding_response.json().get("bundle"),
                 "external_person_id": external_person_id,
             },
