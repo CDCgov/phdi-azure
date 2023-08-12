@@ -158,7 +158,7 @@ def main(event: func.EventGridEvent) -> None:
             os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
         )
         geocoding_scope = (
-            "api://" + geocoding_url.split(".")[0].replace("https://", "") + "/.default"
+            "api://" + geocoding_url.split(".")[0].replace("https://", "")
         )
         access_token = AzureCredentialManager(
             resource_location=geocoding_scope
@@ -175,7 +175,6 @@ def main(event: func.EventGridEvent) -> None:
         record_linkage_scope = (
             "api://"
             + record_linkage_url.split(".")[0].replace("https://", "")
-            + "/.default"
         )
         access_token = AzureCredentialManager(
             resource_location=record_linkage_scope
