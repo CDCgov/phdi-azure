@@ -171,7 +171,7 @@ def main(event: func.EventGridEvent) -> None:
 
         logging.info(f"GEOCODING STATUS CODE: {geocoding_response.status_code}")
         logging.info(f"GEOCODING RESPONSE: {geocoding_response.text}")
-        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link_record"
+        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
         record_linkage_scope = (
             "api://"
             + record_linkage_url.split(".")[0].replace("https://", "")
