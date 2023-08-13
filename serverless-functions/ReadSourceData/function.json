@@ -3,7 +3,7 @@
   "bindings": [
     {
       "type": "queueTrigger",
-      "connection": "connection",
+      "connection": "AzureStorageQueuesConnectionString",
       "name": "message",
       "queueName": "sourcedataqueue",
       "direction": "in"

@@ -57,3 +57,8 @@ variable "record_linkage_container_url" {
   type        = string
   description = "The URL of the record linkage service."
 }
+
+variable "phi_storage_account_connection_string" {
+  type        = string
+  description = "The connection string for the storage account."
+}

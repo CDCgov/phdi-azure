@@ -60,7 +60,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
     SLEEP_TIME                      = var.sleep_time
     INGESTION_URL                   = var.ingestion_container_url
     RECORD_LINKAGE_URL              = var.record_linkage_container_url
-    connection__blobServiceUri = "https://phdi${terraform.workspace}phi${substr(var.client_id, 0, 8)}.queue.core.windows.net"
+    AzureStorageQueuesConnectionString = var.phi_storage_account_connection_string
   }
 
   lifecycle {

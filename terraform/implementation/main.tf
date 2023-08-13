@@ -55,6 +55,7 @@ module "read_source_data" {
   sleep_time                   = 1
   ingestion_container_url      = module.shared.ingestion_container_url
   record_linkage_container_url = module.shared.record_linkage_container_url
+  phi_storage_account_connection_string = module.shared.phi_storage_account_connection_string
 }
 
 output "record_linkage_container_url" {
