@@ -40,22 +40,24 @@ def main(message: func.QueueMessage) -> None:
     :param blob: An input stream of the blob that was uploaded to the blob storage
     :return: None
     """
-    
+
     # Parse event data from message.
     event = message.get_json()
     event = event.get("data", {})
     logging.info(event)
-    
+
     # Get blob info from event.
     blob_url = event.get("url", None)
-    
+
     if blob_url is None:
-        bad_message = ("A message was received from the queue that does not contain a "
-                       "blob url in the body. Therefore, the further processing is not"
-                        " possible.")
+        bad_message = (
+            "A message was received from the queue that does not contain a "
+            "blob url in the body. Therefore, the further processing is not"
+            " possible."
+        )
         logging.error(bad_message)
         raise Exception(bad_message)
-    
+
     container_name = "source-data"
     storage_account_url, filename = blob_url.split(f"/{container_name}/")
 
@@ -170,9 +172,7 @@ def main(message: func.QueueMessage) -> None:
         geocoding_url = (
             os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
         )
-        geocoding_scope = (
-            "api://" + geocoding_url.split(".")[0].replace("https://", "")
-        )
+        geocoding_scope = "api://" + geocoding_url.split(".")[0].replace("https://", "")
         access_token = AzureCredentialManager(
             resource_location=geocoding_scope
         ).get_access_token()
@@ -185,9 +185,8 @@ def main(message: func.QueueMessage) -> None:
         logging.info(f"GEOCODING STATUS CODE: {geocoding_response.status_code}")
         logging.info(f"GEOCODING RESPONSE: {geocoding_response.text}")
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
-        record_linkage_scope = (
-            "api://"
-            + record_linkage_url.split(".")[0].replace("https://", "")
+        record_linkage_scope = "api://" + record_linkage_url.split(".")[0].replace(
+            "https://", ""
         )
         access_token = AzureCredentialManager(
             resource_location=record_linkage_scope
@@ -201,7 +200,9 @@ def main(message: func.QueueMessage) -> None:
             },
             headers={"Authorization": f"Bearer {access_token}"},
         )
-        logging.info(f"RECORD LINKAGE STATUS CODE: {record_linkage_response.status_code}")
+        logging.info(
+            f"RECORD LINKAGE STATUS CODE: {record_linkage_response.status_code}"
+        )
         logging.info(f"RECORD LINKAGE RESPONSE: {record_linkage_response.text}")
         return
 
