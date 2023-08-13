@@ -20,7 +20,7 @@ resource "azurerm_storage_account" "phi" {
 }
 
 resource "azurerm_storage_queue" "source_data_queue" {
-  name                 = "source-data-queue"
+  name                 = "sourcedataqueue"
   storage_account_name = azurerm_storage_account.phi.id
 }
 

@@ -5,7 +5,7 @@
       "type": "queueTrigger",
       "connection": "AzureWebJobsStorage__blobServiceUri",
       "name": "message",
-      "queueName": "source-data-queue",
+      "queueName": "sourcedataqueue",
       "direction": "in"
     }
   ]
