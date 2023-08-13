@@ -171,6 +171,20 @@ jobs:
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
             --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
             --endpoint-type azurefunction
+      - name: Add Event Grid subscription queue
+        env:
+          SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
+          SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
+        run: |
+          az eventgrid event-subscription create \
+            --name phdi${TF_ENV}phi${SHORT_CID}Subqueue \
+            --source-resource-id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageaccounts/phdi${TF_ENV}phi${SHORT_CID}" \
+            --included-event-types Microsoft.Storage.BlobCreated \
+            --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
+            --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Storage/storageAccounts/phdi${TF_ENV}phi${SHORT_CID}/queueservices/default/queues/source-data-queue" \
+            --endpoint-type storagequeue
       - name: Add scaling rules to container apps
         env:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}

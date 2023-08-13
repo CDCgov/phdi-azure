@@ -19,6 +19,11 @@ resource "azurerm_storage_account" "phi" {
   }
 }
 
+resource "azurerm_storage_queue" "source_data_queue" {
+  name                 = "source-data-queue"
+  storage_account_name = azurerm_storage_account.phi.id
+}
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "source_data" {
   name               = "source-data"
   storage_account_id = azurerm_storage_account.phi.id
@@ -102,6 +107,12 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "delta-tables" {
 resource "azurerm_role_assignment" "phi_storage_contributor" {
   scope                = azurerm_storage_account.phi.id
   role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+resource "azurerm_role_assignment" "phi_queue_contributor" {
+  scope                = azurerm_storage_account.phi.id
+  role_definition_name = "Storage Queue Data Contributor"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
