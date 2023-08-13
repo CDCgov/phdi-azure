@@ -21,7 +21,7 @@ resource "azurerm_storage_account" "phi" {
 
 resource "azurerm_storage_queue" "source_data_queue" {
   name                 = "sourcedataqueue"
-  storage_account_name = azurerm_storage_account.phi.id
+  storage_account_name = azurerm_storage_account.phi.name
 }
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "source_data" {
