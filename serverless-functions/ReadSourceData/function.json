@@ -3,7 +3,7 @@
   "bindings": [
     {
       "type": "queueTrigger",
-      "connection": "AzureWebJobsStorage__blobServiceUri",
+      "connection": "connection",
       "name": "message",
       "queueName": "sourcedataqueue",
       "direction": "in"
