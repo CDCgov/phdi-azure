@@ -40,13 +40,13 @@ def main(message: func.QueueMessage) -> None:
     :param blob: An input stream of the blob that was uploaded to the blob storage
     :return: None
     """
-    logging.info('Python queue trigger function processed a queue item.')
     
+    # Parse event data from message.
     event = message.get_json()
-
+    event = event.get("data", {})
     logging.info(event)
-    # Get blob info
-    container_name = "source-data"
+    
+    # Get blob info from event.
     blob_url = event.get("url", None)
     
     if blob_url is None:
@@ -56,6 +56,7 @@ def main(message: func.QueueMessage) -> None:
         logging.error(bad_message)
         raise Exception(bad_message)
     
+    container_name = "source-data"
     storage_account_url, filename = blob_url.split(f"/{container_name}/")
 
     # Determine message type and root template.
