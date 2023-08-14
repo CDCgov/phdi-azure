@@ -20,10 +20,10 @@ from lxml import etree
 from typing import Tuple, Union
 
 MESSAGE_TO_TEMPLATE_MAP = {
+    "fhir": "",
+    "ecr": "EICR",
     "elr": "ORU_R01",
     "vxu": "VXU_V04",
-    "ecr": "EICR",
-    "fhir": "",
 }
 
 
