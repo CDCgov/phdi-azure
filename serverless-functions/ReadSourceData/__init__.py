@@ -172,38 +172,16 @@ def main(message: func.QueueMessage) -> None:
         geocoding_url = (
             os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
         )
-        geocoding_scope = "api://" + geocoding_url.split(".")[0].replace("https://", "")
-        access_token = AzureCredentialManager(
-            resource_location=geocoding_scope
-        ).get_access_token()
-        geocoding_response = requests.post(
-            url=geocoding_url,
-            json={"bundle": fhir_bundle, "geocode_method": "smarty"},
-            headers={"Authorization": f"Bearer {access_token}"},
-        )
-
-        logging.info(f"GEOCODING STATUS CODE: {geocoding_response.status_code}")
-        logging.info(f"GEOCODING RESPONSE: {geocoding_response.text}")
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
-        record_linkage_scope = "api://" + record_linkage_url.split(".")[0].replace(
-            "https://", ""
-        )
-        access_token = AzureCredentialManager(
-            resource_location=record_linkage_scope
-        ).get_access_token()
 
-        record_linkage_response = requests.post(
-            url=record_linkage_url,
-            json={
-                "bundle": geocoding_response.json().get("bundle"),
-                "external_person_id": external_person_id,
-            },
-            headers={"Authorization": f"Bearer {access_token}"},
-        )
-        logging.info(
-            f"RECORD LINKAGE STATUS CODE: {record_linkage_response.status_code}"
-        )
-        logging.info(f"RECORD LINKAGE RESPONSE: {record_linkage_response.text}")
+        geocoding_body = {"bundle": fhir_bundle, "geocode_method": "smarty"}
+        geocoding_response = post_data_to_building_block(geocoding_url, geocoding_body)
+
+        record_linkage_body = {
+            "bundle": geocoding_response.get("bundle"),
+            "external_person_id": external_person_id,
+        }
+        post_data_to_building_block(record_linkage_url, record_linkage_body)
         return
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
@@ -412,3 +390,34 @@ def get_external_person_id(blob_contents: dict) -> Tuple[dict, Union[str, None]]
     fhir_bundle = blob_contents.get("bundle", blob_contents)
 
     return fhir_bundle, get_external_person_id
+
+
+def post_data_to_building_block(url: str, body: dict) -> dict:
+    """
+    POST data to a building block endpoint given the url and body for the request.
+
+    :param url: The url of the building block endpoint.
+    :param body: The JSON body of the request as a dictionary.
+    :return: The JSON response from the building block as a dictionary.
+    """
+
+    application_id_uri = "api://" + url.split(".")[0].replace("https://", "")
+
+    access_token = AzureCredentialManager(
+        resource_location=application_id_uri
+    ).get_access_token()
+
+    response = requests.post(
+        url=url,
+        json=body,
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    status_code = response.status_code
+    if status_code < 400:
+        logging.info(f"{url.upper()} STATUS CODE: {response.status_code}")
+    else:
+        failed_request_message = f"{url.upper()} STATUS CODE: {response.status_code}"
+        logging.error(failed_request_message)
+        raise Exception(failed_request_message)
+
+    return response.json()
