@@ -168,6 +168,7 @@ jobs:
             --source-resource-id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageaccounts/phdi${TF_ENV}phi${SHORT_CID}" \
             --included-event-types Microsoft.Storage.BlobCreated \
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
+            --advanced-filter data.api StringContains FlushWithClose\
             --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Storage/storageAccounts/phdi${TF_ENV}phi${SHORT_CID}/queueservices/default/queues/sourcedataqueue" \
             --endpoint-type storagequeue
       - name: Add scaling rules to container apps
