@@ -386,10 +386,10 @@ def get_external_person_id(blob_contents: dict) -> Tuple[dict, Union[str, None]]
 
     blob_contents = json.loads(blob_contents)
 
-    get_external_person_id = blob_contents.get("external_person_id", None)
+    external_person_id = blob_contents.get("external_person_id", None)
     fhir_bundle = blob_contents.get("bundle", blob_contents)
 
-    return fhir_bundle, get_external_person_id
+    return fhir_bundle, external_person_id
 
 
 def post_data_to_building_block(url: str, body: dict) -> dict:
