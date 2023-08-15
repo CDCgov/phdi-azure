@@ -89,11 +89,6 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
     "message_type" : "",
     "root_template" : "",
     "include_error_types" : "",
-    "external_person_id" : "no external person id provided",
-  }
-  variables = {
-    "fhir_bundle" : "",
-    "message_valid" : true
   }
 
   activities_json = jsonencode(local.ingestion-pipeline-config.properties.activities)
