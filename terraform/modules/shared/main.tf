@@ -555,6 +555,11 @@ resource "helm_release" "helm_clusters" {
   }
 
   set {
+    name  = "storage_account_url"
+    value = azurerm_storage_account.phi.primary_blob_endpoint
+  }
+
+  set {
     name  = "databasePassword"
     value = azurerm_postgresql_flexible_server.mpi.administrator_password
   }
