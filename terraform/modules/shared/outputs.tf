@@ -80,3 +80,7 @@ output "record_linkage_container_url" {
 output "key_vault_name" {
   value = azurerm_key_vault.phdi_key_vault.name
 }
+
+output "phi_storage_account_connection_string" {
+  value = azurerm_storage_account.phi.primary_connection_string
+}

@@ -156,7 +156,6 @@ jobs:
           app-name: "$TF_ENV-read-source-data-$SHORT_CID"
           package: serverless-functions
           publish-profile: ${{ env.PUBLISH_PROFILE }}
-
       - name: Add Event Grid subscription
         env:
           SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
@@ -165,12 +164,21 @@ jobs:
           SHORT_CID: ${{ needs.terraform.outputs.short_cid }}
         run: |
           az eventgrid event-subscription create \
-            --name phdi${TF_ENV}phi${SHORT_CID}Sub \
+            --name phdi${TF_ENV}phi${SHORT_CID}-FlushWithClose-sourcedata-queue \
             --source-resource-id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageaccounts/phdi${TF_ENV}phi${SHORT_CID}" \
             --included-event-types Microsoft.Storage.BlobCreated \
             --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
-            --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Web/sites/${TF_ENV}-read-source-data-${SHORT_CID}/functions/ReadSourceData" \
-            --endpoint-type azurefunction
+            --advanced-filter data.api StringContains FlushWithClose\
+            --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Storage/storageAccounts/phdi${TF_ENV}phi${SHORT_CID}/queueservices/default/queues/sourcedataqueue" \
+            --endpoint-type storagequeue
+          az eventgrid event-subscription create \
+            --name phdi${TF_ENV}phi${SHORT_CID}-PutBlob-sourcedata-queue \
+            --source-resource-id "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageaccounts/phdi${TF_ENV}phi${SHORT_CID}" \
+            --included-event-types Microsoft.Storage.BlobCreated \
+            --subject-begins-with /blobServices/default/containers/source-data/blobs/ \
+            --advanced-filter data.api StringContains PutBlob\
+            --endpoint "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP_NAME}/providers/Microsoft.Storage/storageAccounts/phdi${TF_ENV}phi${SHORT_CID}/queueservices/default/queues/sourcedataqueue" \
+            --endpoint-type storagequeue
       - name: Add scaling rules to container apps
         env:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}

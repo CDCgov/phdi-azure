@@ -47,3 +47,18 @@ variable "sleep_time" {
   type        = number
   description = "The number of seconds to sleep in lookup tries for a resource."
 }
+
+variable "ingestion_container_url" {
+  type        = string
+  description = "The URL of the ingestion service."
+}
+
+variable "record_linkage_container_url" {
+  type        = string
+  description = "The URL of the record linkage service."
+}
+
+variable "phi_storage_account_connection_string" {
+  type        = string
+  description = "The connection string for the storage account."
+}
