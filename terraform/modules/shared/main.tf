@@ -542,10 +542,11 @@ provider "helm" {
   }
 }
 
-resource "helm_release" "record_linkage" {
-  name          = "phdi-${terraform.workspace}"
+resource "helm_release" "helm_clusters" {
+  for_each      = local.images
   repository    = "https://cdcgov.github.io/phdi-charts/"
-  chart         = "record-linkage-chart"
+  name          = "phdi-${terraform.workspace}-${each.key}"
+  chart         = "${each.key}-chart"
   recreate_pods = true
 
   set {
@@ -566,6 +567,16 @@ resource "helm_release" "record_linkage" {
   set {
     name  = "databaseHost"
     value = azurerm_postgresql_flexible_server.mpi.fqdn
+  }
+
+  set {
+    name  = "smartyAuthId"
+    value = azurerm_key_vault_secret.smarty_auth_id.value
+  }
+
+  set {
+    name  = "smartyToken"
+    value = azurerm_key_vault_secret.smarty_auth_token.value
   }
 }
 
