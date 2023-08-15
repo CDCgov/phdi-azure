@@ -554,10 +554,10 @@ resource "helm_release" "helm_clusters" {
     value = "latest"
   }
 
-  # set {
-  #   name  = "storage_account_url"
-  #   value = azurerm_storage_account.phi.primary_blob_endpoint
-  # }
+  set {
+    name  = "storage_account_url"
+    value = azurerm_storage_account.phi.primary_blob_endpoint
+  }
 
   set {
     name  = "databasePassword"
