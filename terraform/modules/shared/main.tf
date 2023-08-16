@@ -19,6 +19,11 @@ resource "azurerm_storage_account" "phi" {
   }
 }
 
+resource "azurerm_storage_queue" "source_data_queue" {
+  name                 = "sourcedataqueue"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "source_data" {
   name               = "source-data"
   storage_account_id = azurerm_storage_account.phi.id
@@ -26,6 +31,11 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "source_data" {
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "bundle_snapshots" {
   name               = "bundle-snapshots"
+  storage_account_id = azurerm_storage_account.phi.id
+}
+
+resource "azurerm_storage_data_lake_gen2_filesystem" "linkage_notebook_outputs" {
+  name               = "linkage-notebook-outputs"
   storage_account_id = azurerm_storage_account.phi.id
 }
 
@@ -47,6 +57,14 @@ resource "azurerm_storage_blob" "ecr" {
 
 resource "azurerm_storage_blob" "elr" {
   name                   = "elr/.keep"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.source_data.name
+  type                   = "Block"
+  source_content         = ""
+}
+
+resource "azurerm_storage_blob" "fhir" {
+  name                   = "fhir/.keep"
   storage_account_name   = azurerm_storage_account.phi.name
   storage_container_name = azurerm_storage_data_lake_gen2_filesystem.source_data.name
   type                   = "Block"
@@ -89,6 +107,12 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "delta-tables" {
 resource "azurerm_role_assignment" "phi_storage_contributor" {
   scope                = azurerm_storage_account.phi.id
   role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+resource "azurerm_role_assignment" "phi_queue_contributor" {
+  scope                = azurerm_storage_account.phi.id
+  role_definition_name = "Storage Queue Data Contributor"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
@@ -209,407 +233,257 @@ resource "azurerm_container_registry" "phdi_registry" {
   admin_enabled       = true
 }
 
-terraform {
-  required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "3.0.1"
-    }
-  }
-}
+# terraform {
+#   required_providers {
+#     docker = {
+#       source  = "kreuzwerker/docker"
+#       version = "3.0.1"
+#     }
+#   }
+# }
 
-provider "docker" {
-  host = "unix:///var/run/docker.sock"
-  registry_auth {
-    address  = "ghcr.io"
-    username = var.ghcr_username
-    password = var.ghcr_token
-  }
-  registry_auth {
-    address  = azurerm_container_registry.phdi_registry.login_server
-    username = azurerm_container_registry.phdi_registry.admin_username
-    password = azurerm_container_registry.phdi_registry.admin_password
-  }
-}
+# provider "docker" {
+#   host = "unix:///var/run/docker.sock"
+#   registry_auth {
+#     address  = "ghcr.io"
+#     username = var.ghcr_username
+#     password = var.ghcr_token
+#   }
+#   registry_auth {
+#     address  = azurerm_container_registry.phdi_registry.login_server
+#     username = azurerm_container_registry.phdi_registry.admin_username
+#     password = azurerm_container_registry.phdi_registry.admin_password
+#   }
+# }
 
-# Pull images from GitHub Container Registry and push to Azure Container Registry
-locals {
-  images = toset([
-    "fhir-converter",
-    "ingestion",
-    "tabulation",
-    "alerts",
-    "message-parser",
-    "validation",
-    "record-linkage",
-  ])
-}
+# # Pull images from GitHub Container Registry and push to Azure Container Registry
+# locals {
+#   images = toset([
+#     "fhir-converter",
+#     "ingestion",
+#     "tabulation",
+#     "alerts",
+#     "message-parser",
+#     "validation",
+#     "record-linkage",
+#   ])
 
-data "docker_registry_image" "ghcr_data" {
-  for_each = local.images
-  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.7"
-}
+#   phdi_version = "v1.0.10"
+# }
 
-resource "docker_image" "ghcr_image" {
-  for_each      = local.images
-  name          = data.docker_registry_image.ghcr_data[each.key].name
-  keep_locally  = true
-  pull_triggers = [data.docker_registry_image.ghcr_data[each.key].sha256_digest]
-}
+# data "docker_registry_image" "ghcr_data" {
+#   for_each = local.images
+#   name     = "ghcr.io/cdcgov/phdi/${each.key}:${local.phdi_version}"
+# }
 
-resource "docker_tag" "tag_for_azure" {
-  for_each     = local.images
-  source_image = docker_image.ghcr_image[each.key].name
-  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
-}
+# resource "docker_image" "ghcr_image" {
+#   for_each      = local.images
+#   name          = data.docker_registry_image.ghcr_data[each.key].name
+#   keep_locally  = true
+#   pull_triggers = [data.docker_registry_image.ghcr_data[each.key].sha256_digest]
+# }
 
-resource "docker_registry_image" "acr_image" {
-  for_each      = local.images
-  depends_on    = [docker_tag.tag_for_azure]
-  name          = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
-  keep_remotely = true
+# resource "docker_tag" "tag_for_azure" {
+#   for_each     = local.images
+#   source_image = docker_image.ghcr_image[each.key].name
+#   target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:${local.phdi_version}"
+# }
 
-  triggers = {
-    sha256_digest = data.docker_registry_image.ghcr_data[each.key].sha256_digest
-  }
-}
+# resource "docker_registry_image" "acr_image" {
+#   for_each      = local.images
+#   depends_on    = [docker_tag.tag_for_azure]
+#   name          = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:${local.phdi_version}"
+#   keep_remotely = true
 
-##### Container apps #####
+#   triggers = {
+#     sha256_digest = data.docker_registry_image.ghcr_data[each.key].sha256_digest
+#   }
+# }
 
-resource "azurerm_container_app_environment" "phdi" {
-  name                       = terraform.workspace
-  location                   = var.location
-  resource_group_name        = var.resource_group_name
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-}
+# ##### Container apps #####
 
-##### Postgres #####
-resource "random_password" "postgres_password" {
-  length           = 32
-  special          = true
-  override_special = "_%@"
-}
+# resource "azurerm_container_app_environment" "phdi" {
+#   name                       = terraform.workspace
+#   location                   = var.location
+#   resource_group_name        = var.resource_group_name
+#   log_analytics_workspace_id = var.log_analytics_workspace_id
+# }
 
-resource "azurerm_postgresql_flexible_server" "mpi" {
-  name                         = "phdi${terraform.workspace}mpi${substr(var.client_id, 0, 8)}"
-  resource_group_name          = var.resource_group_name
-  location                     = var.location
-  sku_name                     = "GP_Standard_D2s_v3"
-  version                      = "14"
-  storage_mb                   = 65536
-  backup_retention_days        = 7
-  geo_redundant_backup_enabled = true
-  administrator_login          = "postgres"
-  administrator_password       = random_password.postgres_password.result
-  tags = {
-    environment = terraform.workspace
-    managed-by  = "terraform"
-  }
+# ##### Postgres #####
+# resource "random_password" "postgres_password" {
+#   length           = 32
+#   special          = true
+#   override_special = "_%@"
+# }
 
-  lifecycle {
-    ignore_changes = [zone]
-  }
-}
+# resource "azurerm_postgresql_flexible_server" "mpi" {
+#   name                         = "phdi${terraform.workspace}mpi${substr(var.client_id, 0, 8)}"
+#   resource_group_name          = var.resource_group_name
+#   location                     = var.location
+#   sku_name                     = "GP_Standard_D2s_v3"
+#   version                      = "14"
+#   storage_mb                   = 65536
+#   backup_retention_days        = 7
+#   geo_redundant_backup_enabled = true
+#   administrator_login          = "postgres"
+#   administrator_password       = random_password.postgres_password.result
+#   tags = {
+#     environment = terraform.workspace
+#     managed-by  = "terraform"
+#   }
 
-resource "azurerm_postgresql_flexible_server_configuration" "mpi" {
-  name      = "azure.extensions"
-  server_id = azurerm_postgresql_flexible_server.mpi.id
-  value     = "UUID-OSSP"
-}
+#   lifecycle {
+#     ignore_changes = [zone]
+#   }
+# }
 
-resource "azurerm_postgresql_flexible_server_database" "mpi" {
-  name      = "DibbsMpiDB"
-  server_id = azurerm_postgresql_flexible_server.mpi.id
-  collation = "en_US.utf8"
-  charset   = "utf8"
-}
+# resource "azurerm_postgresql_flexible_server_configuration" "mpi" {
+#   name      = "azure.extensions"
+#   server_id = azurerm_postgresql_flexible_server.mpi.id
+#   value     = "UUID-OSSP"
+# }
 
-// Allow Azure services to access the database
-// See here: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_firewall_rule
-resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
-  name             = "allow_azure_services"
-  server_id        = azurerm_postgresql_flexible_server.mpi.id
-  start_ip_address = "0.0.0.0"
-  end_ip_address   = "0.0.0.0"
-}
+# resource "azurerm_postgresql_flexible_server_database" "mpi" {
+#   name      = "DibbsMpiDB"
+#   server_id = azurerm_postgresql_flexible_server.mpi.id
+#   collation = "en_US.utf8"
+#   charset   = "utf8"
+# }
 
-resource "azurerm_container_app" "container_app" {
-  for_each                     = local.images
-  name                         = "phdi-${terraform.workspace}-${each.key}"
-  container_app_environment_id = azurerm_container_app_environment.phdi.id
-  resource_group_name          = var.resource_group_name
-  revision_mode                = "Single"
+# // Allow Azure services to access the database
+# // See here: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_firewall_rule
+# resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
+#   name             = "allow_azure_services"
+#   server_id        = azurerm_postgresql_flexible_server.mpi.id
+#   start_ip_address = "0.0.0.0"
+#   end_ip_address   = "0.0.0.0"
+# }
 
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
-  }
+# resource "azurerm_container_app" "container_app" {
+#   for_each                     = local.images
+#   name                         = "phdi-${terraform.workspace}-${each.key}"
+#   container_app_environment_id = azurerm_container_app_environment.phdi.id
+#   resource_group_name          = var.resource_group_name
+#   revision_mode                = "Single"
 
-  template {
-    container {
-      name   = "phdi-${terraform.workspace}-${each.key}"
-      image  = docker_registry_image.acr_image[each.key].name
-      cpu    = 0.5
-      memory = "1Gi"
+#   identity {
+#     type         = "UserAssigned"
+#     identity_ids = [azurerm_user_assigned_identity.pipeline_runner.id]
+#   }
 
-      env {
-        name  = "SMARTY_AUTH_ID"
-        value = var.smarty_auth_id
-      }
-      env {
-        name  = "SMARTY_AUTH_TOKEN"
-        value = var.smarty_auth_token
-      }
-      env {
-        name  = "SMARTY_LICENSE_TYPE"
-        value = var.smarty_license_type
-      }
-      env {
-        name  = "AZURE_CLIENT_ID"
-        value = azurerm_user_assigned_identity.pipeline_runner.client_id
-      }
-      env {
-        name  = "AZURE_TENANT_ID"
-        value = data.azurerm_client_config.current.tenant_id
-      }
-      env {
-        name  = "AZURE_SUBSCRIPTION_ID"
-        value = data.azurerm_client_config.current.subscription_id
-      }
-      env {
-        name  = "STORAGE_ACCOUNT_URL"
-        value = azurerm_storage_account.phi.primary_blob_endpoint
-      }
-      env {
-        name  = "SALT_STR"
-        value = random_uuid.salt.result
-      }
-      env {
-        name  = "COMMUNICATION_SERVICE_NAME"
-        value = azurerm_communication_service.communication_service.name
-      }
-      env {
-        name  = "MPI_DB_TYPE"
-        value = "postgres"
-      }
-      env {
-        name  = "MPI_PASSWORD"
-        value = azurerm_postgresql_flexible_server.mpi.administrator_password
-      }
-      env {
-        name  = "MPI_USER"
-        value = azurerm_postgresql_flexible_server.mpi.administrator_login
-      }
-      env {
-        name  = "MPI_PORT"
-        value = "5432"
-      }
-      env {
-        name  = "MPI_HOST"
-        value = azurerm_postgresql_flexible_server.mpi.fqdn
-      }
-      env {
-        name  = "MPI_DBNAME"
-        value = azurerm_postgresql_flexible_server_database.mpi.name
-      }
-      env {
-        name  = "MPI_PATIENT_TABLE"
-        value = "patient"
-      }
-      env {
-        name  = "MPI_PERSON_TABLE"
-        value = "person"
-      }
-    }
-  }
+#   template {
+#     max_replicas = 200
+#     min_replicas = 0
+#     container {
+#       name   = "phdi-${terraform.workspace}-${each.key}"
+#       image  = docker_registry_image.acr_image[each.key].name
+#       cpu    = 1.0
+#       memory = "2Gi"
 
-  ingress {
-    external_enabled = true
-    target_port      = 8080
-    traffic_weight {
-      latest_revision = true
-      percentage      = 100
-    }
-  }
+#       env {
+#         name  = "SMARTY_AUTH_ID"
+#         value = var.smarty_auth_id
+#       }
+#       env {
+#         name  = "SMARTY_AUTH_TOKEN"
+#         value = var.smarty_auth_token
+#       }
+#       env {
+#         name  = "SMARTY_LICENSE_TYPE"
+#         value = var.smarty_license_type
+#       }
+#       env {
+#         name  = "AZURE_CLIENT_ID"
+#         value = azurerm_user_assigned_identity.pipeline_runner.client_id
+#       }
+#       env {
+#         name  = "AZURE_TENANT_ID"
+#         value = data.azurerm_client_config.current.tenant_id
+#       }
+#       env {
+#         name  = "AZURE_SUBSCRIPTION_ID"
+#         value = data.azurerm_client_config.current.subscription_id
+#       }
+#       env {
+#         name  = "STORAGE_ACCOUNT_URL"
+#         value = azurerm_storage_account.phi.primary_blob_endpoint
+#       }
+#       env {
+#         name  = "SALT_STR"
+#         value = random_uuid.salt.result
+#       }
+#       env {
+#         name  = "COMMUNICATION_SERVICE_NAME"
+#         value = azurerm_communication_service.communication_service.name
+#       }
+#       env {
+#         name  = "MPI_DB_TYPE"
+#         value = "postgres"
+#       }
+#       env {
+#         name  = "MPI_PASSWORD"
+#         value = azurerm_postgresql_flexible_server.mpi.administrator_password
+#       }
+#       env {
+#         name  = "MPI_USER"
+#         value = azurerm_postgresql_flexible_server.mpi.administrator_login
+#       }
+#       env {
+#         name  = "MPI_PORT"
+#         value = "5432"
+#       }
+#       env {
+#         name  = "MPI_HOST"
+#         value = azurerm_postgresql_flexible_server.mpi.fqdn
+#       }
+#       env {
+#         name  = "MPI_DBNAME"
+#         value = azurerm_postgresql_flexible_server_database.mpi.name
+#       }
+#       env {
+#         name  = "MPI_PATIENT_TABLE"
+#         value = "patient"
+#       }
+#       env {
+#         name  = "MPI_PERSON_TABLE"
+#         value = "person"
+#       }
+#     }
+#   }
 
-  secret {
-    name  = "phdi-registry-password"
-    value = azurerm_container_registry.phdi_registry.admin_password
-  }
+#   ingress {
+#     external_enabled = true
+#     target_port      = 8080
+#     traffic_weight {
+#       latest_revision = true
+#       percentage      = 100
+#     }
+#   }
 
-  registry {
-    server               = azurerm_container_registry.phdi_registry.login_server
-    username             = azurerm_container_registry.phdi_registry.admin_username
-    password_secret_name = "phdi-registry-password"
-  }
+#   secret {
+#     name  = "phdi-registry-password"
+#     value = azurerm_container_registry.phdi_registry.admin_password
+#   }
 
-  lifecycle {
-    ignore_changes = [secret]
-  }
-}
+#   registry {
+#     server               = azurerm_container_registry.phdi_registry.login_server
+#     username             = azurerm_container_registry.phdi_registry.admin_username
+#     password_secret_name = "phdi-registry-password"
+#   }
 
-resource "azurerm_container_app_environment_storage" "tabulation_storage" {
-  name                         = "phdi${terraform.workspace}tables"
-  container_app_environment_id = azurerm_container_app_environment.phdi.id
-  account_name                 = azurerm_storage_account.phi.name
-  share_name                   = azurerm_storage_share.tables.name
-  access_key                   = azurerm_storage_account.phi.primary_access_key
-  access_mode                  = "ReadWrite"
-}
+#   lifecycle {
+#     ignore_changes = [secret]
+#   }
+# }
 
-#### VNET for kubernetes ####
-
-resource "azurerm_virtual_network" "aks_vnet" {
-  name                = "phdi-${terraform.workspace}-vnet"
-  resource_group_name = var.resource_group_name
-  address_space       = [var.k8s_vnet_address_space]
-  location            = var.location
-
-  subnet {
-    name           = "phdi-${terraform.workspace}-aks_subnet"
-    address_prefix = var.k8s_subnet_address_prefix
-  }
-}
-
-resource "azurerm_network_security_group" "aks_nsg" {
-  name                = "phdi-${terraform.workspace}-nsg"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-
-  security_rule {
-    name                       = "AzureDataFactoryInbound"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "DataFactory"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                       = "AzureDataFactoryOutbound"
-    priority                   = 100
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "DataFactory"
-  }
-}
-
-resource "azurerm_subnet_network_security_group_association" "aks_nsg_association" {
-  subnet_id                 = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
-  network_security_group_id = azurerm_network_security_group.aks_nsg.id
-}
-
-#### Kubernetes Service ####
-
-resource "azurerm_kubernetes_cluster" "cluster" {
-  name                = "phdi-${terraform.workspace}-cluster"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  dns_prefix          = "phdi-${terraform.workspace}"
-
-  default_node_pool {
-    name           = "default"
-    node_count     = 1
-    vm_size        = "Standard_D2_v2"
-    vnet_subnet_id = azurerm_virtual_network.aks_vnet.subnet.*.id[0]
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-  network_profile {
-    network_plugin = "azure"
-  }
-}
-
-data "azurerm_kubernetes_cluster" "credentials" {
-  name                = azurerm_kubernetes_cluster.cluster.name
-  resource_group_name = var.resource_group_name
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = data.azurerm_kubernetes_cluster.credentials.kube_config.0.host
-    client_certificate     = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_certificate)
-    client_key             = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.client_key)
-    cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.credentials.kube_config.0.cluster_ca_certificate)
-  }
-}
-
-resource "helm_release" "helm_clusters" {
-  for_each      = local.images
-  repository    = "https://cdcgov.github.io/phdi-charts/"
-  name          = "phdi-${terraform.workspace}-${each.key}"
-  chart         = "${each.key}-chart"
-  recreate_pods = true
-
-  set {
-    name  = "image.tag"
-    value = "latest"
-  }
-
-  set {
-    name  = "databasePassword"
-    value = azurerm_postgresql_flexible_server.mpi.administrator_password
-  }
-
-  set {
-    name  = "databaseName"
-    value = azurerm_postgresql_flexible_server_database.mpi.name
-  }
-
-  set {
-    name  = "databaseHost"
-    value = azurerm_postgresql_flexible_server.mpi.fqdn
-  }
-
-  set {
-    name  = "smartyAuthId"
-    value = azurerm_key_vault_secret.smarty_auth_id.value
-  }
-
-  set {
-    name  = "smartyToken"
-    value = azurerm_key_vault_secret.smarty_auth_token.value
-  }
-}
-
-##### FHIR Server #####
-
-resource "azurerm_healthcare_service" "fhir_server" {
-  name                = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
-  location            = "eastus"
-  resource_group_name = var.resource_group_name
-  kind                = "fhir-R4"
-  cosmosdb_throughput = 400
-
-  lifecycle {
-    ignore_changes = [name, tags]
-  }
-
-  tags = {
-    environment = terraform.workspace
-    managed-by  = "terraform"
-  }
-}
-
-resource "azurerm_role_assignment" "gh_sp_fhir_contributor" {
-  scope                = azurerm_healthcare_service.fhir_server.id
-  role_definition_name = "FHIR Data Contributor"
-  principal_id         = var.object_id
-}
-
-resource "azurerm_role_assignment" "pipeline_runner_fhir_contributor" {
-  scope                = azurerm_healthcare_service.fhir_server.id
-  role_definition_name = "FHIR Data Contributor"
-  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
-}
+# resource "azurerm_container_app_environment_storage" "tabulation_storage" {
+#   name                         = "phdi${terraform.workspace}tables"
+#   container_app_environment_id = azurerm_container_app_environment.phdi.id
+#   account_name                 = azurerm_storage_account.phi.name
+#   share_name                   = azurerm_storage_share.tables.name
+#   access_key                   = azurerm_storage_account.phi.primary_access_key
+#   access_mode                  = "ReadWrite"
+# }
 
 ##### User Assigned Identity #####
 
@@ -731,3 +605,14 @@ resource "azurerm_communication_service" "communication_service" {
 #  }
 #  JSON
 #}
+
+# resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
+#   name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-keyvault-linked-service"
+#   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+#   type                 = "AzureKeyVault"
+#   type_properties_json = <<JSON
+#   {
+#   "baseUrl": "https://${terraform.workspace}vault${substr(var.client_id, 0, 8)}.vault.azure.net/"
+#   }
+#   JSON
+# }

@@ -25,7 +25,6 @@ module "data_factory" {
   message_parser_url       = module.shared.message_parser_url
   # tabulation_container_url                = module.shared.tabulation_container_url
   # alerts_container_url                    = module.shared.alerts_container_url
-  fhir_server_url                         = "https://${module.shared.fhir_server_name}.azurehealthcareapis.com/"
   phi_storage_account_endpoint_url        = module.shared.phi_storage_account_endpoint_url
   record_linkage_container_url            = module.shared.record_linkage_container_url
   pipeline_runner_id                      = module.shared.pipeline_runner_id
@@ -42,17 +41,20 @@ module "data_factory" {
 
 
 module "read_source_data" {
-  source                    = "../modules/read_source_data"
-  resource_group_name       = var.resource_group_name
-  location                  = var.location
-  phdi_data_factory_name    = module.data_factory.phdi_data_factory_name
-  ingestion_pipeline_name   = module.data_factory.ingestion_pipeline_name
-  subscription_id           = var.subscription_id
-  pipeline_runner_id        = module.shared.pipeline_runner_id
-  pipeline_runner_client_id = module.shared.pipeline_runner_client_id
-  client_id                 = var.client_id
-  wait_time                 = 10
-  sleep_time                = 1
+  source                                = "../modules/read_source_data"
+  resource_group_name                   = var.resource_group_name
+  location                              = var.location
+  phdi_data_factory_name                = module.data_factory.phdi_data_factory_name
+  ingestion_pipeline_name               = module.data_factory.ingestion_pipeline_name
+  subscription_id                       = var.subscription_id
+  pipeline_runner_id                    = module.shared.pipeline_runner_id
+  pipeline_runner_client_id             = module.shared.pipeline_runner_client_id
+  client_id                             = var.client_id
+  wait_time                             = 10
+  sleep_time                            = 1
+  ingestion_container_url               = module.shared.ingestion_container_url
+  record_linkage_container_url          = module.shared.record_linkage_container_url
+  phi_storage_account_connection_string = module.shared.phi_storage_account_connection_string
 }
 
 output "record_linkage_container_url" {

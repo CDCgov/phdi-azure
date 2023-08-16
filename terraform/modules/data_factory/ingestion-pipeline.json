@@ -9,7 +9,7 @@
                 "dependsOn": [],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -77,7 +77,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -114,7 +114,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -151,7 +151,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -188,7 +188,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -225,7 +225,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -262,7 +262,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -299,7 +299,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -336,7 +336,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -372,7 +372,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -409,7 +409,7 @@
                 ],
                 "policy": {
                     "timeout": "0.12:00:00",
-                    "retry": 0,
+                    "retry": 3,
                     "retryIntervalInSeconds": 30,
                     "secureOutput": false,
                     "secureInput": false
@@ -456,7 +456,7 @@
                             "type": "WebActivity",
                             "policy": {
                                 "timeout": "0.12:00:00",
-                                "retry": 0,
+                                "retry": 3,
                                 "retryIntervalInSeconds": 30,
                                 "secureOutput": false,
                                 "secureInput": false
@@ -493,7 +493,7 @@
                             ],
                             "policy": {
                                 "timeout": "0.12:00:00",
-                                "retry": 0,
+                                "retry": 3,
                                 "retryIntervalInSeconds": 30,
                                 "secureOutput": false,
                                 "secureInput": false
@@ -518,83 +518,8 @@
                         }
                     ]
                 }
-            },
-            {
-                "name": "upload_fhir_bundle",
-                "description": "Compute a hashed identifier that can be used for record linkage.",
-                "type": "WebActivity",
-                "dependsOn": [
-                    {
-                        "activity": "record_linkage",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${ingestion_container_url}/fhir/transport/http/upload_bundle_to_fhir_server",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"fhir_url\": \"${fhir_server_url}\",\n    \"bundle\": @{activity('record_linkage').output.updated_bundle},\n    \"cred_manager\": \"azure\"\n}",
-                        "type": "Expression"
-                    },
-                    "authentication": {
-                        "resource": "api://phdi-${environment}-ingestion",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
-                        },
-                        "type": "UserAssignedManagedIdentity"
-                    }
-                }
-            },
-            {
-                "name": "log_fhir_upload_failure",
-                "description": "Write FHIR upload failures to storage.",
-                "type": "WebActivity",
-                "dependsOn": [
-                    {
-                        "activity": "upload_fhir_bundle",
-                        "dependencyConditions": [
-                            "Failed"
-                        ]
-                    }
-                ],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "url": "${ingestion_container_url}/cloud/storage/write_blob_to_storage",
-                    "method": "POST",
-                    "body": {
-                        "value": "{\n    \"blob\": @{activity('upload_fhir_bundle').output.message},\n    \"cloud_provider\": \"azure\",\n    \"bucket_name\": \"${fhir_upload_failures_container_name}\",\n    \"file_name\": \"@{concat(substring(pipeline().parameters.filename, 12, 4), pipeline().RunId, '_', substring(pipeline().parameters.filename, 16, sub(length(pipeline().parameters.filename),length(substring(pipeline().parameters.filename, 0, add(length('source_data/'), 4))))))}\"\n}",
-                        "type": "Expression"
-                    },
-                    "authentication": {
-                        "resource": "api://phdi-${environment}-ingestion",
-                        "credential": {
-                            "referenceName": "pipeline-runner-credential",
-                            "type": "CredentialReference"
-                        },
-                        "type": "UserAssignedManagedIdentity"
-                    }
-                }
             }
         ],
-        "concurrency": 10,
         "parameters": {
             "message": {
                 "type": "String"
