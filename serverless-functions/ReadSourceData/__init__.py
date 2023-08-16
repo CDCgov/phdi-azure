@@ -10,13 +10,27 @@ from phdi.cloud.azure import AzureCredentialManager, AzureCloudContainerConnecti
 from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
+import requests
+from phdi.fhir.harmonization.standardization import (
+    standardize_names,
+    standardize_phones,
+    standardize_dob,
+)
 from lxml import etree
+from typing import Tuple, Union
+
+MESSAGE_TO_TEMPLATE_MAP = {
+    "fhir": "",
+    "ecr": "EICR",
+    "elr": "ORU_R01",
+    "vxu": "VXU_V04",
+}
 
 
-def main(event: func.EventGridEvent) -> None:
+def main(message: func.QueueMessage) -> None:
     """
     When this function is triggered with a blob payload, read the new file if its
-    name begins with 'source-data/', identify each individual messsage
+    name begins with 'source-data/', identify each individual message
     (ELR, VXU, or eCR) contained in the file, and trigger in an Azure Data Factory
     ingestion pipeline for each of them. An exception is raised if pipeline triggering
     fails for any message.
@@ -27,52 +41,61 @@ def main(event: func.EventGridEvent) -> None:
     :return: None
     """
 
-    # Get blob info
+    # Parse event data from message.
+    event = message.get_json()
+    event = event.get("data", {})
+    logging.info(event)
+
+    # Get blob info from event.
+    blob_url = event.get("url", None)
+
+    if blob_url is None:
+        bad_message = (
+            "A message was received from the queue that does not contain a "
+            "blob url in the body. Therefore, the further processing is not"
+            " possible."
+        )
+        logging.error(bad_message)
+        raise Exception(bad_message)
+
     container_name = "source-data"
-    blob_url = event.get_json()["url"]
     storage_account_url, filename = blob_url.split(f"/{container_name}/")
 
-    # Determine data type and root template.
+    # Determine message type and root template.
     filename_parts = filename.split("/")
+    message_type = filename_parts[0]
 
-    if filename_parts[0] == "elr":
-        message_type = "elr"
-        root_template = "ORU_R01"
+    if message_type not in MESSAGE_TO_TEMPLATE_MAP:
+        logging.warning(
+            "The read source data function was triggered. We expected a file in the "
+            "elr, vxu, ecr, or fhir folders, but something else was provided."
+        )
+        return
 
-    elif filename_parts[0] == "vxu":
-        message_type = "vxu"
-        root_template = "VXU_V04"
-
-    elif filename_parts[0] == "ecr":
-        message_type = "ecr"
-        root_template = "EICR"
-
-        if any([name for name in ["RR", "html"] if name in filename_parts[1]]):
+    if message_type == "ecr":
+        if any([name for name in ["_RR", ".html"] if name in filename_parts[1]]):
             logging.info(
                 "The read source data function was triggered. Processing will not "
                 "continue as the file uploaded was not a currently handled type."
             )
             return
 
-    else:
-        logging.warning(
-            "The read source data function was triggered. We expected a file in the "
-            "elr, vxu, or ecr folders, but something else was provided."
-        )
-        return
+    root_template = MESSAGE_TO_TEMPLATE_MAP.get(message_type)
 
     # Download blob contents.
     cred_manager = AzureCredentialManager(resource_location=storage_account_url)
     cloud_container_connection = AzureCloudContainerConnection(
         storage_account_url=storage_account_url, cred_manager=cred_manager
     )
+    blob_contents = cloud_container_connection.download_object(
+        container_name=container_name, filename=filename
+    )
+
+    external_person_id = None
 
     # Handle eICR + Reportability Response messages
     if message_type == "ecr":
-        ecr = cloud_container_connection.download_object(
-            container_name=container_name, filename=filename
-        )
-
+        ecr = blob_contents
         wait_time = float(os.environ.get("WAIT_TIME", 10))
         sleep_time = float(os.environ.get("SLEEP_TIME", 1))
 
@@ -90,24 +113,76 @@ def main(event: func.EventGridEvent) -> None:
             )
 
         if reportability_response == "":
-            logging.warning(
-                "The ingestion pipeline was not triggered for this eCR, because a "
-                "reportability response was not found for filename "
-                f"{container_name}/{filename}."
-            )
-            return
+            # If no RR is found, check if we should continue processing the eICR and
+            # trigger the pipeline.
+            require_rr = os.environ.get("REQUIRE_RR", "true").lower()
+            if require_rr == "true":
+                require_rr = True
+            elif require_rr == "false":
+                require_rr = False
+            else:
+                error_message = (
+                    "The environment variable REQUIRE_RR must be set to either 'true' "
+                    "or 'false'."
+                )
+                logging.error(error_message)
+                raise Exception(error_message)
 
-        # Extract RR fields and put them in the ecr
-        ecr = rr_to_ecr(reportability_response, ecr)
+            if require_rr:
+                missing_rr_message = (
+                    "A reportability response could not be found for filename "
+                    f"{container_name}/{filename} after searching for {wait_time} "
+                    "seconds. The ingestion pipeline was not triggered. To search "
+                    "for a longer period of time, increase the value of the WAIT_TIME "
+                    "environment variable (default: 10 seconds). To allow processing of"
+                    " eICRs to continue without a reportability response, set the "
+                    "REQUIRE_RR environment variable to 'false' (default: 'true')."
+                )
+                logging.error(missing_rr_message)
+                raise Exception(missing_rr_message)
+            else:
+                missing_rr_message = (
+                    "A reportability response could not be found for filename "
+                    f"{container_name}/{filename} after searching for {wait_time} "
+                    "seconds. The ingestion pipeline was triggered for this eICR "
+                    "without inclusion of the reportability response. To search for a "
+                    "longer period of time, increase the value of the WAIT_TIME "
+                    "environment variable (default: 10 seconds). To prevent further "
+                    "processing of eICRs to continue without a reportability response, "
+                    "set the REQUIRE_RR environment variable to 'true' "
+                    "(default: 'true')."
+                )
+                logging.warning(missing_rr_message)
+        else:
+            # Extract RR fields and put them in the ecr
+            ecr = rr_to_ecr(reportability_response, ecr)
 
         messages = [ecr]
 
     # Handle batch Hl7v2 messages.
     elif message_type == "vxu" or message_type == "elr":
-        blob_contents = cloud_container_connection.download_object(
-            container_name=container_name, filename=filename
-        )
         messages = convert_hl7_batch_messages_to_list(blob_contents)
+
+    # Handle FHIR messages.
+    elif message_type == "fhir":
+        fhir_bundle, external_person_id = get_external_person_id(blob_contents)
+        fhir_bundle = standardize_dob(
+            standardize_phones(standardize_names(fhir_bundle))
+        )
+        geocoding_url = (
+            os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
+        )
+        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
+
+        geocoding_body = {"bundle": fhir_bundle, "geocode_method": "smarty"}
+        geocoding_response = post_data_to_building_block(geocoding_url, geocoding_body)
+
+        record_linkage_body = {
+            "bundle": geocoding_response.get("bundle"),
+            "external_person_id": external_person_id,
+        }
+        post_data_to_building_block(record_linkage_url, record_linkage_body)
+        return
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
@@ -136,6 +211,9 @@ def main(event: func.EventGridEvent) -> None:
             "filename": f"{container_name}/{filename}",
             "include_error_types": include_error_types,
         }
+
+        if external_person_id is not None:
+            pipeline_parameters["external_person_id"] = external_person_id
 
         try:
             adf_client.pipelines.create_run(
@@ -174,7 +252,7 @@ def get_reportability_response(
 
 
 # extract rr fields and insert them into the ecr
-def rr_to_ecr(rr, ecr):
+def rr_to_ecr(rr: str, ecr: str) -> str:
     """
     Extracts relevant fields from an RR document, and inserts them into a
     given eICR document. Ensures that the eICR contains properly formatted
@@ -285,3 +363,61 @@ def rr_to_ecr(rr, ecr):
     ecr = etree.tostring(ecr, encoding="unicode", method="xml")
 
     return ecr
+
+
+def get_external_person_id(blob_contents: dict) -> Tuple[dict, Union[str, None]]:
+    """
+    FHIR data can be uploaded to the source-data container as a plain FHIR bundle, or
+    it can be uploaded as dict representing a FHIR bundle and an external patient
+    id with the form:
+
+    {"bundle": <FHIR bundle>, "external_person_id": <external patient id>}.
+
+    Given the contents of a blob read from source-data/fhir, this function returns the
+    the FHIR bundle and the external patient id. In the case that the data is simply a
+    FHIR bundle and no patient id has been provided a null value is returned for
+    external_person_id.
+
+    :param blob_contents: The contents of a blob read from source-data/fhir.
+    :return: A tuple containing the FHIR bundle and the external patient id of the form
+        [<fhir_bundle>, <external_person_id>]. If no external patient id is provided
+        the second element of the tuple is None.
+    """
+
+    blob_contents = json.loads(blob_contents)
+
+    external_person_id = blob_contents.get("external_person_id", None)
+    fhir_bundle = blob_contents.get("bundle", blob_contents)
+
+    return fhir_bundle, external_person_id
+
+
+def post_data_to_building_block(url: str, body: dict) -> dict:
+    """
+    POST data to a building block endpoint given the url and body for the request.
+
+    :param url: The url of the building block endpoint.
+    :param body: The JSON body of the request as a dictionary.
+    :return: The JSON response from the building block as a dictionary.
+    """
+
+    application_id_uri = "api://" + url.split(".")[0].replace("https://", "")
+
+    access_token = AzureCredentialManager(
+        resource_location=application_id_uri
+    ).get_access_token()
+
+    response = requests.post(
+        url=url,
+        json=body,
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    status_code = response.status_code
+    if status_code < 400:
+        logging.info(f"{url.upper()} STATUS CODE: {response.status_code}")
+    else:
+        failed_request_message = f"{url.upper()} STATUS CODE: {response.status_code}"
+        logging.error(failed_request_message)
+        raise Exception(failed_request_message)
+
+    return response.json()

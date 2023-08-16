@@ -6,10 +6,6 @@ output "phi_storage_account_key" {
   value = azurerm_storage_account.phi.primary_access_key
 }
 
-output "fhir_server_name" {
-  value = azurerm_healthcare_service.fhir_server.name
-}
-
 output "pipeline_runner_id" {
   value = azurerm_user_assigned_identity.pipeline_runner.id
 }
@@ -39,7 +35,7 @@ output "fhir_conversion_failures_container_name" {
 }
 
 output "delta_tables_container_name" {
-  value = azurerm_storage_container.delta_tables_container_name.name
+  value = azurerm_storage_data_lake_gen2_filesystem.delta-tables.name
 }
 
 output "phi_storage_account_name" {
@@ -79,4 +75,8 @@ output "record_linkage_container_url" {
 
 output "key_vault_name" {
   value = azurerm_key_vault.phdi_key_vault.name
+}
+
+output "phi_storage_account_connection_string" {
+  value = azurerm_storage_account.phi.primary_connection_string
 }

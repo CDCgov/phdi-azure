@@ -53,3 +53,10 @@ jobs:
       - name: Check style (flake8)
         run: |
           flake8
+  ensure-clean-notebooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check notebook cleanliness
+        uses: ResearchSoftwareActions/EnsureCleanNotebooksAction@1.1

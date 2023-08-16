@@ -1,0 +1,24 @@
+{
+    "name": "Synapse Analytics Pipeline Weekly Trigger",
+    "properties": {
+        "annotations": [],
+        "runtimeState": "Started",
+        "pipelines": [
+            {
+                "pipelineReference": {
+                    "referenceName": "Synapse Analytics Pipeline",
+                    "type": "PipelineReference"
+                }
+            }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+            "recurrence": {
+                "frequency": "Week",
+                "interval": 1,
+                "startTime": "2023-07-05T20:45:00",
+                "timeZone": "Pacific Standard Time"
+            }
+        }
+    }
+}

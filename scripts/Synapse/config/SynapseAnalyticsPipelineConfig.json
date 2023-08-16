@@ -1,0 +1,199 @@
+{
+    "name": "Synapse Analytics Pipeline",
+    "properties": {
+        "activities": [
+            {
+                "name": "updateECRDataStore",
+                "type": "SynapseNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "updateECRDataStore",
+                        "type": "NotebookReference"
+                    },
+                    "sparkPool": {
+                        "referenceName": "sparkpool",
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
+                }
+            },
+            {
+                "name": "updateECRDataStorePersonID",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "updateECRDataStore",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "updateECRDataStorePersonID",
+                        "type": "NotebookReference"
+                    },
+                    "sparkPool": {
+                        "referenceName": "sparkpool",
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
+                }
+            },
+            {
+                "name": "updateECRDataStoreIrisID",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "updateECRDataStorePersonID",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "updateECRDataStoreIrisID",
+                        "type": "NotebookReference"
+                    },
+                    "sparkPool": {
+                        "referenceName": "sparkpool",
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
+                }
+            },
+            {
+                "name": "updateECRDataStoreIncidentID",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "updateECRDataStoreIrisID",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "updateECRDataStoreIncidentID",
+                        "type": "NotebookReference"
+                    },
+                    "sparkPool": {
+                        "referenceName": "sparkpool",
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
+                }
+            },
+            {
+                "name": "extractTSV",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "updateECRDataStoreIncidentID",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "extractTSV",
+                        "type": "NotebookReference"
+                    },
+                    "sparkPool": {
+                        "referenceName": "sparkpool",
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": null,
+                        "spark.dynamicAllocation.minExecutors": null,
+                        "spark.dynamicAllocation.maxExecutors": null
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": null
+                }
+            }
+        ],
+        "variables": {
+            "test": {
+                "type": "String",
+                "defaultValue": "test"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2023-08-07T22:50:54Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}

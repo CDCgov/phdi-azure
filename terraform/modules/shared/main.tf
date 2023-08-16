@@ -19,8 +19,23 @@ resource "azurerm_storage_account" "phi" {
   }
 }
 
+resource "azurerm_storage_queue" "source_data_queue" {
+  name                 = "sourcedataqueue"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "source_data" {
   name               = "source-data"
+  storage_account_id = azurerm_storage_account.phi.id
+}
+
+resource "azurerm_storage_data_lake_gen2_filesystem" "bundle_snapshots" {
+  name               = "bundle-snapshots"
+  storage_account_id = azurerm_storage_account.phi.id
+}
+
+resource "azurerm_storage_data_lake_gen2_filesystem" "linkage_notebook_outputs" {
+  name               = "linkage-notebook-outputs"
   storage_account_id = azurerm_storage_account.phi.id
 }
 
@@ -48,6 +63,22 @@ resource "azurerm_storage_blob" "elr" {
   source_content         = ""
 }
 
+resource "azurerm_storage_blob" "fhir" {
+  name                   = "fhir/.keep"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.source_data.name
+  type                   = "Block"
+  source_content         = ""
+}
+
+resource "azurerm_storage_blob" "covid-identification-config" {
+  name                   = "covid_identification_config.json"
+  storage_account_name   = azurerm_storage_account.phi.name
+  storage_container_name = azurerm_storage_data_lake_gen2_filesystem.delta-tables.name
+  type                   = "Block"
+  source_content         = file("../../scripts/Synapse/config/covid_identification_config.json")
+}
+
 resource "azurerm_storage_container" "fhir_conversion_failures_container_name" {
   name                 = "fhir-conversion-failures"
   storage_account_name = azurerm_storage_account.phi.name
@@ -68,14 +99,20 @@ resource "azurerm_storage_container" "patient_data_container_name" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
-resource "azurerm_storage_container" "delta_tables_container_name" {
-  name                 = "delta-tables"
-  storage_account_name = azurerm_storage_account.phi.name
+resource "azurerm_storage_data_lake_gen2_filesystem" "delta-tables" {
+  name               = "delta-tables"
+  storage_account_id = azurerm_storage_account.phi.id
 }
 
 resource "azurerm_role_assignment" "phi_storage_contributor" {
   scope                = azurerm_storage_account.phi.id
   role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
+resource "azurerm_role_assignment" "phi_queue_contributor" {
+  scope                = azurerm_storage_account.phi.id
+  role_definition_name = "Storage Queue Data Contributor"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
@@ -168,6 +205,24 @@ resource "azurerm_key_vault_secret" "mpi_db_password" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
+resource "azurerm_key_vault_secret" "phi_storage_account_name" {
+  name         = "phi-storage-account-name"
+  value        = azurerm_storage_account.phi.name
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "record_linkage_url" {
+  name         = "record-linkage-url"
+  value        = "https://phdi-${terraform.workspace}-record-linkage.${azurerm_container_app_environment.phdi.default_domain}"
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "ingestion-url" {
+  name         = "ingestion-url"
+  value        = "https://phdi-${terraform.workspace}-ingestion.${azurerm_container_app_environment.phdi.default_domain}"
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
 ##### Container registry #####
 
 resource "azurerm_container_registry" "phdi_registry" {
@@ -212,11 +267,13 @@ locals {
     "validation",
     "record-linkage",
   ])
+
+  phdi_version = "v1.0.10"
 }
 
 data "docker_registry_image" "ghcr_data" {
   for_each = local.images
-  name     = "ghcr.io/cdcgov/phdi/${each.key}:v1.0.5"
+  name     = "ghcr.io/cdcgov/phdi/${each.key}:${local.phdi_version}"
 }
 
 resource "docker_image" "ghcr_image" {
@@ -229,13 +286,13 @@ resource "docker_image" "ghcr_image" {
 resource "docker_tag" "tag_for_azure" {
   for_each     = local.images
   source_image = docker_image.ghcr_image[each.key].name
-  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+  target_image = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:${local.phdi_version}"
 }
 
 resource "docker_registry_image" "acr_image" {
   for_each      = local.images
   depends_on    = [docker_tag.tag_for_azure]
-  name          = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:latest"
+  name          = "${azurerm_container_registry.phdi_registry.login_server}/phdi/${each.key}:${local.phdi_version}"
   keep_remotely = true
 
   triggers = {
@@ -315,22 +372,24 @@ resource "azurerm_container_app" "container_app" {
   }
 
   template {
+    max_replicas = 200
+    min_replicas = 0
     container {
       name   = "phdi-${terraform.workspace}-${each.key}"
       image  = docker_registry_image.acr_image[each.key].name
-      cpu    = 0.5
-      memory = "1Gi"
+      cpu    = 1.0
+      memory = "2Gi"
 
       env {
-        name  = "AUTH_ID"
+        name  = "SMARTY_AUTH_ID"
         value = var.smarty_auth_id
       }
       env {
-        name  = "AUTH_TOKEN"
+        name  = "SMARTY_AUTH_TOKEN"
         value = var.smarty_auth_token
       }
       env {
-        name  = "LICENSE_TYPE"
+        name  = "SMARTY_LICENSE_TYPE"
         value = var.smarty_license_type
       }
       env {
@@ -426,37 +485,6 @@ resource "azurerm_container_app_environment_storage" "tabulation_storage" {
   access_mode                  = "ReadWrite"
 }
 
-##### FHIR Server #####
-
-resource "azurerm_healthcare_service" "fhir_server" {
-  name                = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
-  location            = "eastus"
-  resource_group_name = var.resource_group_name
-  kind                = "fhir-R4"
-  cosmosdb_throughput = 400
-
-  lifecycle {
-    ignore_changes = [name, tags]
-  }
-
-  tags = {
-    environment = terraform.workspace
-    managed-by  = "terraform"
-  }
-}
-
-resource "azurerm_role_assignment" "gh_sp_fhir_contributor" {
-  scope                = azurerm_healthcare_service.fhir_server.id
-  role_definition_name = "FHIR Data Contributor"
-  principal_id         = var.object_id
-}
-
-resource "azurerm_role_assignment" "pipeline_runner_fhir_contributor" {
-  scope                = azurerm_healthcare_service.fhir_server.id
-  role_definition_name = "FHIR Data Contributor"
-  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
-}
-
 ##### User Assigned Identity #####
 
 resource "azurerm_user_assigned_identity" "pipeline_runner" {
@@ -494,7 +522,7 @@ resource "azurerm_synapse_workspace" "phdi" {
   name                                 = "phdi${terraform.workspace}synapse${substr(var.client_id, 0, 8)}"
   resource_group_name                  = var.resource_group_name
   location                             = var.location
-  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.source_data.id
+  storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.delta-tables.id
   sql_administrator_login              = "sqladminuser"
   sql_administrator_login_password     = random_password.synapse_sql_password.result
 
@@ -514,12 +542,15 @@ resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
 }
 
 resource "azurerm_synapse_spark_pool" "phdi" {
-  name                 = "sparkpool"
-  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
-  node_size_family     = "MemoryOptimized"
-  node_size            = "Medium"
-  cache_size           = 100
-  spark_version        = 3.3
+  name                                = "sparkpool"
+  synapse_workspace_id                = azurerm_synapse_workspace.phdi.id
+  node_size_family                    = "MemoryOptimized"
+  node_size                           = "Small"
+  cache_size                          = 100
+  spark_version                       = 3.3
+  dynamic_executor_allocation_enabled = true
+  min_executors                       = 1
+  max_executors                       = 2
 
   auto_scale {
     max_node_count = 50
@@ -542,4 +573,47 @@ resource "azurerm_role_assignment" "synapse_blob_contributor" {
   scope                = azurerm_storage_account.phi.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_synapse_workspace.phdi.identity[0].principal_id
+}
+
+resource "azuread_application" "synapse_app" {
+  display_name = "phdi-${terraform.workspace}-synapse-${substr(var.client_id, 0, 8)}"
+}
+
+resource "azuread_application_password" "synapse_app_password" {
+  application_object_id = azuread_application.synapse_app.object_id
+}
+
+resource "azurerm_key_vault_secret" "synapse_client_secret" {
+  name         = "synapse-client-secret"
+  value        = azuread_application_password.synapse_app_password.value
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_key_vault_secret" "synapse_client_id" {
+  name         = "synapse-client-id"
+  value        = azuread_application.synapse_app.application_id
+  key_vault_id = azurerm_key_vault.phdi_key_vault.id
+}
+
+resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
+  name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-keyvault-linked-service"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  type                 = "AzureKeyVault"
+  type_properties_json = <<JSON
+  {
+  "baseUrl": "https://${terraform.workspace}vault${substr(var.client_id, 0, 8)}.vault.azure.net/"
+  }
+  JSON
+}
+
+resource "azurerm_synapse_linked_service" "synapse_linked_service_blob_storage" {
+  name                 = "phdi${terraform.workspace}${substr(var.client_id, 0, 8)}-blob-storage-linked-service"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  type                 = "AzureBlobStorage"
+  type_properties_json = <<JSON
+  {
+  "serviceEndpoint": "https://phdi${terraform.workspace}phi${substr(var.client_id, 0, 8)}.blob.core.windows.net/",
+  "accountKind": "StorageV2"
+  }
+  JSON
 }

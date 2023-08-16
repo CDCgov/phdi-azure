@@ -2,8 +2,10 @@
   "scriptFile": "__init__.py",
   "bindings": [
     {
-      "type": "eventGridTrigger",
-      "name": "event",
+      "type": "queueTrigger",
+      "connection": "AzureStorageQueuesConnectionString",
+      "name": "message",
+      "queueName": "sourcedataqueue",
       "direction": "in"
     }
   ]

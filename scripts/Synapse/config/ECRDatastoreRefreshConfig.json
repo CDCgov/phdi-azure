@@ -1,9 +1,10 @@
 {
-    "name": "Parquet Pipeline",
+    "name": "ECR Datastore Refresh",
     "properties": {
+        "description": "Updates the ECR Datastore daily with ECR data that has run through the DIBBs Pipeline",
         "activities": [
             {
-                "name": "Convert Parquet MPI",
+                "name": "UpdateECRDataStore",
                 "type": "SynapseNotebook",
                 "dependsOn": [],
                 "policy": {
@@ -16,19 +17,14 @@
                 "userProperties": [],
                 "typeProperties": {
                     "notebook": {
-                        "referenceName": "Convert Parquet MPI",
+                        "referenceName": "updateECRDataStore",
                         "type": "NotebookReference"
                     },
                     "snapshot": true,
                     "sparkPool": {
                         "referenceName": "sparkpool",
                         "type": "BigDataPoolReference"
-                    },
-                    "executorSize": "Medium",
-                    "conf": {
-                        "spark.dynamicAllocation.enabled": false
-                    },
-                    "driverSize": "Medium"
+                    }
                 }
             }
         ],
