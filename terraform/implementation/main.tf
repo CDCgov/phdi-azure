@@ -321,8 +321,8 @@ resource "helm_release" "agic" {
       subscription_id      = var.subscription_id,
       resource_group_name  = var.resource_group_name,
       app_gateway_name     = var.app_gateway_name,
-      identity_resource_id = azurerm_user_assigned_identity.aks_identity.id
-      identity_client_id   = azurerm_user_assigned_identity.aks_identity.client_id
+      identity_resource_id = azurerm_user_assigned_identity.aks_identity.id,
+      identity_client_id   = azurerm_user_assigned_identity.aks_identity.client_id,
     })}"
   ]
 }
