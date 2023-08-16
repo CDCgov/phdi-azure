@@ -6,10 +6,6 @@ output "phi_storage_account_key" {
   value = azurerm_storage_account.phi.primary_access_key
 }
 
-output "fhir_server_name" {
-  value = azurerm_healthcare_service.fhir_server.name
-}
-
 output "pipeline_runner_id" {
   value = azurerm_user_assigned_identity.pipeline_runner.id
 }
