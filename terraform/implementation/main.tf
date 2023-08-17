@@ -7,11 +7,12 @@ locals {
   listener_name                  = "${azurerm_virtual_network.aks_vnet.name}-httplstn"
   request_routing_rule_name      = "${azurerm_virtual_network.aks_vnet.name}-rqrt"
 
-  aks_vnet_name           = "phdi-${terraform.workspace}-vnet"
-  aks_subnet_name         = "phdi-${terraform.workspace}-subnet"
-  aks_cluster_name        = "phdi-${terraform.workspace}-cluster"
+  aks_vnet_name           = "phdi-${terraform.workspace}-aks-vnet"
+  aks_subnet_name         = "phdi-${terraform.workspace}-aks-subnet"
+  aks_cluster_name        = "phdi-${terraform.workspace}-aks-cluster"
   aks_dns_prefix          = "phdi-${terraform.workspace}"
-  app_gateway_subnet_name = "appgwsubnet"
+  app_gateway_name        = "phdi-${terraform.workspace}-aks-appgw"
+  app_gateway_subnet_name = "phdi-${terraform.workspace}-aks-appgw-subnet"
 
   services = toset([
     "fhir-converter",
@@ -24,12 +25,44 @@ locals {
   ])
 }
 
-# User Assigned Identities 
-resource "azurerm_user_assigned_identity" "aks_identity" {
-  resource_group_name = var.resource_group_name
-  location            = var.location
+# Service Principal
+resource "azuread_application" "aks" {
+  display_name = "phdi-${terraform.workspace}-aks"
+  owners       = [data.azuread_client_config.current.object_id]
+}
 
-  name = "aks_identity"
+resource "azuread_service_principal" "aks" {
+  application_id               = azuread_application.aks.application_id
+  app_role_assignment_required = false
+  owners                       = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_service_principal_password" "aks" {
+  service_principal_id = azuread_service_principal.aks.object_id
+}
+
+resource "azurerm_role_assignment" "gateway_contributor" {
+  scope                = azurerm_application_gateway.network.id
+  role_definition_name = "Contributor"
+  principal_id         = azuread_service_principal.aks.object_id
+}
+
+resource "azurerm_role_assignment" "resource_group_reader" {
+  scope                = data.azurerm_resource_group.rg.id
+  role_definition_name = "Reader"
+  principal_id         = azuread_service_principal.aks.object_id
+}
+
+resource "azurerm_role_assignment" "public_ip_reader" {
+  scope                = azurerm_public_ip.aks.id
+  role_definition_name = "Reader"
+  principal_id         = azuread_service_principal.aks.object_id
+}
+
+resource "azurerm_role_assignment" "app_gateway_subnet_network_contributor" {
+  scope                = data.azurerm_subnet.appgwsubnet.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azuread_service_principal.aks.object_id
 }
 
 # SSH Key
@@ -75,7 +108,7 @@ resource "azurerm_virtual_network" "aks_vnet" {
 
 # Public Ip 
 resource "azurerm_public_ip" "aks" {
-  name                = "aks-pip"
+  name                = "phdi-${terraform.workspace}-aks-pip"
   location            = var.location
   resource_group_name = var.resource_group_name
   allocation_method   = "Static"
@@ -83,7 +116,7 @@ resource "azurerm_public_ip" "aks" {
 }
 
 resource "azurerm_application_gateway" "network" {
-  name                = var.app_gateway_name
+  name                = local.app_gateway_name
   resource_group_name = var.resource_group_name
   location            = var.location
 
@@ -177,6 +210,11 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     ssh_key {
       key_data = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
     }
+  }
+
+  azure_active_directory_role_based_access_control {
+    managed            = true
+    azure_rbac_enabled = true
   }
 }
 
@@ -287,6 +325,10 @@ provider "helm" {
 # Application Gateway Ingress Controller
 
 resource "null_resource" "aks_credential" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
   provisioner "local-exec" {
     command = <<-EOT
       # Get an access token for AKS
@@ -299,30 +341,29 @@ resource "null_resource" "aks_credential" {
   depends_on = [azurerm_kubernetes_cluster.k8s]
 }
 
-resource "null_resource" "install_aad_pod_identity" {
-  provisioner "local-exec" {
-    command = <<-EOT
-      # Install AAD Pod Identity
-      kubectl create -f https://raw.githubusercontent.com/Azure/aad-pod-identity/master/deploy/infra/deployment.yaml
-    EOT
-  }
-
-  depends_on = [null_resource.aks_credential]
-}
-
 resource "helm_release" "agic" {
   name       = "aks-agic"
   repository = "https://appgwingress.blob.core.windows.net/ingress-azure-helm-package"
   chart      = "ingress-azure"
-  depends_on = [null_resource.install_aad_pod_identity]
+  depends_on = [null_resource.aks_credential]
 
   values = [
     "${templatefile("helm-agic-config.yaml", {
-      subscription_id      = var.subscription_id,
-      resource_group_name  = var.resource_group_name,
-      app_gateway_name     = var.app_gateway_name,
-      identity_resource_id = azurerm_user_assigned_identity.aks_identity.id,
-      identity_client_id   = azurerm_user_assigned_identity.aks_identity.client_id,
+      subscription_id     = var.subscription_id,
+      resource_group_name = var.resource_group_name,
+      app_gateway_name    = local.app_gateway_name,
+      secret_json = base64encode(jsonencode({
+        clientId                       = "${azuread_service_principal.aks.application_id}",
+        clientSecret                   = "${azuread_service_principal_password.aks.value}",
+        subscriptionId                 = "${var.subscription_id}",
+        tenantId                       = "${data.azurerm_client_config.current.tenant_id}",
+        activeDirectoryEndpointUrl     = "https://login.microsoftonline.com",
+        resourceManagerEndpointUrl     = "https://management.azure.com/",
+        activeDirectoryGraphResourceId = "https://graph.windows.net/",
+        sqlManagementEndpointUrl       = "https://management.core.windows.net:8443/",
+        galleryEndpointUrl             = "https://gallery.azure.com/",
+        managementEndpointUrl          = "https://management.core.windows.net/",
+      }))
     })}"
   ]
 }

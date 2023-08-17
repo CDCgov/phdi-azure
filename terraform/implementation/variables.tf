@@ -56,12 +56,6 @@ variable "app_gateway_subnet_address_prefix" {
   default     = "10.30.2.0/24"
 }
 
-variable "app_gateway_name" {
-  type        = string
-  description = "Name of the Application Gateway"
-  default     = "AKSApplicationGateway"
-}
-
 variable "app_gateway_sku" {
   type        = string
   description = "Name of the Application Gateway SKU"

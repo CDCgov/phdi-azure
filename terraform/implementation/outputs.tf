@@ -37,14 +37,6 @@ output "host" {
   sensitive = true
 }
 
-output "identity_resource_id" {
-  value = azurerm_user_assigned_identity.aks_identity.id
-}
-
-output "identity_client_id" {
-  value = azurerm_user_assigned_identity.aks_identity.client_id
-}
-
 output "application_ip_address" {
   value = azurerm_public_ip.aks.ip_address
 }

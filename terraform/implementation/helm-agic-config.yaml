@@ -31,17 +31,17 @@ appgw:
 #
 # Two authentication methods are available:
 # - Option 1: AAD-Pod-Identity (https://github.com/Azure/aad-pod-identity)
-armAuth:
-    type: aadPodIdentity
-    identityResourceID: ${identity_resource_id}
-    identityClientID: ${identity_client_id}
+# armAuth:
+#     type: aadPodIdentity
+#     identityResourceID:
+#     identityClientID:
 
 ## Alternatively you can use Service Principal credentials
-# armAuth:
-#    type: servicePrincipal
-#    secretJSON: <<Generate this value with: "az ad sp create-for-rbac --subscription <subscription-uuid> --sdk-auth | base64 -w0" >>
+armAuth:
+    type: servicePrincipal
+    secretJSON: ${secret_json}
 
 ################################################################################
 # Specify if the cluster is RBAC enabled or not
 rbac:
-    enabled: false # true/false
+    enabled: true # true/false
