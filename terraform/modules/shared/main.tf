@@ -277,7 +277,7 @@ locals {
     "record-linkage",
   ])
 
-  phdi_version = "v1.0.10"
+  phdi_version = "v1.0.11"
 }
 
 data "docker_registry_image" "ghcr_data" {
@@ -572,9 +572,10 @@ resource "azurerm_synapse_spark_pool" "phdi" {
 
   spark_config {
     content  = <<EOF
-spark.shuffle.spill                true
+spark.kryoserializer.buffer.max 512
+spark.serializer org.apache.spark.serializer.KryoSerializer
 EOF
-    filename = "config.txt"
+    filename = "sparkpoolconfig.txt"
   }
 }
 
