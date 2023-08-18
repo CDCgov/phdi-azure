@@ -320,7 +320,7 @@ resource "azurerm_postgresql_flexible_server" "mpi" {
   name                         = "phdi${terraform.workspace}mpi${substr(var.client_id, 0, 8)}"
   resource_group_name          = var.resource_group_name
   location                     = var.location
-  sku_name                     = "GP_Standard_D2s_v3"
+  sku_name                     = "GP_Standard_D64s_v3"
   version                      = "14"
   storage_mb                   = 65536
   backup_retention_days        = 7
