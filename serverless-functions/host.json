@@ -16,9 +16,9 @@
     "queues": {
         "maxPollingInterval": "00:00:02",
         "visibilityTimeout" : "00:00:30",
-        "batchSize": 32,
+        "batchSize": 16,
         "maxDequeueCount": 5,
-        "newBatchThreshold": 128,
+        "newBatchThreshold": 8,
         "messageEncoding": "base64"
     }
 }
