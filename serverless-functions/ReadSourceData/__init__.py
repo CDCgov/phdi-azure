@@ -10,7 +10,6 @@ from phdi.cloud.azure import AzureCredentialManager, AzureCloudContainerConnecti
 from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
-import requests
 from phdi.fhir.harmonization.standardization import (
     standardize_names,
     standardize_phones,
@@ -18,6 +17,8 @@ from phdi.fhir.harmonization.standardization import (
 )
 from lxml import etree
 from typing import Tuple, Union
+from httpx import AsyncClient
+from azure.identity.aio import DefaultAzureCredential
 
 MESSAGE_TO_TEMPLATE_MAP = {
     "fhir": "",
@@ -27,16 +28,18 @@ MESSAGE_TO_TEMPLATE_MAP = {
 }
 
 
-def main(message: func.QueueMessage) -> None:
+async def main(message: func.QueueMessage) -> None:
     """
     When this function is triggered with a blob payload, read the new file if its
     name begins with 'source-data/', identify each individual message
     (ELR, VXU, or eCR) contained in the file, and trigger in an Azure Data Factory
     ingestion pipeline for each of them. An exception is raised if pipeline triggering
     fails for any message.
+    
     When handling eCR data, this function looks for a related RR, and polls until it
     finds one. By default, this function polls for 10 seconds with 1 second of sleep.
     These values may be set with the environment variables: WAIT_TIME, SLEEP_TIME
+    
     :param blob: An input stream of the blob that was uploaded to the blob storage
     :return: None
     """
@@ -175,13 +178,13 @@ def main(message: func.QueueMessage) -> None:
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
 
         geocoding_body = {"bundle": fhir_bundle, "geocode_method": "smarty"}
-        geocoding_response = post_data_to_building_block(geocoding_url, geocoding_body)
+        geocoding_response = await post_data_to_building_block(geocoding_url, geocoding_body)
 
         record_linkage_body = {
             "bundle": geocoding_response.get("bundle"),
             "external_person_id": external_person_id,
         }
-        post_data_to_building_block(record_linkage_url, record_linkage_body)
+        await post_data_to_building_block(record_linkage_url, record_linkage_body)
         return
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
@@ -392,27 +395,28 @@ def get_external_person_id(blob_contents: dict) -> Tuple[dict, Union[str, None]]
     return fhir_bundle, external_person_id
 
 
-def post_data_to_building_block(url: str, body: dict) -> dict:
+async def post_data_to_building_block(url: str, body: dict) -> dict:
     """
     POST data to a building block endpoint given the url and body for the request.
 
     :param url: The url of the building block endpoint.
     :param body: The JSON body of the request as a dictionary.
     :return: The JSON response from the building block as a dictionary.
-    """
-
+    """   
+    
     application_id_uri = "api://" + url.split(".")[0].replace("https://", "")
+    
+    async with DefaultAzureCredential() as credential:
+        token_object = await credential.get_token(application_id_uri + "/.default")
+        access_token = token_object.token
 
-    access_token = AzureCredentialManager(
-        resource_location=application_id_uri
-    ).get_access_token()
-
-    response = requests.post(
-        url=url,
-        json=body,
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
+    async with AsyncClient() as client:
+        response = await client.post(url=url, 
+                          headers={"Authorization": f"Bearer {access_token}"}, 
+                          json=body,
+                        )
     status_code = response.status_code
+    breakpoint()
     if status_code < 400:
         logging.info(f"{url.upper()} STATUS CODE: {response.status_code}")
     else:
