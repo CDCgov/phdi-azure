@@ -415,8 +415,8 @@ async def post_data_to_building_block(url: str, body: dict) -> dict:
                           headers={"Authorization": f"Bearer {access_token}"}, 
                           json=body,
                         )
+        
     status_code = response.status_code
-    breakpoint()
     if status_code < 400:
         logging.info(f"{url.upper()} STATUS CODE: {response.status_code}")
     else:
