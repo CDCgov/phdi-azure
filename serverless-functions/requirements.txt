@@ -4,4 +4,4 @@ azure-mgmt-datafactory
 azure-storage-blob
 phdi
 lxml
-aiothttp
+aiohttp
