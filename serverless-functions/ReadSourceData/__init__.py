@@ -17,7 +17,7 @@ from phdi.fhir.harmonization.standardization import (
 )
 from lxml import etree
 from typing import Tuple, Union
-from httpx import AsyncClient
+from httpx import AsyncClient, Timeout
 from azure.identity.aio import DefaultAzureCredential
 
 MESSAGE_TO_TEMPLATE_MAP = {
@@ -410,10 +410,10 @@ async def post_data_to_building_block(url: str, body: dict) -> dict:
         token_object = await credential.get_token(application_id_uri + "/.default")
         access_token = token_object.token
 
-    async with AsyncClient() as client:
+    async with AsyncClient(timeout=Timeout(timeout=30)) as client:
         response = await client.post(url=url, 
                           headers={"Authorization": f"Bearer {access_token}"}, 
-                          json=body,
+                          json=body
                         )
         
     status_code = response.status_code
