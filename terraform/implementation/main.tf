@@ -196,9 +196,9 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   }
 
   network_profile {
-    network_plugin     = "azure"
-    dns_service_ip     = var.aks_dns_service_ip
-    service_cidr       = var.aks_service_cidr
+    network_plugin = "azure"
+    dns_service_ip = var.aks_dns_service_ip
+    service_cidr   = var.aks_service_cidr
   }
 
   http_application_routing_enabled = false
@@ -209,11 +209,6 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     ssh_key {
       key_data = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
     }
-  }
-
-  azure_active_directory_role_based_access_control {
-    managed            = true
-    azure_rbac_enabled = true
   }
 }
 
