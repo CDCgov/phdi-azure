@@ -98,12 +98,6 @@ variable "aks_dns_service_ip" {
   default     = "10.0.0.10"
 }
 
-variable "aks_docker_bridge_cidr" {
-  type        = string
-  description = "CIDR notation IP for Docker bridge."
-  default     = "172.17.0.1/16"
-}
-
 variable "aks_enable_rbac" {
   type        = bool
   description = "Enable RBAC on the AKS cluster. Defaults to false."
