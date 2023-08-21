@@ -17,8 +17,3 @@ data "azurerm_subnet" "appgwsubnet" {
   virtual_network_name = azurerm_virtual_network.aks_vnet.name
   resource_group_name  = var.resource_group_name
 }
-
-data "azurerm_kubernetes_cluster" "credentials" {
-  name                = azurerm_kubernetes_cluster.k8s.name
-  resource_group_name = var.resource_group_name
-}
