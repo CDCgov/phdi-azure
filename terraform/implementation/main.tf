@@ -324,28 +324,11 @@ provider "helm" {
 
 # Application Gateway Ingress Controller
 
-resource "null_resource" "aks_credential" {
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      # Get an access token for AKS
-      az aks get-credentials --name ${local.aks_cluster_name} \
-        --resource-group ${var.resource_group_name} \
-        --overwrite-existing
-    EOT
-  }
-
-  depends_on = [azurerm_kubernetes_cluster.k8s]
-}
-
 resource "helm_release" "agic" {
   name       = "aks-agic"
   repository = "https://appgwingress.blob.core.windows.net/ingress-azure-helm-package"
   chart      = "ingress-azure"
-  depends_on = [null_resource.aks_credential]
+  depends_on = [azurerm_kubernetes_cluster.k8s]
 
   values = [
     "${templatefile("helm-agic-config.yaml", {
