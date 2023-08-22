@@ -566,6 +566,16 @@ resource "azurerm_synapse_spark_pool" "phdi" {
     delay_in_minutes = 15
   }
 
+  library_requirement {
+    content  = <<EOF
+azure-identity
+phdi
+recordlinkage
+azure-keyvault-secrets
+EOF
+    filename = "requirements.txt"
+  }
+
   spark_config {
     content  = <<EOF
 spark.shuffle.spill                true
