@@ -1,10 +1,17 @@
 from ReadSourceData import main as read_source_data
-from ReadSourceData import get_reportability_response
-from ReadSourceData import rr_to_ecr as rr_to_ecr
+from ReadSourceData import (
+    get_reportability_response,
+    rr_to_ecr,
+    get_external_person_id,
+    MESSAGE_TO_TEMPLATE_MAP,
+    post_data_to_building_block,
+)
+
 from azure.core.exceptions import ResourceNotFoundError
 from unittest import mock
 from lxml import etree
 import pytest
+import json
 
 
 @mock.patch("ReadSourceData.DataFactoryManagementClient")
@@ -43,10 +50,12 @@ def test_handle_batch_hl7(
 
     event = mock.MagicMock()
     event.get_json.return_value = {
-        "url": (
-            "https://phdidevphi87b9f133.blob.core.windows.net/"
-            "source-data/elr/some-filename.hl7"
-        )
+        "data": {
+            "url": (
+                "https://phdidevphi87b9f133.blob.core.windows.net/"
+                "source-data/elr/some-filename.hl7"
+            )
+        }
     }
 
     patched_batch_converter.return_value = ["some-message"]
@@ -55,17 +64,21 @@ def test_handle_batch_hl7(
     patched_batch_converter.assert_called()
 
 
+@mock.patch("ReadSourceData.get_external_person_id")
 @mock.patch("ReadSourceData.DataFactoryManagementClient")
 @mock.patch("ReadSourceData.AzureCredentialManager")
 @mock.patch("ReadSourceData.AzureCloudContainerConnection")
 @mock.patch("ReadSourceData.os")
 @mock.patch("ReadSourceData.convert_hl7_batch_messages_to_list")
+@mock.patch("ReadSourceData.post_data_to_building_block")
 def test_pipeline_trigger_success(
+    patched_post_data_to_building_block,
     patched_batch_converter,
     patched_os,
     patched_cloud_container_connection,
     patched_azure_cred_manager,
     patched_adf_management_client,
+    patched_get_external_person_id,
 ):
     patched_os.environ = {
         "AZURE_SUBSCRIPTION_ID": "some-subscription-id",
@@ -79,51 +92,46 @@ def test_pipeline_trigger_success(
     patched_azure_cred_manager.return_value.get_credentials.return_value = (
         "some-credentials"
     )
-
     patched_cloud_container_connection.return_value.download_object.return_value = (
         "<some-message/>"
     )
+    patched_batch_converter.return_value = ["<some-message/>"]
+    patched_get_external_person_id.return_value = ("<some-message/>", None)
 
     adf_client = mock.MagicMock()
     adf_client.pipelines.create_run.return_value = good_response
     patched_adf_management_client.return_value = adf_client
-    for source_data_subdirectory in ["elr", "vxu", "ecr"]:
-        if source_data_subdirectory == "elr":
-            message_type = "elr"
-            root_template = "ORU_R01"
 
-        elif source_data_subdirectory == "vxu":
-            message_type = "vxu"
-            root_template = "VXU_V04"
+    for source_data_subdirectory in MESSAGE_TO_TEMPLATE_MAP.keys():
+        if source_data_subdirectory != "fhir":
+            message_type = source_data_subdirectory
+            root_template = MESSAGE_TO_TEMPLATE_MAP[source_data_subdirectory]
 
-        elif source_data_subdirectory == "ecr":
-            message_type = "ecr"
-            root_template = "EICR"
+            parameters = {
+                "message": '"<some-message/>"',
+                "message_type": message_type,
+                "root_template": root_template,
+                "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
+                "include_error_types": "fatal, errors",
+            }
 
-        event = mock.MagicMock()
-        event.get_json.return_value = {
-            "url": (
-                "https://phdidevphi87b9f133.blob.core.windows.net/"
-                f"source-data/{source_data_subdirectory}/some-filename.hl7"
+            event = mock.MagicMock()
+            event.get_json.return_value = {
+                "data": {
+                    "url": (
+                        "https://phdidevphi87b9f133.blob.core.windows.net/"
+                        f"source-data/{source_data_subdirectory}/some-filename.hl7"
+                    )
+                }
+            }
+
+            read_source_data(event)
+            adf_client.pipelines.create_run.assert_called_with(
+                patched_os.environ["RESOURCE_GROUP_NAME"],
+                patched_os.environ["FACTORY_NAME"],
+                patched_os.environ["PIPELINE_NAME"],
+                parameters=parameters,
             )
-        }
-        patched_batch_converter.return_value = ["<some-message/>"]
-
-        parameters = {
-            "message": '"<some-message/>"',
-            "message_type": message_type,
-            "root_template": root_template,
-            "filename": f"source-data/{source_data_subdirectory}/some-filename.hl7",
-            "include_error_types": "fatal, errors",
-        }
-
-        read_source_data(event)
-        adf_client.pipelines.create_run.assert_called_with(
-            patched_os.environ["RESOURCE_GROUP_NAME"],
-            patched_os.environ["FACTORY_NAME"],
-            patched_os.environ["PIPELINE_NAME"],
-            parameters=parameters,
-        )
 
 
 @mock.patch("ReadSourceData.DataFactoryManagementClient")
@@ -234,10 +242,12 @@ def test_missing_rr_when_not_required(
 
     event = mock.MagicMock()
     event.get_json.return_value = {
-        "url": (
-            "https://phdidevphi87b9f133.blob.core.windows.net/"
-            "source-data/ecr/12345eICR.xml"
-        )
+        "data": {
+            "url": (
+                "https://phdidevphi87b9f133.blob.core.windows.net/"
+                "source-data/ecr/12345eICR.xml"
+            )
+        }
     }
 
     blob = mock.MagicMock()
@@ -405,3 +415,34 @@ def test_add_rr_to_ecr():
             assert temps is not None
             assert temps.attrib["root"] == "2.16.840.1.113883.10.20.15.2.3.29"
             assert "RRVS19" in status_code.attrib["code"]
+
+
+def test_get_external_person_id():
+    with open("./tests/ReadSourceData/test_fhir_bundle.json", "r") as file:
+        fhir_bundle = json.load(file)
+
+    # Without external patient id
+    assert get_external_person_id(json.dumps(fhir_bundle)) == (fhir_bundle, None)
+
+    # With external patient id
+    blob_contents = {"bundle": fhir_bundle, "external_person_id": "12345"}
+    blob_contents = json.dumps(blob_contents)
+
+    assert get_external_person_id(blob_contents) == (fhir_bundle, "12345")
+
+
+@mock.patch("ReadSourceData.AzureCredentialManager")
+@mock.patch("requests.post")
+def test_post_data_to_building_block(mocked_post, patched_azure_cred_manager):
+    with open("./tests/ReadSourceData/test_fhir_bundle.json", "r") as file:
+        fhir_bundle = json.load(file)
+
+    patched_azure_cred_manager.return_value.get_access_token.return_value = (
+        "some-credentials"
+    )
+
+    # Test for failure
+    mocked_post.return_value = mock.Mock(status_code=400, json=(lambda: fhir_bundle))
+    with pytest.raises(Exception) as e:
+        post_data_to_building_block(url="https://some_url", body=fhir_bundle)
+    assert "HTTPS://SOME_URL STATUS CODE: 400" in str(e.value)
