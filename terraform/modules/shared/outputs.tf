@@ -82,5 +82,5 @@ output "phi_storage_account_connection_string" {
 }
 
 output "staging_queue_url" {
-  value = azurerm_storage_queue.stagging_queue.url
+  value = azurerm_storage_queue.staging_queue.url
 }
