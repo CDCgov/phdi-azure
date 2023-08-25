@@ -61,7 +61,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
     INGESTION_URL                      = var.ingestion_container_url
     RECORD_LINKAGE_URL                 = var.record_linkage_container_url
     AzureStorageQueuesConnectionString = var.phi_storage_account_connection_string
-    STAGING_QUEUE_URL                  = var.staging_queue_url   
+    STAGING_QUEUE_URL                  = var.staging_queue_url
   }
 
   lifecycle {
