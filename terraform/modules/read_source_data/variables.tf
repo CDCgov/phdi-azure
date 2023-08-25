@@ -62,3 +62,8 @@ variable "phi_storage_account_connection_string" {
   type        = string
   description = "The connection string for the storage account."
 }
+
+variable "staging_queue_url" {
+  type        = string
+  description = "The URL of the staging queue."
+}
