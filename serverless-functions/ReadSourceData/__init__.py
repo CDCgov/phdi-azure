@@ -11,11 +11,11 @@ from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
 import requests
-from phdi.fhir.harmonization.standardization import (
-    standardize_names,
-    standardize_phones,
-    standardize_dob,
-)
+# from phdi.fhir.harmonization.standardization import (
+#     standardize_names,
+#     standardize_phones,
+#     standardize_dob,
+# )
 from lxml import etree
 from typing import Tuple, Union
 from azure.storage.queue import QueueClient
@@ -188,7 +188,8 @@ def main(message: func.QueueMessage) -> None:
         # record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
 
         # geocoding_body = {"bundle": fhir_bundle, "geocode_method": "smarty"}
-        # geocoding_response = post_data_to_building_block(geocoding_url, geocoding_body)
+        # geocoding_response = post_data_to_building_block(geocoding_url, 
+        #                                                  geocoding_body)
 
         # record_linkage_body = {
         #     "bundle": geocoding_response.get("bundle"),
