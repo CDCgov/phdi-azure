@@ -610,7 +610,7 @@ resource "azurerm_key_vault_secret" "synapse_client_id" {
   key_vault_id = azurerm_key_vault.phdi_key_vault.id
 }
 
-# resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
+resource "azurerm_synapse_linked_service" "synapse_linked_service_key_vault" {
   name                 = "${terraform.workspace}${substr(var.client_id, 0, 8)}-keyvault-linked-service"
   synapse_workspace_id = azurerm_synapse_workspace.phdi.id
   type                 = "AzureKeyVault"
