@@ -148,7 +148,7 @@
                 }
             },
             {
-                "name": "extractTSV",
+                "name": "generateIRISCaseFiles",
                 "type": "SynapseNotebook",
                 "dependsOn": [
                     {
@@ -168,7 +168,7 @@
                 "userProperties": [],
                 "typeProperties": {
                     "notebook": {
-                        "referenceName": "extractTSV",
+                        "referenceName": "generateIRISCaseFiles",
                         "type": "NotebookReference"
                     },
                     "sparkPool": {
