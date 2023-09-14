@@ -141,6 +141,11 @@
                 "data_type": "string",
                 "nullable": true
             },
+            "test_type_system": {
+                "fhir_path": "Observation.code.coding.system",
+                "data_type": "string",
+                "nullable": true
+            },
             "test_result_qualitative": {
                 "fhir_path": "Observation.valueString",
                 "data_type": "string",
@@ -148,7 +153,7 @@
             },
             "test_result_quantitative": {
                 "fhir_path": "Observation.valueQuantity.value",
-                "data_type": "number",
+                "data_type": "float",
                 "nullable": true
             },
             "test_result_units": {
@@ -166,8 +171,18 @@
                 "data_type": "string",
                 "nullable": true
             },
+            "test_result_code_system": {
+                "fhir_path": "Observation.valueCodeableConcept.coding.system",
+                "data_type": "string",
+                "nullable": true
+            },
             "test_result_interp": {
                 "fhir_path": "Observation.interpretation.coding.display",
+                "data_type": "string",
+                "nullable": true
+            },
+            "test_result_interp_code": {
+                "fhir_path": "Observation.interpretation.coding.code",
                 "data_type": "string",
                 "nullable": true
             },
