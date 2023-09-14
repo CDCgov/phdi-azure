@@ -141,11 +141,6 @@
                 "data_type": "string",
                 "nullable": true
             },
-            "test_type_system": {
-                "fhir_path": "Observation.code.coding.system",
-                "data_type": "string",
-                "nullable": true
-            },
             "test_result_qualitative": {
                 "fhir_path": "Observation.valueString",
                 "data_type": "string",
@@ -171,13 +166,33 @@
                 "data_type": "string",
                 "nullable": true
             },
-            "test_result_system": {
-                "fhir_path": "Observation.valueCodeableConcept.coding.system",
-                "data_type": "number",
-                "nullable": true
-            },
             "test_result_interp": {
                 "fhir_path": "Observation.interpretation.coding.display",
+                "data_type": "string",
+                "nullable": true
+            },
+            "test_result_interp_system": {
+                "fhir_path": "Observation.interpretation.coding.system",
+                "data_type": "string",
+                "nullable": true
+            },
+            "test_result_ref_range_low": {
+                "fhir_path": "Observation.refereneceRange.low.value",
+                "data_type": "float",
+                "nullable": true
+            },
+            "test_result_ref_range_low_units": {
+                "fhir_path": "Observation.refereneceRange.low.unit",
+                "data_type": "string",
+                "nullable": true
+            },
+            "test_result_ref_range_high": {
+                "fhir_path": "Observation.refereneceRange.high.value",
+                "data_type": "float",
+                "nullable": true
+            },
+            "test_result_ref_range_high_units": {
+                "fhir_path": "Observation.refereneceRange.high.unit",
                 "data_type": "string",
                 "nullable": true
             },
