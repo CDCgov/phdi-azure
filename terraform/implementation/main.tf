@@ -55,6 +55,7 @@ module "read_source_data" {
   ingestion_container_url               = module.shared.ingestion_container_url
   record_linkage_container_url          = module.shared.record_linkage_container_url
   phi_storage_account_connection_string = module.shared.phi_storage_account_connection_string
+  staging_queue_url                     = module.shared.staging_queue_url
 }
 
 output "record_linkage_container_url" {

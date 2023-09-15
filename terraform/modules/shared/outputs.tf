@@ -80,3 +80,7 @@ output "key_vault_name" {
 output "phi_storage_account_connection_string" {
   value = azurerm_storage_account.phi.primary_connection_string
 }
+
+output "staging_queue_url" {
+  value = "https://${azurerm_storage_account.phi.name}.queue.core.windows.net/${azurerm_storage_queue.staging_queue.name}"
+}
