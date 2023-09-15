@@ -24,6 +24,11 @@ resource "azurerm_storage_queue" "source_data_queue" {
   storage_account_name = azurerm_storage_account.phi.name
 }
 
+resource "azurerm_storage_queue" "staging_queue" {
+  name                 = "stagingqueue"
+  storage_account_name = azurerm_storage_account.phi.name
+}
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "source_data" {
   name               = "source-data"
   storage_account_id = azurerm_storage_account.phi.id
@@ -568,6 +573,16 @@ resource "azurerm_synapse_spark_pool" "phdi" {
 
   auto_pause {
     delay_in_minutes = 15
+  }
+
+  library_requirement {
+    content  = <<EOF
+azure-identity
+phdi
+recordlinkage
+azure-keyvault-secrets
+EOF
+    filename = "requirements.txt"
   }
 
   spark_config {

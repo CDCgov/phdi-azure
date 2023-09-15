@@ -11,13 +11,15 @@ from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
 import requests
-from phdi.fhir.harmonization.standardization import (
-    standardize_names,
-    standardize_phones,
-    standardize_dob,
-)
+
+# from phdi.fhir.harmonization.standardization import (
+#     standardize_names,
+#     standardize_phones,
+#     standardize_dob,
+# )
 from lxml import etree
 from typing import Tuple, Union
+from azure.storage.queue import QueueClient
 
 MESSAGE_TO_TEMPLATE_MAP = {
     "fhir": "",
@@ -165,23 +167,36 @@ def main(message: func.QueueMessage) -> None:
 
     # Handle FHIR messages.
     elif message_type == "fhir":
-        fhir_bundle, external_person_id = get_external_person_id(blob_contents)
-        fhir_bundle = standardize_dob(
-            standardize_phones(standardize_names(fhir_bundle))
-        )
-        geocoding_url = (
-            os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
-        )
-        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
+        # TODO Remove once the MPI is ready to continue seeding.
+        staging_queue_url = os.environ["STAGING_QUEUE_URL"]
+        credential = AzureCredentialManager(
+            resource_location=staging_queue_url
+        ).get_credential_object()
 
-        geocoding_body = {"bundle": fhir_bundle, "geocode_method": "smarty"}
-        geocoding_response = post_data_to_building_block(geocoding_url, geocoding_body)
+        staging_queue_client = QueueClient.from_queue_url(
+            queue_url=staging_queue_url, credential=credential
+        )
+        staging_queue_client.send_message(content=message.get_body().decode("utf-8"))
 
-        record_linkage_body = {
-            "bundle": geocoding_response.get("bundle"),
-            "external_person_id": external_person_id,
-        }
-        post_data_to_building_block(record_linkage_url, record_linkage_body)
+        # TODO Uncomment once the MPI is ready to continue seeding.
+        # fhir_bundle, external_person_id = get_external_person_id(blob_contents)
+        # fhir_bundle = standardize_dob(
+        #     standardize_phones(standardize_names(fhir_bundle))
+        # )
+        # geocoding_url = (
+        #     os.environ["INGESTION_URL"] + "/fhir/geospatial/geocode/geocode_bundle"
+        # )
+        # record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
+
+        # geocoding_body = {"bundle": fhir_bundle, "geocode_method": "smarty"}
+        # geocoding_response = post_data_to_building_block(geocoding_url,
+        #                                                  geocoding_body)
+
+        # record_linkage_body = {
+        #     "bundle": geocoding_response.get("bundle"),
+        #     "external_person_id": external_person_id,
+        # }
+        # post_data_to_building_block(record_linkage_url, record_linkage_body)
         return
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
