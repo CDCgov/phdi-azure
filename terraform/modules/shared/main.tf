@@ -274,8 +274,6 @@ locals {
   images = toset([
     "fhir-converter",
     "ingestion",
-    "tabulation",
-    "alerts",
     "message-parser",
     "validation",
     "record-linkage",

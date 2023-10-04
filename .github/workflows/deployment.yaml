@@ -96,11 +96,9 @@ jobs:
           terraform init -backend-config=backend.tfvars
           terraform workspace select $TF_ENV || terraform workspace new $TF_ENV
           terraform apply -auto-approve -lock-timeout=30m \
-            -replace="module.shared.docker_tag.tag_for_azure[\"alerts\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"fhir-converter\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"ingestion\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"message-parser\"]" \
-            -replace="module.shared.docker_tag.tag_for_azure[\"tabulation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"validation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"record-linkage\"]"
 
@@ -184,7 +182,7 @@ jobs:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
         run: |
-          for SERVICE in fhir-converter ingestion tabulation validation message-parser record-linkage; do
+          for SERVICE in fhir-converter ingestion validation message-parser record-linkage; do
             az containerapp update --name phdi-$TF_ENV-$SERVICE \
               --resource-group $RESOURCE_GROUP_NAME \
               --scale-rule-name concurrent-http-requests \
@@ -197,7 +195,7 @@ jobs:
         run: |
           az extension add --name containerapp
           DEFAULT_DOMAIN=$(az containerapp env show --name $TF_ENV --query properties.defaultDomain -o tsv)
-          for SERVICE in fhir-converter ingestion alerts tabulation validation message-parser record-linkage; do
+          for SERVICE in fhir-converter ingestion validation message-parser record-linkage; do
             if [[ $(az containerapp auth show --name phdi-$TF_ENV-$SERVICE) == "{}" ]]; then
               if [[ $(az ad app list | grep -c phdi-$TF_ENV-$SERVICE) -gt 0 ]]; then
                 APP_ID=$(az ad app list --display-name phdi-$TF_ENV-$SERVICE --query [].appId -o tsv)

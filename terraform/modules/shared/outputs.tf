@@ -62,17 +62,6 @@ output "record_linkage_container_url" {
   value = "https://phdi-${terraform.workspace}-record-linkage.${azurerm_container_app_environment.phdi.default_domain}"
 }
 
-
-# TODO: Uncomment when tabulation is implemented
-# output "tabulation_container_url" {
-#   value = "https://phdi-${terraform.workspace}-tabulation.${azurerm_container_app_environment.phdi.default_domain}"
-# }
-
-# TODO: Uncomment when alerts are implemented
-# output "alerts_container_url" {
-#   value = "https://phdi-${terraform.workspace}-alerts.${azurerm_container_app_environment.phdi.default_domain}"
-# }
-
 output "key_vault_name" {
   value = azurerm_key_vault.phdi_key_vault.name
 }
