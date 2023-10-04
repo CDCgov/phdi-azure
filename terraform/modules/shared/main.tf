@@ -130,11 +130,10 @@ resource "azurerm_role_assignment" "phi_queue_contributor" {
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
 
-resource "azurerm_storage_share" "tables" {
-  name                 = "phdi${terraform.workspace}tables"
+resource "azurerm_storage_share" "custom_schemas" {
+  name                 = "phdi${terraform.workspace}customschemas"
   storage_account_name = azurerm_storage_account.phi.name
   quota                = 50
-  enabled_protocol     = "SMB"
 }
 
 ##### Key Vault #####
@@ -462,6 +461,23 @@ resource "azurerm_container_app" "container_app" {
         name  = "MPI_PERSON_TABLE"
         value = "person"
       }
+
+      dynamic "volume_mounts" {
+        for_each = each.key == "message-parser" ? [1] : []
+        content {
+          name = azurerm_storage_share.custom_schemas.name
+          path = "/code/app/custom_schemas"
+        }
+      }
+    }
+
+    dynamic "volume" {
+      for_each = each.key == "message-parser" ? [1] : []
+      content {
+        name         = azurerm_storage_share.custom_schemas.name
+        storage_type = "AzureFile"
+        storage_name = azurerm_container_app_environment_storage.custom_schema_storage.name
+      }
     }
   }
 
@@ -490,11 +506,11 @@ resource "azurerm_container_app" "container_app" {
   }
 }
 
-resource "azurerm_container_app_environment_storage" "tabulation_storage" {
-  name                         = "phdi${terraform.workspace}tables"
+resource "azurerm_container_app_environment_storage" "custom_schema_storage" {
+  name                         = "phdi${terraform.workspace}customschemas"
   container_app_environment_id = azurerm_container_app_environment.phdi.id
   account_name                 = azurerm_storage_account.phi.name
-  share_name                   = azurerm_storage_share.tables.name
+  share_name                   = azurerm_storage_share.custom_schemas.name
   access_key                   = azurerm_storage_account.phi.primary_access_key
   access_mode                  = "ReadWrite"
 }
