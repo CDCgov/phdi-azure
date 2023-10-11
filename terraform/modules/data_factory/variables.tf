@@ -33,19 +33,6 @@ variable "record_linkage_container_url" {
   description = "URL of the record linkage container"
 }
 
-
-# TODO: Uncomment when tabulation is implemented
-# variable "tabulation_container_url" {
-#   type        = string
-#   description = "URL of the tabulation container"
-# }
-
-# TODO: Uncomment when alerts are implemented
-# variable "alerts_container_url" {
-#   type        = string
-#   description = "URL of the alerts container"
-# }
-
 variable "phi_storage_account_endpoint_url" {
   type        = string
   description = "URL of the PHI storage account"

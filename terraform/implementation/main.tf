@@ -16,15 +16,13 @@ module "shared" {
 
 
 module "data_factory" {
-  source                   = "../modules/data_factory"
-  resource_group_name      = var.resource_group_name
-  location                 = var.location
-  fhir_converter_url       = module.shared.fhir_converter_url
-  ingestion_container_url  = module.shared.ingestion_container_url
-  validation_container_url = module.shared.validation_container_url
-  message_parser_url       = module.shared.message_parser_url
-  # tabulation_container_url                = module.shared.tabulation_container_url
-  # alerts_container_url                    = module.shared.alerts_container_url
+  source                                  = "../modules/data_factory"
+  resource_group_name                     = var.resource_group_name
+  location                                = var.location
+  fhir_converter_url                      = module.shared.fhir_converter_url
+  ingestion_container_url                 = module.shared.ingestion_container_url
+  validation_container_url                = module.shared.validation_container_url
+  message_parser_url                      = module.shared.message_parser_url
   phi_storage_account_endpoint_url        = module.shared.phi_storage_account_endpoint_url
   record_linkage_container_url            = module.shared.record_linkage_container_url
   pipeline_runner_id                      = module.shared.pipeline_runner_id

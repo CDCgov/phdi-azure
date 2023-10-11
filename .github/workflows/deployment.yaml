@@ -28,6 +28,7 @@ jobs:
       tf_env: ${{ steps.set-environment.outputs.tf_env }}
       short_cid: ${{ steps.set-environment.outputs.short_cid }}
       record_linkage_container_url: ${{ steps.terraform.outputs.record_linkage_container_url }}
+      message_parser_url: ${{ steps.terraform.outputs.message_parser_url }}
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
@@ -96,11 +97,9 @@ jobs:
           terraform init -backend-config=backend.tfvars
           terraform workspace select $TF_ENV || terraform workspace new $TF_ENV
           terraform apply -auto-approve -lock-timeout=30m \
-            -replace="module.shared.docker_tag.tag_for_azure[\"alerts\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"fhir-converter\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"ingestion\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"message-parser\"]" \
-            -replace="module.shared.docker_tag.tag_for_azure[\"tabulation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"validation\"]" \
             -replace="module.shared.docker_tag.tag_for_azure[\"record-linkage\"]"
 
@@ -116,6 +115,9 @@ jobs:
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: "Azure login"
         uses: azure/login@v1
@@ -184,7 +186,7 @@ jobs:
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
         run: |
-          for SERVICE in fhir-converter ingestion tabulation validation message-parser record-linkage; do
+          for SERVICE in fhir-converter ingestion validation message-parser record-linkage; do
             az containerapp update --name phdi-$TF_ENV-$SERVICE \
               --resource-group $RESOURCE_GROUP_NAME \
               --scale-rule-name concurrent-http-requests \
@@ -197,7 +199,7 @@ jobs:
         run: |
           az extension add --name containerapp
           DEFAULT_DOMAIN=$(az containerapp env show --name $TF_ENV --query properties.defaultDomain -o tsv)
-          for SERVICE in fhir-converter ingestion alerts tabulation validation message-parser record-linkage; do
+          for SERVICE in fhir-converter ingestion validation message-parser record-linkage; do
             if [[ $(az containerapp auth show --name phdi-$TF_ENV-$SERVICE) == "{}" ]]; then
               if [[ $(az ad app list | grep -c phdi-$TF_ENV-$SERVICE) -gt 0 ]]; then
                 APP_ID=$(az ad app list --display-name phdi-$TF_ENV-$SERVICE --query [].appId -o tsv)
@@ -305,6 +307,16 @@ jobs:
           cat ../../scripts/Synapse/config/UpdateMIITriggerConfig.json | envsubst > ../../scripts/Synapse/config/UpdateMIITriggerConfigSubstituted.json
           az synapse trigger create --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII Trigger" --file @../../scripts/Synapse/config/UpdateMIITriggerConfigSubstituted.json
           az synapse trigger start --workspace-name phdi${TF_ENV}synapse${SHORT_CID} --name "Update MII Trigger"
+      - name: Add custom schema to message parser
+        env:
+          MESSAGE_PARSER_URL: ${{ needs.terraform.outputs.message_parser_url }}
+        run: |
+          # Get token for message parser
+          TOKEN=$(az account get-access-token --resource api://phdi-${TF_ENV}-message-parser --query accessToken -o tsv)
+          # Wrap ecr_datastore_config.json into variable
+          ECR_DATASTORE_CONFIG=$(jq -n --argjson value "$(cat ../../scripts/Synapse/config/ecr_datastore_config.json)" '{"parsing_schema": $value}')
+          # PUT ecr_datastore_config.json to message parser
+          curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d "$ECR_DATASTORE_CONFIG" $MESSAGE_PARSER_URL/schemas/ecr.json
   end-to-end:
     name: End-to-end tests
     needs: 
