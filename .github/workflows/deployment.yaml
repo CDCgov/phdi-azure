@@ -330,10 +330,11 @@ jobs:
           client-id: ${{ secrets.CLIENT_ID }}
           tenant-id: ${{ secrets.TENANT_ID }}
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
-          
+
       - name: Add custom schema to message parser
         env:
           MESSAGE_PARSER_URL: ${{ needs.terraform.outputs.message_parser_url }}
+          TF_ENV: ${{ needs.terraform.outputs.tf_env }}
         run: |
           # Get token for message parser
           TOKEN=$(az account get-access-token --resource api://phdi-${TF_ENV}-message-parser --query accessToken -o tsv)
