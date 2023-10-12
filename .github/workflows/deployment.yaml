@@ -28,7 +28,6 @@ jobs:
       tf_env: ${{ steps.set-environment.outputs.tf_env }}
       short_cid: ${{ steps.set-environment.outputs.short_cid }}
       record_linkage_container_url: ${{ steps.terraform.outputs.record_linkage_container_url }}
-      message_parser_url: ${{ steps.terraform.outputs.message_parser_url }}
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
@@ -333,13 +332,14 @@ jobs:
 
       - name: Add custom schema to message parser
         env:
-          MESSAGE_PARSER_URL: ${{ needs.terraform.outputs.message_parser_url }}
           TF_ENV: ${{ needs.terraform.outputs.tf_env }}
         run: |
           # Get token for message parser
           TOKEN=$(az account get-access-token --resource api://phdi-${TF_ENV}-message-parser --query accessToken -o tsv)
           # Wrap ecr_datastore_config.json into variable
           ECR_DATASTORE_CONFIG=$(jq -n --argjson value "$(cat ../../scripts/Synapse/config/ecr_datastore_config.json)" '{"parsing_schema": $value}')
+          # Get message parser container app URL
+          MESSAGE_PARSER_URL=$(az containerapp show -g phdi -n phdi-${TF_ENV}-message-parser --query properties.configuration.ingress.fqdn -o tsv)
           # PUT ecr_datastore_config.json to message parser
           curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d "$ECR_DATASTORE_CONFIG" $MESSAGE_PARSER_URL/schemas/ecr.json
   end-to-end:
