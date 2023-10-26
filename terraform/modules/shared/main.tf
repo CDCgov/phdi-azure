@@ -324,7 +324,7 @@ resource "azurerm_container_app_environment" "phdi" {
 resource "random_password" "postgres_password" {
   length           = 32
   special          = true
-  override_special = "_%@"
+  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 resource "azurerm_postgresql_flexible_server" "mpi" {
