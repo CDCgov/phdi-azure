@@ -167,17 +167,6 @@ def main(message: func.QueueMessage) -> None:
 
     # Handle FHIR messages.
     elif message_type == "fhir":
-        # TODO Remove once the MPI is ready to continue seeding.
-        staging_queue_url = os.environ["STAGING_QUEUE_URL"]
-        credential = AzureCredentialManager(
-            resource_location=staging_queue_url
-        ).get_credential_object()
-
-        staging_queue_client = QueueClient.from_queue_url(
-            queue_url=staging_queue_url, credential=credential
-        )
-        staging_queue_client.send_message(content=message.get_body().decode("utf-8"))
-
         fhir_bundle, external_person_id = get_external_person_id(blob_contents)
         fhir_bundle = standardize_dob(
             standardize_phones(standardize_names(fhir_bundle))
