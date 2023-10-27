@@ -417,9 +417,20 @@ def post_data_to_building_block(url: str, body: dict) -> dict:
     status_code = response.status_code
     if status_code < 400:
         logging.info(f"{url.upper()} STATUS CODE: {response.status_code}")
+
+        failed_request_message = f"{url.upper()} STATUS CODE: {response.status_code}"
+        failed_request_reason = f"{url.upper()} REASON: {response.reason}"
+        failed_request_json = f"{url.upper()} REASON: {response.json()}"
+        logging.error(failed_request_message)
+        logging.error(failed_request_reason)
+        logging.error(failed_request_json)
     else:
         failed_request_message = f"{url.upper()} STATUS CODE: {response.status_code}"
+        failed_request_reason = f"{url.upper()} REASON: {response.reason}"
+        failed_request_json = f"{url.upper()} REASON: {response.json()}"
         logging.error(failed_request_message)
+        logging.error(failed_request_reason)
+        logging.error(failed_request_json)
         raise Exception(failed_request_message)
 
     return response.json()
