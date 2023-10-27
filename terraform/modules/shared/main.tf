@@ -279,7 +279,7 @@ locals {
     "record-linkage",
   ])
 
-  phdi_version = "v1.1.0"
+  phdi_version = "v1.1.1"
 }
 
 data "docker_registry_image" "ghcr_data" {
