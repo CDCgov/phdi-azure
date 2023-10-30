@@ -513,6 +513,37 @@ resource "azurerm_container_app_environment_storage" "custom_schema_storage" {
   access_mode                  = "ReadWrite"
 }
 
+##### FHIR Server #####
+
+resource "azurerm_healthcare_service" "fhir_server" {
+  name                = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
+  location            = "eastus"
+  resource_group_name = var.resource_group_name
+  kind                = "fhir-R4"
+  cosmosdb_throughput = (terraform.workspace == "uat" ? 2000 : 400)
+
+  lifecycle {
+    ignore_changes = [name, tags]
+  }
+
+  tags = {
+    environment = terraform.workspace
+    managed-by  = "terraform"
+  }
+}
+
+resource "azurerm_role_assignment" "gh_sp_fhir_contributor" {
+  scope                = azurerm_healthcare_service.fhir_server.id
+  role_definition_name = "FHIR Data Contributor"
+  principal_id         = var.object_id
+}
+
+resource "azurerm_role_assignment" "pipeline_runner_fhir_contributor" {
+  scope                = azurerm_healthcare_service.fhir_server.id
+  role_definition_name = "FHIR Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
+}
+
 ##### User Assigned Identity #####
 
 resource "azurerm_user_assigned_identity" "pipeline_runner" {

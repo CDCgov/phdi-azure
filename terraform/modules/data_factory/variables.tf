@@ -33,6 +33,11 @@ variable "record_linkage_container_url" {
   description = "URL of the record linkage container"
 }
 
+variable "fhir_server_url" {
+  type        = string
+  description = "URL of the FHIR server"
+}
+
 variable "phi_storage_account_endpoint_url" {
   type        = string
   description = "URL of the PHI storage account"
