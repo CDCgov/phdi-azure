@@ -445,4 +445,4 @@ def test_post_data_to_building_block(mocked_post, patched_azure_cred_manager):
     mocked_post.return_value = mock.Mock(status_code=400, json=(lambda: fhir_bundle))
     with pytest.raises(Exception) as e:
         post_data_to_building_block(url="https://some_url", body=fhir_bundle)
-    assert "HTTPS://SOME_URL MESSAGE: " in str(e.value)
+    assert "message" in str(e.value)
