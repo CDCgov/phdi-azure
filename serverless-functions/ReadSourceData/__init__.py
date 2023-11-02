@@ -19,7 +19,6 @@ from phdi.fhir.harmonization.standardization import (
 )
 from lxml import etree
 from typing import Tuple, Union
-from azure.storage.queue import QueueClient
 
 MESSAGE_TO_TEMPLATE_MAP = {
     "fhir": "",
