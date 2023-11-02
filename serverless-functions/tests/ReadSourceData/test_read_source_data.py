@@ -442,7 +442,10 @@ def test_post_data_to_building_block(mocked_post, patched_azure_cred_manager):
     )
 
     # Test for failure
-    mocked_post.return_value = mock.Mock(status_code=400, json=(lambda: fhir_bundle))
+    mocked_post.return_value = mock.Mock(
+        message="Bad request", json=(lambda: fhir_bundle)
+    )
     with pytest.raises(Exception) as e:
         post_data_to_building_block(url="https://some_url", body=fhir_bundle)
-    assert "HTTPS://SOME_URL STATUS CODE: 400" in str(e.value)
+        print(str(e.value))
+    assert "HTTPS://SOME_URL MESSAGE: Bad request" in str(e.value)
