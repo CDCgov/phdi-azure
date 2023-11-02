@@ -279,7 +279,7 @@ locals {
     "record-linkage",
   ])
 
-  phdi_version = "v1.0.14"
+  phdi_version = "v1.1.1"
 }
 
 data "docker_registry_image" "ghcr_data" {
@@ -323,8 +323,8 @@ resource "azurerm_container_app_environment" "phdi" {
 ##### Postgres #####
 resource "random_password" "postgres_password" {
   length           = 32
-  special          = true
-  override_special = "_%@"
+  special          = false
+  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 resource "azurerm_postgresql_flexible_server" "mpi" {
