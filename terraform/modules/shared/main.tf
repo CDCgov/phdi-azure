@@ -515,12 +515,43 @@ resource "azurerm_container_app_environment_storage" "custom_schema_storage" {
 
 ##### FHIR Server #####
 
-resource "azurerm_healthcare_service" "fhir_server" {
-  name                = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
-  location            = "eastus"
+locals {
+  fhir_server_name = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
+}
+
+resource "azurerm_healthcare_workspace" "fhir_server" {
+  name                = local.fhir_server_name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+resource "azurerm_healthcare_fhir_service" "fhir_server" {
+  name                = local.fhir_server_name
+  location            = var.location
   resource_group_name = var.resource_group_name
+  workspace_id        = azurerm_healthcare_workspace.fhir_server.id
   kind                = "fhir-R4"
-  cosmosdb_throughput = (terraform.workspace == "uat" ? 2000 : 400)
+
+  authentication {
+    authority = "https://login.microsoftonline.com/tenantId"
+    audience  = "https://${local.fhir_server_name}.fhir.azurehealthcareapis.com"
+  }
+
+  access_policy_object_ids = [
+    data.azurerm_client_config.current.object_id
+  ]
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  cors {
+    allowed_origins     = ["*.${azurerm_container_app_environment.phdi.default_domain}"]
+    allowed_headers     = ["*"]
+    allowed_methods     = ["GET", "DELETE", "PUT"]
+    max_age_in_seconds  = 3600
+    credentials_allowed = true
+  }
 
   lifecycle {
     ignore_changes = [name, tags]
@@ -533,13 +564,13 @@ resource "azurerm_healthcare_service" "fhir_server" {
 }
 
 resource "azurerm_role_assignment" "gh_sp_fhir_contributor" {
-  scope                = azurerm_healthcare_service.fhir_server.id
+  scope                = azurerm_healthcare_fhir_service.fhir_server.id
   role_definition_name = "FHIR Data Contributor"
   principal_id         = var.object_id
 }
 
 resource "azurerm_role_assignment" "pipeline_runner_fhir_contributor" {
-  scope                = azurerm_healthcare_service.fhir_server.id
+  scope                = azurerm_healthcare_fhir_service.fhir_server.id
   role_definition_name = "FHIR Data Contributor"
   principal_id         = azurerm_user_assigned_identity.pipeline_runner.principal_id
 }
