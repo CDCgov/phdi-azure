@@ -521,13 +521,13 @@ locals {
 
 resource "azurerm_healthcare_workspace" "fhir_server" {
   name                = local.fhir_server_name
-  location            = var.location
+  location            = "westus2"
   resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_healthcare_fhir_service" "fhir_server" {
   name                = local.fhir_server_name
-  location            = var.location
+  location            = "westus2"
   resource_group_name = var.resource_group_name
   workspace_id        = azurerm_healthcare_workspace.fhir_server.id
   kind                = "fhir-R4"
