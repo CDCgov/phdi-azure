@@ -515,18 +515,14 @@ resource "azurerm_container_app_environment_storage" "custom_schema_storage" {
 
 ##### FHIR Server #####
 
-locals {
-  fhir_server_name = "${terraform.workspace}fhir${substr(var.client_id, 0, 8)}"
-}
-
 resource "azurerm_healthcare_workspace" "fhir_server" {
-  name                = local.fhir_server_name
+  name                = "${terraform.workspace}${substr(var.client_id, 0, 8)}"
   location            = "westus2"
   resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_healthcare_fhir_service" "fhir_server" {
-  name                = local.fhir_server_name
+  name                = "fhir-server"
   location            = "westus2"
   resource_group_name = var.resource_group_name
   workspace_id        = azurerm_healthcare_workspace.fhir_server.id
@@ -534,7 +530,7 @@ resource "azurerm_healthcare_fhir_service" "fhir_server" {
 
   authentication {
     authority = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}"
-    audience  = "https://${local.fhir_server_name}.fhir.azurehealthcareapis.com"
+    audience  = "https://fhir-server.fhir.azurehealthcareapis.com"
   }
 
   access_policy_object_ids = [
