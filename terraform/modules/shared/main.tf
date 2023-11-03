@@ -546,7 +546,7 @@ resource "azurerm_healthcare_fhir_service" "fhir_server" {
   }
 
   cors {
-    allowed_origins     = ["*.${azurerm_container_app_environment.phdi.default_domain}"]
+    allowed_origins     = [azurerm_container_app_environment.phdi.default_domain]
     allowed_headers     = ["*"]
     allowed_methods     = ["GET", "DELETE", "PUT"]
     max_age_in_seconds  = 3600
