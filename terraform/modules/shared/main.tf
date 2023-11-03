@@ -533,7 +533,7 @@ resource "azurerm_healthcare_fhir_service" "fhir_server" {
   kind                = "fhir-R4"
 
   authentication {
-    authority = "https://login.microsoftonline.com/tenantId"
+    authority = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}"
     audience  = "https://${local.fhir_server_name}.fhir.azurehealthcareapis.com"
   }
 
