@@ -541,14 +541,6 @@
                             "name": "upload_fhir_bundle",
                             "description": "Compute a hashed identifier that can be used for record linkage.",
                             "type": "WebActivity",
-                            "dependsOn": [
-                                {
-                                    "activity": "record_linkage",
-                                    "dependencyConditions": [
-                                        "Succeeded"
-                                    ]
-                                }
-                            ],
                             "policy": {
                                 "timeout": "0.12:00:00",
                                 "retry": 3,
