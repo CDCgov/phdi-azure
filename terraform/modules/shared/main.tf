@@ -546,7 +546,7 @@ resource "azurerm_healthcare_fhir_service" "fhir_server" {
   }
 
   cors {
-    allowed_origins     = ["https://${azurerm_container_app.container_app["ingestion"].fqdn}"]
+    allowed_origins     = ["https://${azurerm_container_app.container_app["ingestion"].latest_revision_fqdn}"]
     allowed_headers     = ["*"]
     allowed_methods     = ["GET", "DELETE", "PUT"]
     max_age_in_seconds  = 3600
