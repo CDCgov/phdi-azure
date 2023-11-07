@@ -52,7 +52,7 @@ jobs:
         run: |
           TIMESTAMP=$(date "+%Y-%m-%dT%H:%M:%S")
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
-          az storage blob upload --account-name phdi${TF_ENV}phi${SHORT_CID} --container-name source-data --name vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7 --file sample-data/VXU-V04-01_success_single.hl7
+          az storage blob upload --account-name phdi${TF_ENV}phi${SHORT_CID} --container-name source-data --name elr/ELR_e2e_sample_1_$TIMESTAMP.hl7 --file sample-data/ELR_e2e_sample_1.hl7
       - name: Check pipeline run
         env:
           TF_ENV: ${{ steps.set-environment.outputs.tf_env }}
@@ -62,7 +62,7 @@ jobs:
           az extension add --name datafactory --upgrade
           START_DATE=$(date --date="1 day ago" "+%Y-%m-%dT%H:%M:%S")
           END_DATE=$(date --date="1 day" "+%Y-%m-%dT%H:%M:%S")
-          SOURCE_FILE="source-data/vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7"
+          SOURCE_FILE="source-data/elr/ELR_e2e_sample_1_$TIMESTAMP.hl7"
           CHECK_COUNT=0
 
           check_pipeline_run_count() {
@@ -100,5 +100,5 @@ jobs:
           echo $RESPONSE | jq -e '.entry[0].resource.name[0].family == "EVERYMAN" and .entry[0].resource.name[0].given[0] == "ADAM"'
           PATIENT_ID=$(echo $RESPONSE | jq -r '.entry[0].resource.id')
           echo "FHIR server query succeeded! Deleting sample data..."
-          az storage blob delete --account-name phdi${TF_ENV}phi${SHORT_CID} --container-name source-data --name vxu/VXU-V04-01_success_single_$TIMESTAMP.hl7
+          az storage blob delete --account-name phdi${TF_ENV}phi${SHORT_CID} --container-name source-data --name elr/ELR_e2e_sample_1_$TIMESTAMP.hl7
           curl -X DELETE --header "Authorization: Bearer $TOKEN" "https://${TF_ENV}${SHORT_CID}-fhir-server.fhir.azurehealthcareapis.com/Patient?identifier=${PATIENT_ID}&hardDelete=true"
