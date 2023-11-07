@@ -7,7 +7,7 @@ output "phi_storage_account_key" {
 }
 
 output "fhir_server_url" {
-  value = azurerm_healthcare_fhir_service.fhir_server.authentication.audience
+  value = azurerm_healthcare_fhir_service.fhir_server.authentication[0].audience
 }
 
 output "pipeline_runner_id" {
