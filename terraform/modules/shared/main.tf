@@ -530,7 +530,7 @@ resource "azurerm_healthcare_fhir_service" "fhir_server" {
 
   authentication {
     authority = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}"
-    audience  = "https://fhir-server.fhir.azurehealthcareapis.com"
+    audience  = "https://${terraform.workspace}${substr(var.client_id, 0, 8)}-fhir-server.fhir.azurehealthcareapis.com"
   }
 
   access_policy_object_ids = [
@@ -544,7 +544,7 @@ resource "azurerm_healthcare_fhir_service" "fhir_server" {
   cors {
     allowed_origins     = ["https://${azurerm_container_app.container_app["ingestion"].latest_revision_fqdn}"]
     allowed_headers     = ["*"]
-    allowed_methods     = ["GET", "DELETE", "PUT"]
+    allowed_methods     = ["GET", "DELETE", "PUT", "POST"]
     max_age_in_seconds  = 3600
     credentials_allowed = true
   }
