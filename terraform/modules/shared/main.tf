@@ -533,14 +533,6 @@ resource "azurerm_healthcare_fhir_service" "fhir_server" {
     audience  = "https://${terraform.workspace}${substr(var.client_id, 0, 8)}-fhir-server.fhir.azurehealthcareapis.com"
   }
 
-  access_policy_object_ids = [
-    data.azurerm_client_config.current.object_id
-  ]
-
-  identity {
-    type = "SystemAssigned"
-  }
-
   cors {
     allowed_origins     = ["https://${azurerm_container_app.container_app["ingestion"].latest_revision_fqdn}"]
     allowed_headers     = ["*"]
