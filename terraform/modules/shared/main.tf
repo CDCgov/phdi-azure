@@ -620,13 +620,6 @@ resource "azurerm_synapse_workspace" "phdi" {
   }
 }
 
-resource "azurerm_synapse_firewall_rule" "allow_azure_services" {
-  name                 = "AllowAllWindowsAzureIps"
-  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
-  start_ip_address     = "0.0.0.0"
-  end_ip_address       = "0.0.0.0"
-}
-
 resource "azurerm_synapse_spark_pool" "phdi" {
   name                                = "sparkpool"
   synapse_workspace_id                = azurerm_synapse_workspace.phdi.id
@@ -664,6 +657,13 @@ spark.serializer org.apache.spark.serializer.KryoSerializer
 EOF
     filename = "sparkpoolconfig.txt"
   }
+}
+
+resource "azurerm_synapse_firewall_rule" "synapse_firewall_rule" {
+  name                 = "AllowAll"
+  synapse_workspace_id = azurerm_synapse_workspace.phdi.id
+  start_ip_address     = "0.0.0.0"
+  end_ip_address       = "255.255.255.255"
 }
 
 resource "azurerm_role_assignment" "synapse_blob_contributor" {
