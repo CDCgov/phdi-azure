@@ -96,8 +96,8 @@ jobs:
           TIMESTAMP: ${{ steps.upload-sample-data.outputs.timestamp }}
         run: |
           TOKEN=$(az account get-access-token --resource=https://${TF_ENV}${SHORT_CID}-fhir-server.fhir.azurehealthcareapis.com --query accessToken --output tsv)
-          RESPONSE=$(curl -X GET --header "Authorization: Bearer $TOKEN" "https://${TF_ENV}${SHORT_CID}-fhir-server.fhir.azurehealthcareapis.com/Patient?family=EVERYMAN&given=ADAM")
-          echo $RESPONSE | jq -e '.entry[0].resource.name[0].family == "EVERYMAN" and .entry[0].resource.name[0].given[0] == "ADAM"'
+          RESPONSE=$(curl -X GET --header "Authorization: Bearer $TOKEN" "https://${TF_ENV}${SHORT_CID}-fhir-server.fhir.azurehealthcareapis.com/Patient?family=SHEPARD&given=JOHN")
+          echo $RESPONSE | jq -e '.entry[0].resource.name[0].family == "SHEPARD" and .entry[0].resource.name[0].given[0] == "JOHN"'
           PATIENT_ID=$(echo $RESPONSE | jq -r '.entry[0].resource.id')
           echo "FHIR server query succeeded! Deleting sample data..."
           az storage blob delete --account-name phdi${TF_ENV}phi${SHORT_CID} --container-name source-data --name elr/ELR_e2e_sample_1_$TIMESTAMP.hl7
