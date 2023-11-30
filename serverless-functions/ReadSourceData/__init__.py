@@ -11,6 +11,7 @@ from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
 import requests
+import uuid
 
 from phdi.fhir.harmonization.standardization import (
     standardize_names,
@@ -25,6 +26,7 @@ MESSAGE_TO_TEMPLATE_MAP = {
     "ecr": "EICR",
     "elr": "ORU_R01",
     "vxu": "VXU_V04",
+    "ecr-rerun": "",
 }
 
 
@@ -184,6 +186,41 @@ def main(message: func.QueueMessage) -> None:
         }
         post_data_to_building_block(record_linkage_url, record_linkage_body)
         return
+
+    # Handle re-run eCR messages
+    elif message_type == "ecr-rerun":
+        fhir_bundle, external_person_id = get_external_person_id(blob_contents)
+
+        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
+        record_linkage_body = {
+            "bundle": fhir_bundle,
+            "external_person_id": external_person_id,
+        }
+        record_linkage_response = post_data_to_building_block(
+            record_linkage_url, record_linkage_body
+        )
+
+        record_linkage_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
+        message_parser_body = {
+            "message_format": "fhir",
+            "message": record_linkage_response.get("bundle"),
+        }
+        message_parser_response = post_data_to_building_block(
+            record_linkage_url, message_parser_body
+        )
+
+        # Write blob data  to storage
+        container_name = "delta-tables"
+        filename = f"raw_data/{str(uuid.uuid4())}.json"
+        parsed_message = message_parser_response.get("bundle")
+
+        cred_manager = AzureCredentialManager(resource_location=storage_account_url)
+        cloud_container_connection = AzureCloudContainerConnection(
+            storage_account_url=storage_account_url, cred_manager=cred_manager
+        )
+        cloud_container_connection.upload_object(
+            message=parsed_message, container_name=container_name, filename=filename
+        )
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
