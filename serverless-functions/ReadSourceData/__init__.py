@@ -189,13 +189,8 @@ def main(message: func.QueueMessage) -> None:
 
     # Handle re-run eCR messages
     elif message_type == "ecr-rerun":
-        logging.info("Obtaining blob contents")
         fhir_bundle, external_person_id = get_external_person_id(blob_contents)
-        # logging.info("original fhir_bundle:")
-        # logging.info(fhir_bundle)
-        # logging.info("original external_person_id:", external_person_id)
 
-        logging.info("starting RL")
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
         record_linkage_body = {
             "bundle": fhir_bundle,
@@ -204,9 +199,7 @@ def main(message: func.QueueMessage) -> None:
         record_linkage_response = post_data_to_building_block(
             record_linkage_url, record_linkage_body
         )
-        # logging.info("after RL fhir_bundle:", record_linkage_response.get("bundle"))
 
-        logging.info("starting message parsing")
         message_parsing_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
         message_parser_body = {
             "message_format": "fhir",
@@ -217,11 +210,9 @@ def main(message: func.QueueMessage) -> None:
             message_parsing_url, message_parser_body
         )
 
-        logging.info("starting write to file")
         # Write blob data to storage
         container_name = "delta-tables"
-        # filename = f"raw_data/{str(uuid.uuid4())}.json"
-        filename = "mg_test.json"
+        filename = f"raw_data/{str(uuid.uuid4())}.json"
         parsed_message = message_parser_response.get("parsed_values")
         logging.info(parsed_message)
 
@@ -232,7 +223,6 @@ def main(message: func.QueueMessage) -> None:
         cloud_container_connection.upload_object(
             message=parsed_message, container_name=container_name, filename=filename
         )
-        logging.info("wrote file to delta-tables")
         return
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
@@ -472,11 +462,9 @@ def post_data_to_building_block(url: str, body: dict) -> dict:
         )
         failed_request_reason = f"{url.upper()} REASON: {response.reason}"
         failed_response_text = f"{url.upper()} TEXT: {response.text}"
-        # failed_request_message = f"{url.upper()} MESSAGE: {response.json()['message']}"
         logging.error(failed_request_status_code)
         logging.error(failed_request_reason)
         logging.error(failed_response_text)
-        # logging.error(failed_request_message)
         raise Exception(failed_response_text)
 
     return response.json()
