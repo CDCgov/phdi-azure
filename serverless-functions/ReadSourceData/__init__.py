@@ -190,6 +190,8 @@ def main(message: func.QueueMessage) -> None:
     # Handle re-run eCR messages
     elif message_type == "ecr-rerun":
         fhir_bundle, external_person_id = get_external_person_id(blob_contents)
+        logging.info("original fhir_bundle:", fhir_bundle)
+        logging.info("original external_person_id:", external_person_id)
 
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
         record_linkage_body = {
@@ -199,6 +201,7 @@ def main(message: func.QueueMessage) -> None:
         record_linkage_response = post_data_to_building_block(
             record_linkage_url, record_linkage_body
         )
+        logging.info("after RL fhir_bundle:", record_linkage_response.get("bundle"))
 
         record_linkage_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
         message_parser_body = {
@@ -458,9 +461,11 @@ def post_data_to_building_block(url: str, body: dict) -> dict:
             f"{url.upper()} STATUS CODE: {response.status_code}"
         )
         failed_request_reason = f"{url.upper()} REASON: {response.reason}"
+        failed_response_text = f"{url.upper()} TEXT: {response.text}"
         failed_request_message = f"{url.upper()} MESSAGE: {response.json()['message']}"
         logging.error(failed_request_status_code)
         logging.error(failed_request_reason)
+        logging.error(failed_response_text)
         logging.error(failed_request_message)
         raise Exception(failed_request_message)
 
