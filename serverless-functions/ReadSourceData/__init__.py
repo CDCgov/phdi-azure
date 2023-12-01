@@ -191,8 +191,9 @@ def main(message: func.QueueMessage) -> None:
     elif message_type == "ecr-rerun":
         logging.info("Obtaining blob contents")
         fhir_bundle, external_person_id = get_external_person_id(blob_contents)
-        logging.info("original fhir_bundle:", fhir_bundle)
-        logging.info("original external_person_id:", external_person_id)
+        # logging.info("original fhir_bundle:")
+        # logging.info(fhir_bundle)
+        # logging.info("original external_person_id:", external_person_id)
 
         logging.info("starting RL")
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
