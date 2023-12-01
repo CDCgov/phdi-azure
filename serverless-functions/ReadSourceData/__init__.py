@@ -207,13 +207,13 @@ def main(message: func.QueueMessage) -> None:
         # logging.info("after RL fhir_bundle:", record_linkage_response.get("bundle"))
 
         logging.info("starting message parsing")
-        record_linkage_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
+        message_parsing_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
         message_parser_body = {
             "message_format": "fhir",
             "message": record_linkage_response.get("updated_bundle"),
         }
         message_parser_response = post_data_to_building_block(
-            record_linkage_url, message_parser_body
+            message_parsing_url, message_parser_body
         )
 
         logging.info("starting write to file")
