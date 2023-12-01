@@ -214,7 +214,8 @@ def main(message: func.QueueMessage) -> None:
 
         # Write blob data  to storage
         container_name = "delta-tables"
-        filename = f"raw_data/{str(uuid.uuid4())}.json"
+        # filename = f"raw_data/{str(uuid.uuid4())}.json"
+        filename = f"raw_data/mg_test.json"
         parsed_message = message_parser_response.get("bundle")
 
         cred_manager = AzureCredentialManager(resource_location=storage_account_url)
