@@ -218,8 +218,9 @@ def main(message: func.QueueMessage) -> None:
         )
 
         logging.info("starting write to file")
-        # Write blob data  to storage
+        # Write blob data to storage
         container_name = "delta-tables"
+        storage_account_url = storage_account_url.replace("source-data", "delta-tables")
         # filename = f"raw_data/{str(uuid.uuid4())}.json"
         filename = "mg_test.json"
         parsed_message = message_parser_response.get("bundle")
