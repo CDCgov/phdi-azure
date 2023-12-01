@@ -189,10 +189,12 @@ def main(message: func.QueueMessage) -> None:
 
     # Handle re-run eCR messages
     elif message_type == "ecr-rerun":
+        logging.info("Obtaining blob contents")
         fhir_bundle, external_person_id = get_external_person_id(blob_contents)
         logging.info("original fhir_bundle:", fhir_bundle)
         logging.info("original external_person_id:", external_person_id)
 
+        logging.info("starting RL")
         record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
         record_linkage_body = {
             "bundle": fhir_bundle,
@@ -203,6 +205,7 @@ def main(message: func.QueueMessage) -> None:
         )
         logging.info("after RL fhir_bundle:", record_linkage_response.get("bundle"))
 
+        logging.info("starting message parsing")
         record_linkage_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
         message_parser_body = {
             "message_format": "fhir",
@@ -212,10 +215,11 @@ def main(message: func.QueueMessage) -> None:
             record_linkage_url, message_parser_body
         )
 
+        logging.info("starting write to file")
         # Write blob data  to storage
         container_name = "delta-tables"
         # filename = f"raw_data/{str(uuid.uuid4())}.json"
-        filename = f"raw_data/mg_test.json"
+        filename = "raw_data/mg_test.json"
         parsed_message = message_parser_response.get("bundle")
 
         cred_manager = AzureCredentialManager(resource_location=storage_account_url)
