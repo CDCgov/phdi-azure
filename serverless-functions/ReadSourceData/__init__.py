@@ -204,7 +204,7 @@ def main(message: func.QueueMessage) -> None:
         record_linkage_response = post_data_to_building_block(
             record_linkage_url, record_linkage_body
         )
-        logging.info("after RL fhir_bundle:", record_linkage_response.get("bundle"))
+        # logging.info("after RL fhir_bundle:", record_linkage_response.get("bundle"))
 
         logging.info("starting message parsing")
         record_linkage_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
