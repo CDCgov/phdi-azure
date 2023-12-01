@@ -211,6 +211,7 @@ def main(message: func.QueueMessage) -> None:
         message_parser_body = {
             "message_format": "fhir",
             "message": record_linkage_response.get("updated_bundle"),
+            "parsing_schema_name": "ecr.json",
         }
         message_parser_response = post_data_to_building_block(
             message_parsing_url, message_parser_body
