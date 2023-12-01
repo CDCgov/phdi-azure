@@ -210,7 +210,7 @@ def main(message: func.QueueMessage) -> None:
         record_linkage_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
         message_parser_body = {
             "message_format": "fhir",
-            "message": record_linkage_response.get("bundle"),
+            "message": record_linkage_response.get("updated_bundle"),
         }
         message_parser_response = post_data_to_building_block(
             record_linkage_url, message_parser_body
@@ -468,11 +468,11 @@ def post_data_to_building_block(url: str, body: dict) -> dict:
         )
         failed_request_reason = f"{url.upper()} REASON: {response.reason}"
         failed_response_text = f"{url.upper()} TEXT: {response.text}"
-        failed_request_message = f"{url.upper()} MESSAGE: {response.json()['message']}"
+        # failed_request_message = f"{url.upper()} MESSAGE: {response.json()['message']}"
         logging.error(failed_request_status_code)
         logging.error(failed_request_reason)
         logging.error(failed_response_text)
-        logging.error(failed_request_message)
-        raise Exception(failed_request_message)
+        # logging.error(failed_request_message)
+        raise Exception(failed_response_text)
 
     return response.json()
