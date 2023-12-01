@@ -231,6 +231,7 @@ def main(message: func.QueueMessage) -> None:
         cloud_container_connection.upload_object(
             message=parsed_message, container_name=container_name, filename=filename
         )
+        return
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
     resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
