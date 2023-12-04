@@ -53,6 +53,7 @@ module "read_source_data" {
   sleep_time                            = 1
   ingestion_container_url               = module.shared.ingestion_container_url
   record_linkage_container_url          = module.shared.record_linkage_container_url
+  message_parser_url                    = module.shared.message_parser_url
   phi_storage_account_connection_string = module.shared.phi_storage_account_connection_string
   staging_queue_url                     = module.shared.staging_queue_url
 }

@@ -67,3 +67,8 @@ variable "staging_queue_url" {
   type        = string
   description = "The URL of the staging queue."
 }
+
+variable "message_parser_url" {
+  type        = string
+  description = "URL of the message parser container"
+}

@@ -60,6 +60,7 @@ resource "azurerm_linux_function_app" "read_source_data" {
     SLEEP_TIME                         = var.sleep_time
     INGESTION_URL                      = var.ingestion_container_url
     RECORD_LINKAGE_URL                 = var.record_linkage_container_url
+    MESSAGE_PARSER_URL                 = var.message_parser_url
     AzureStorageQueuesConnectionString = var.phi_storage_account_connection_string
     STAGING_QUEUE_URL                  = var.staging_queue_url
   }

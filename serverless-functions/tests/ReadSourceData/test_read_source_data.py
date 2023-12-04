@@ -85,6 +85,8 @@ def test_pipeline_trigger_success(
         "RESOURCE_GROUP_NAME": "some-resource-group",
         "FACTORY_NAME": "some-adf",
         "PIPELINE_NAME": "some-pipeline",
+        "RECORD_LINKAGE_URL": "some_record_linkage_url",
+        "MESSAGE_PARSER_URL": "some_message_parser_url",
     }
 
     good_response = mock.Mock()
@@ -103,7 +105,10 @@ def test_pipeline_trigger_success(
     patched_adf_management_client.return_value = adf_client
 
     for source_data_subdirectory in MESSAGE_TO_TEMPLATE_MAP.keys():
-        if source_data_subdirectory != "fhir":
+        if (
+            source_data_subdirectory != "fhir"
+            and source_data_subdirectory != "ecr-rerun"
+        ):
             message_type = source_data_subdirectory
             root_template = MESSAGE_TO_TEMPLATE_MAP[source_data_subdirectory]
 
@@ -442,7 +447,9 @@ def test_post_data_to_building_block(mocked_post, patched_azure_cred_manager):
     )
 
     # Test for failure
-    mocked_post.return_value = mock.Mock(status_code=400, json=(lambda: fhir_bundle))
+    mocked_post.return_value = mock.Mock(
+        status_code=400, json=(lambda: fhir_bundle), text="Oops! Error"
+    )
     with pytest.raises(Exception) as e:
         post_data_to_building_block(url="https://some_url", body=fhir_bundle)
-    assert "message" in str(e.value)
+    assert "Oops!" in str(e.value)

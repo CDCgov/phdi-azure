@@ -11,6 +11,7 @@ from phdi.harmonization.hl7 import (
     convert_hl7_batch_messages_to_list,
 )
 import requests
+import uuid
 
 from phdi.fhir.harmonization.standardization import (
     standardize_names,
@@ -25,6 +26,7 @@ MESSAGE_TO_TEMPLATE_MAP = {
     "ecr": "EICR",
     "elr": "ORU_R01",
     "vxu": "VXU_V04",
+    "ecr-rerun": "",
 }
 
 
@@ -183,6 +185,44 @@ def main(message: func.QueueMessage) -> None:
             "external_person_id": external_person_id,
         }
         post_data_to_building_block(record_linkage_url, record_linkage_body)
+        return
+
+    # Handle re-run eCR messages
+    elif message_type == "ecr-rerun":
+        fhir_bundle, external_person_id = get_external_person_id(blob_contents)
+
+        record_linkage_url = os.environ["RECORD_LINKAGE_URL"] + "/link-record"
+        record_linkage_body = {
+            "bundle": fhir_bundle,
+            "external_person_id": external_person_id,
+        }
+        record_linkage_response = post_data_to_building_block(
+            record_linkage_url, record_linkage_body
+        )
+
+        message_parsing_url = os.environ["MESSAGE_PARSER_URL"] + "/parse_message"
+        message_parser_body = {
+            "message_format": "fhir",
+            "message": record_linkage_response.get("updated_bundle"),
+            "parsing_schema_name": "ecr.json",
+        }
+        message_parser_response = post_data_to_building_block(
+            message_parsing_url, message_parser_body
+        )
+
+        # Write blob data to storage
+        container_name = "delta-tables"
+        filename = f"raw_data/{str(uuid.uuid4())}.json"
+        parsed_message = message_parser_response.get("parsed_values")
+        logging.info(parsed_message)
+
+        cred_manager = AzureCredentialManager(resource_location=storage_account_url)
+        cloud_container_connection = AzureCloudContainerConnection(
+            storage_account_url=storage_account_url, cred_manager=cred_manager
+        )
+        cloud_container_connection.upload_object(
+            message=parsed_message, container_name=container_name, filename=filename
+        )
         return
 
     subscription_id = os.environ["AZURE_SUBSCRIPTION_ID"]
@@ -421,10 +461,10 @@ def post_data_to_building_block(url: str, body: dict) -> dict:
             f"{url.upper()} STATUS CODE: {response.status_code}"
         )
         failed_request_reason = f"{url.upper()} REASON: {response.reason}"
-        failed_request_message = f"{url.upper()} MESSAGE: {response.json()['message']}"
+        failed_response_text = f"{url.upper()} TEXT: {response.text}"
         logging.error(failed_request_status_code)
         logging.error(failed_request_reason)
-        logging.error(failed_request_message)
-        raise Exception(failed_request_message)
+        logging.error(failed_response_text)
+        raise Exception(failed_response_text)
 
     return response.json()
