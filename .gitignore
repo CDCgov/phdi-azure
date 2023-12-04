@@ -33,6 +33,7 @@ hs_err_pid*
 .venv
 .dev_venv
 .python-version
+.ipynb_checkpoints
 
 # Azure Functions
 *local.settings.json
