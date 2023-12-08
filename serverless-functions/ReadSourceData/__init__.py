@@ -212,8 +212,8 @@ def main(message: func.QueueMessage) -> None:
 
         # Write blob data to storage
         container_name = "delta-tables"
-        blob_storage_account_url = storage_account_url.replace("dfs", "blob")
         logging.info(storage_account_url)
+        blob_storage_account_url = storage_account_url.replace("dfs", "blob")
         logging.info(blob_storage_account_url)
         filename = f"raw_data/{str(uuid.uuid4())}.json"
         parsed_message = message_parser_response.get("parsed_values")
