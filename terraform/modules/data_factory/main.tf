@@ -98,13 +98,13 @@ resource "azurerm_data_factory_pipeline" "phdi_ingestion" {
 
 ##### Pipeline metrics dashboard #####
 
-resource "azurerm_portal_dashboard" "pipeline_metrics" {
-  name                = "pipeline-metrics-${terraform.workspace}"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  tags = {
-    source = "terraform"
-  }
+# resource "azurerm_portal_dashboard" "pipeline_metrics" {
+#   name                = "pipeline-metrics-${terraform.workspace}"
+#   resource_group_name = var.resource_group_name
+#   location            = var.location
+#   tags = {
+#     source = "terraform"
+#   }
 
-  dashboard_properties = jsonencode(local.pipeline-metrics-dashboard-config.properties)
-}
+#   dashboard_properties = jsonencode(local.pipeline-metrics-dashboard-config.properties)
+# }

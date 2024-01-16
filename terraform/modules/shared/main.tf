@@ -394,8 +394,8 @@ resource "azurerm_container_app" "container_app" {
     container {
       name   = "phdi-${terraform.workspace}-${each.key}"
       image  = docker_registry_image.acr_image[each.key].name
-      cpu    = 1.0
-      memory = "2Gi"
+      cpu    = each.key == "fhir-converter" ? "1" : "0.25"
+      memory = each.key == "fhir-converter" ? "2" : "0.5"
 
       env {
         name  = "SMARTY_AUTH_ID"
