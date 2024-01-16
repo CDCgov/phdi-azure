@@ -389,7 +389,7 @@ resource "azurerm_container_app" "container_app" {
   }
 
   template {
-    max_replicas = 200
+    max_replicas = 10
     min_replicas = 0
     container {
       name   = "phdi-${terraform.workspace}-${each.key}"
@@ -482,6 +482,11 @@ resource "azurerm_container_app" "container_app" {
         storage_type = "AzureFile"
         storage_name = azurerm_container_app_environment_storage.custom_schema_storage.name
       }
+    }
+
+    http_scale_rule {
+      name                = "http-scale-rule"
+      concurrent_requests = each.key == "fhir-converter" ? 10 : 100
     }
   }
 
